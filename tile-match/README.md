@@ -32,14 +32,6 @@ python3 -m http.server 8000   # → http://localhost:8000/tile-match/
 
 仓库改为 public 后:**Settings → Pages → Deploy from a branch → main / (root)**。游戏地址:`https://<用户名>.github.io/gamified-learning/tile-match/`(根路径的跳转页会自动进入)。
 
-## 路线图(下一波)
+## 路线图
 
-- [ ] 每日限时挑战(第 1 关后解锁,日期种子,只用已收集词条,本地最佳成绩,排名接口预留)
-- [ ] 无尽模式(第 1 关后解锁,只用已收集词条)
-- [ ] 动词铺到 A2+B1 共 60 词(CEFR 分层),插画补齐
-- [ ] 释义多语言扩展、界面语言完善
-- [ ] 音效打磨
-
-## License
-
-[PolyForm Noncommercial 1.0.0](../LICENSE) —— 非商业使用自由,商业权利保留。
+见 [docs/ROADMAP.md](../docs/ROADMAP.md)(每日挑战与无尽模式优先;四消/百搭块为实验候选)。设计决策见 [docs/DESIGN.md](../docs/DESIGN.md)。

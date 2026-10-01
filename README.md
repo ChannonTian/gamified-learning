@@ -10,6 +10,13 @@ Building a language learning game suite that really applies the latest learning 
 |---|---|---|---|
 | [tile-match](./tile-match/) | 荷兰语 | 强变化/不规则动词变位(过去式单复数 + 过去分词)三消 | 原型可玩,持续迭代 |
 
+## 文档
+
+- [AGENTS.md](AGENTS.md) — 项目记忆:约定、当前状态、已踩过的坑(AI 会话先读)
+- [docs/DESIGN.md](docs/DESIGN.md) — 设计决策与依据
+- [docs/DEVLOG.md](docs/DEVLOG.md) — 迭代日志(最新在上)
+- [docs/ROADMAP.md](docs/ROADMAP.md) — 路线图
+
 ## 本地运行
 
 任意游戏文件夹直接双击 `index.html` 即可(单文件、零依赖);或:
