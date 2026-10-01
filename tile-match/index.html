@@ -94,8 +94,9 @@
   /* ---------- Board (4:3 tiles → 4:3 board) ---------- */
   #boardWrap{
     position:relative;
-    width:min(94vw,70vh,460px);
-    aspect-ratio:4/3;
+    width:min(94vw,400px);
+    aspect-ratio:16/27;
+    max-height:calc(100dvh - 180px);
     background:var(--card);
     border:1px solid var(--line);
     border-radius:18px;
@@ -104,11 +105,11 @@
   }
   #board{
     position:relative; width:100%; height:100%;
-    touch-action:none;
+    touch-action:none; overflow:hidden;
   }
   .tile{
     position:absolute; left:0; top:0;
-    width:calc(100%/var(--n)); height:calc(100%/var(--n));
+    width:calc(100%/var(--cols)); height:calc(100%/var(--rows));
     transition:transform .16s cubic-bezier(.35,1.25,.55,1);
     will-change:transform;
   }
@@ -528,12 +529,11 @@ const VERBS=[
 ];
 // 手机优先:4×4 小盘 + 每关 3 个动词(9 种词形/16 格),格子更大、词更大更完整
 const LEVELS=[
-  {id:"A1.1", verbs:[0,1,2],   goal:3},
-  {id:"A1.2", verbs:[3,4,5],   goal:3},
-  {id:"A1.3", verbs:[6,9,7],   goal:3},
-  {id:"B1.1", verbs:[8,10,11], goal:3},
+  {id:"A1.1", verbs:[0,1,2,3],   goal:4},
+  {id:"A1.2", verbs:[4,5,6,9],   goal:4},
+  {id:"B1.1", verbs:[7,8,10,11], goal:4},
 ];
-const SIZE=4, SG=0, PL=1, PP=2;
+const COLS=4, ROWS=9, SG=0, PL=1, PP=2;
 const IDLE_HINT_MS_DEFAULT=7000;
 
 /* ================= 存档 ================= */
@@ -852,7 +852,7 @@ function computeLevelFont(){
   // 用 canvas 实测本关最长词的渲染宽度,统一字号保证任何词都完整显示
   const ctx=measureCanvas.getContext("2d");
   ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
-  const cellW=boardEl.clientWidth/SIZE;
+  const cellW=boardEl.clientWidth/COLS;
   const usable=cellW*0.92-6;                 // face 宽度减内边距
   let maxW=1;
   for(const v of level.verbs){
@@ -862,7 +862,7 @@ function computeLevelFont(){
   levelFont=Math.max(9,Math.min(22, 100*usable/maxW));
 }
 function applyFontToAll(){
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     const t=board[r]&&board[r][c];
     if(t&&t.el) t.el.firstChild.style.fontSize=levelFont+"px";
   }
@@ -893,8 +893,8 @@ function placeTile(t,r,c,instant=false){
 function pickRefillTile(nbrVerb){
   const act=level.verbs;
   const cnt={};
-  for(let r=0;r<SIZE;r++)for(let cc=0;cc<SIZE;cc++){const t=board[r][cc]; if(t) cnt[t.v*3+t.f]=(cnt[t.v*3+t.f]||0)+1;}
-  const per=SIZE*SIZE/(act.length*3);
+  for(let r=0;r<ROWS;r++)for(let cc=0;cc<COLS;cc++){const t=board[r][cc]; if(t) cnt[t.v*3+t.f]=(cnt[t.v*3+t.f]||0)+1;}
+  const per=COLS*ROWS/(act.length*3);
   const opts=[];
   for(const v of act)for(let f=0;f<3;f++){
     let w=Math.max(.2, per-(cnt[v*3+f]||0)+.6);
@@ -907,8 +907,8 @@ function pickRefillTile(nbrVerb){
 }
 
 function fillBoard(){
-  board=Array.from({length:SIZE},()=>Array(SIZE).fill(null));
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+  board=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     let t=null;
     for(let tries=0;tries<40;tries++){
       const cand=randTileAt(r,c);
@@ -951,16 +951,16 @@ function scan(g){
     const forms=new Set(cells.map(([r,c])=>g[r][c].f));
     if(forms.size===3) runs.push({cells,v:g[cells[0][0]][cells[0][1]].v});
   };
-  for(let r=0;r<SIZE;r++){
+  for(let r=0;r<ROWS;r++){
     let s=0;
-    for(let c=1;c<=SIZE;c++){
-      if(c===SIZE||g[r][c].v!==g[r][s].v){ consider(Array.from({length:c-s},(_,i)=>[r,s+i])); s=c; }
+    for(let c=1;c<=COLS;c++){
+      if(c===COLS||g[r][c].v!==g[r][s].v){ consider(Array.from({length:c-s},(_,i)=>[r,s+i])); s=c; }
     }
   }
-  for(let c=0;c<SIZE;c++){
+  for(let c=0;c<COLS;c++){
     let s=0;
-    for(let r=1;r<=SIZE;r++){
-      if(r===SIZE||g[r][c].v!==g[s][c].v){ consider(Array.from({length:r-s},(_,i)=>[s+i,c])); s=r; }
+    for(let r=1;r<=ROWS;r++){
+      if(r===ROWS||g[r][c].v!==g[s][c].v){ consider(Array.from({length:r-s},(_,i)=>[s+i,c])); s=r; }
     }
   }
   return runs;
@@ -968,10 +968,10 @@ function scan(g){
 
 // 找一个可行交换 + 指出「补全连线的那一块」(提示只高亮它)
 function findHintMove(){
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     for(const [dr,dc] of [[0,1],[1,0]]){
       const r2=r+dr,c2=c+dc;
-      if(r2>=SIZE||c2>=SIZE) continue;
+      if(r2>=ROWS||c2>=COLS) continue;
       const a=board[r][c], b=board[r2][c2];
       board[r][c]=b; board[r2][c2]=a;
       const runs=scan(board);
@@ -991,10 +991,10 @@ function findHintMove(){
 }
 function countMoves(){
   let n=0;
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     for(const [dr,dc] of [[0,1],[1,0]]){
       const r2=r+dr,c2=c+dc;
-      if(r2>=SIZE||c2>=SIZE) continue;
+      if(r2>=ROWS||c2>=COLS) continue;
       const a=board[r][c], b=board[r2][c2];
       board[r][c]=b; board[r2][c2]=a;
       const ok=scan(board).length>0;
@@ -1007,7 +1007,7 @@ function countMoves(){
 
 function buildBoardDOM(){
   boardEl.innerHTML="";
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
 }
 
 async function startLevel(id){
@@ -1019,7 +1019,8 @@ async function startLevel(id){
   document.getElementById("lvlTag").textContent=lv.id;
   updateHUD();
   busy=true;
-  boardEl.style.setProperty("--n",SIZE);
+  boardEl.style.setProperty("--cols",COLS);
+  boardEl.style.setProperty("--rows",ROWS);
   // 开局保底:至少两个可行组合
   let ok=false;
   for(let i=0;i<120&&!ok;i++){ fillBoard(); if(countMoves()>=2) ok=true; }
@@ -1043,8 +1044,8 @@ function forceTwoNearMiss(){
     return t;
   };
   board[0][0]={v:V1,f:SG}; board[0][1]={v:V1,f:PL}; board[0][2]=junk(V1,PP); board[1][2]={v:V1,f:PP};
-  board[SIZE-3][SIZE-3]={v:V2,f:SG}; board[SIZE-3][SIZE-2]={v:V2,f:PL};
-  board[SIZE-3][SIZE-1]=junk(V2,PP); board[SIZE-2][SIZE-1]={v:V2,f:PP};
+  board[ROWS-3][COLS-3]={v:V2,f:SG}; board[ROWS-3][COLS-2]={v:V2,f:PL};
+  board[ROWS-3][COLS-1]=junk(V2,PP); board[ROWS-2][COLS-1]={v:V2,f:PP};
   if(scan(board).length) forceTwoNearMiss();
 }
 
@@ -1083,7 +1084,7 @@ async function trySwap(r1,c1,r2,c2){
   if(streak>=2){
     const bonus=25*(streak-1);
     scoreRun+=bonus;
-    popScore(0.6, SIZE/2-0.5, `🔥 combo +${bonus}`, true);
+    popScore(0.6, COLS/2-0.5, `🔥 combo +${bonus}`, true);
   }
   updateHUD();
   busy=false;
@@ -1146,8 +1147,8 @@ function popScore(r,c,text,big=false){
   const el=document.createElement("div");
   el.className="score-pop"+(big?" big":"");
   el.textContent=text;
-  el.style.left=((c+0.5)/SIZE*100)+"%";
-  el.style.top=((r+0.5)/SIZE*100)+"%";
+  el.style.left=((c+0.5)/COLS*100)+"%";
+  el.style.top=((r+0.5)/ROWS*100)+"%";
   wrap.appendChild(el);
   setTimeout(()=>el.remove(),950);
 }
@@ -1170,7 +1171,9 @@ function showLearnBanner(v){
     };
     b.onclick=finish;
     b.style.setProperty("--bdur","3.6s");
-    requestAnimationFrame(()=>b.classList.add("show"));
+    b.classList.remove("show");
+    void b.offsetWidth;                    // 强制重流,不依赖 rAF(后台标签页也能触发)
+    b.classList.add("show");
     timer=setTimeout(finish,3600);
     speakVerb(V);      // 依次朗读 原形 → 单数 → 复数 → 分词;横幅至少停留 3.6s,点按可提前关
   });
@@ -1181,9 +1184,9 @@ async function playLearnQueue(q){
 
 async function gravityRefill(){
   const spawned=[];
-  for(let c=0;c<SIZE;c++){
-    let write=SIZE-1;
-    for(let r=SIZE-1;r>=0;r--){
+  for(let c=0;c<COLS;c++){
+    let write=ROWS-1;
+    for(let r=ROWS-1;r>=0;r--){
       const t=board[r][c];
       if(t){
         if(write!==r){ board[write][c]=t; board[r][c]=null; placeTile(t,write,c); }
@@ -1192,7 +1195,7 @@ async function gravityRefill(){
     }
     let above=1;
     for(let r=write;r>=0;r--){
-      const nb=(r+1<SIZE&&board[r+1][c])?board[r+1][c].v:null;
+      const nb=(r+1<ROWS&&board[r+1][c])?board[r+1][c].v:null;
       const t=pickRefillTile(Math.random()<.35?nb:null);
       board[r][c]=t;
       const el=makeTileEl(t,r,c);
@@ -1219,16 +1222,16 @@ async function gravityRefill(){
 async function reshuffle(){
   busy=true;
   const vals=[];
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++) vals.push({v:board[r][c].v,f:board[r][c].f});
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) vals.push({v:board[r][c].v,f:board[r][c].f});
   let placed=false;
   for(let tries=0;tries<300&&!placed;tries++){
     for(let i=vals.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [vals[i],vals[j]]=[vals[j],vals[i]]; }
-    for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){ board[r][c].v=vals[r*SIZE+c].v; board[r][c].f=vals[r*SIZE+c].f; }
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ board[r][c].v=vals[r*COLS+c].v; board[r][c].f=vals[r*COLS+c].f; }
     if(!scan(board).length&&countMoves()>=2) placed=true;
   }
   boardEl.classList.add("fading");
   await sleep(220);
-  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     const t=board[r][c];
     t.el.className="tile f-"+["sg","pl","pp"][t.f];
     t.el.style.setProperty("--h",VERBS[t.v].hue);
@@ -1323,7 +1326,7 @@ boardEl.addEventListener("pointermove",e=>{
     if(Math.abs(dx)>Math.abs(dy)) dc=dx>0?1:-1; else dr=dy>0?1:-1;
     const r2=t.r+dr,c2=t.c+dc;
     dragInfo=null;
-    if(r2>=0&&r2<SIZE&&c2>=0&&c2<SIZE) trySwap(t.r,t.c,r2,c2);
+    if(r2>=0&&r2<ROWS&&c2>=0&&c2<COLS) trySwap(t.r,t.c,r2,c2);
   }
 });
 boardEl.addEventListener("pointerup",e=>{
