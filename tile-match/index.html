@@ -468,7 +468,10 @@
     </div>
     <div class="set-row">
       <label data-i18n="set.hintwait">Hint wachttijd</label>
-      <div class="seg" id="setHintWait"></div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setHintWait" min="0" max="30" step="1">
+        <span id="hintWaitVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
     </div>
     <div class="set-row">
       <label data-i18n="set.color">Kleurhint</label>
@@ -658,11 +661,14 @@ const IDLE_HINT_MS_DEFAULT=7000;
 
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:7, colorHint:true, shapeHint:true, dark:false};
-let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, colorHint:true, shapeHint:true, dark:false}; // hintWait 默认=横幅 10s+2s
+let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, done:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
-  if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
+  if(s && typeof s==="object"){
+    save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}};
+    if(save.settings.hintWait===7) save.settings.hintWait=12;   // 旧默认迁移:提示等待略长于连击窗口
+  }
 }catch(e){}
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
 
@@ -726,9 +732,42 @@ const I18N={
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
   },
+  en:{
+    "menu.new":"New game","menu.continue":"Continue","menu.levels":"Levels",
+    "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
+    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock",
+    "menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection",
+    "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
+    "set.title":"Settings","set.style":"Art style","set.lang":"Language",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait",
+    "set.color":"Colour hint","set.shape":"Shape hint","set.dark":"Dark mode",
+    "opt.off":"Off","opt.on":"On",
+    "card.tip":"Tap the card for the meaning","card.tip2":"Tap again to keep playing",
+    "result.title":"Level cleared! 🎉","result.done":"All {n} verbs collected.",
+    "result.record":"new record! 🏆","result.best":"best","result.zetten":"moves",
+    "btn.next":"Next level →","btn.again":"Retry","btn.menu":"Menu",
+    "toast.shuffle":"No combos left — new board!",
+    "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
+    "book.title":"Collection","book.locked":"Not collected yet",
+    "book.lockedsub":"Make a combo with this verb to unlock it.","book.view":"Tap to view the card",
+    "help.title":"How to play",
+    "help.p1":"Match strong verbs: swap two adjacent tiles and make a row of 3 or more tiles of the same verb, containing the singular past, the plural past AND the past participle. The row vanishes and you see the full verb.",
+    "help.goal":"Goal: collect every verb of the level. You collect a verb by making one valid combo with it.",
+    "help.score":"Score: every tile is worth 10 points. Cascades multiply the points. Consecutive successful swaps give a 🔥 combo bonus — the streak ends when the card disappears or a swap fails.",
+    "help.moves":"Swaps: a row only counts when all three forms are in it. Otherwise everything slides back silently.",
+    "help.form":"Shape = tense form",
+    "help.l.sg":"rounded = past sing.","help.l.pl":"square = past plur.","help.l.pp":"cut = past participle",
+    "help.color":"Colour = verb: all forms of one verb share the same (subtle) colour. Reading matters more than looking.",
+    "help.stuck":"Stuck? Tap 💡 for a hint — or wait a moment and one appears automatically. In level mode a learning card with audio appears after every combo.",
+    "set.voice":"Voice","set.voicetest":"Test",
+    "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
+  },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
-function glossOf(V){ return save.settings.uiLang==="zh" ? V.zh : V.en; }
+function glossOf(V){
+  if(save.settings.uiLang==="zh") return V.zh;
+  return V.en;
+}
 function applyI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); });
 }
@@ -795,6 +834,32 @@ function person(ctx,pose,x,y,flip=false){
   const flipG=flip?` transform="translate(${2*x},0) scale(-1,1)"`:"";
   let s="";
   const head=(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="8.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>${ctx.sw?"":`<circle cx="${cx-2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/><circle cx="${cx+2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/>`}`;
+  if(pose==="sit"){
+    s+=head(x,y-38);
+    s+=limb(ctx,[[x,y-29.5],[x,y-14]]);
+    s+=limb(ctx,[[x,y-14],[x+9,y-11],[x+11,y]]);
+    s+=limb(ctx,[[x,y-14],[x+6,y-9],[x+7,y]]);
+    s+=limb(ctx,[[x,y-24],[x+8,y-17]]);
+    s+=limb(ctx,[[x,y-24],[x-6,y-16]]);
+    return `<g${flipG}>${s}</g>`;
+  }
+  if(pose==="jump"){
+    s+=head(x,y-40);
+    s+=limb(ctx,[[x,y-31],[x,y-14]]);
+    s+=limb(ctx,[[x,y-14],[x-8,y-20]]);
+    s+=limb(ctx,[[x,y-14],[x+8,y-22]]);
+    s+=limb(ctx,[[x,y-27],[x-11,y-38]]);
+    s+=limb(ctx,[[x,y-27],[x+11,y-38]]);
+    return `<g${flipG}>${s}</g>`;
+  }
+  if(pose==="duck"){
+    s+=head(x+10,y-32);
+    s+=limb(ctx,[[x+9,y-23],[x+2,y-12]]);
+    s+=limb(ctx,[[x+2,y-12],[x-4,y]]);
+    s+=limb(ctx,[[x+2,y-12],[x+8,y]]);
+    s+=limb(ctx,[[x+8,y-20],[x+14,y-14]]);
+    return `<g${flipG}>${s}</g>`;
+  }
   if(pose==="lie"){
     s+=limb(ctx,[[x-14,y-30],[x-26,y-27]])
       +limb(ctx,[[x-6,y-31],[x-20,y-24]])
@@ -960,10 +1025,162 @@ function genericArt(vIdx,c){
     : `<text x="60" y="75" text-anchor="middle" font-weight="800" font-size="52" font-family="inherit" fill="${c.ink}">${letter}</text>`;
   return bgCircle(c,V.hue)+txt+deco+ground(c);
 }
+/* ---- 道具库(场景组合用) ---- */
+const PROP={
+  glass:(c,x,y)=>`<path d="M${x-7} ${y-12} L${x-5} ${y+8} L${x+5} ${y+8} L${x+7} ${y-12} Z" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.2"/><path d="M${x-5.5} ${y-2} L${x+5.5} ${y-2}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".45"/>`,
+  chair:(c,x,y)=>`<rect x="${x-11}" y="${y-18}" width="21" height="4.5" rx="2.2" fill="${c.teal}"/><rect x="${x-10}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/><rect x="${x+7}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/>`,
+  rug:(c,x,y)=>`<ellipse cx="${x}" cy="${y+2}" rx="26" ry="6" fill="${c.sw?"rgba(255,201,77,.3)":"#ffd9a8"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
+  lamppost:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-52}" stroke="${c.ink}" stroke-width="3.5" stroke-opacity=".7" stroke-linecap="round"/><circle cx="${x}" cy="${y-56}" r="5.5" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/><line x1="${x}" y1="${y-46}" x2="${x+10}" y2="${y-46}" stroke="${c.ink}" stroke-width="2.5" stroke-opacity=".5"/>`,
+  book:(c,x,y)=>`<path d="M${x-12} ${y-9} Q ${x-4} ${y-13} ${x} ${y-9} Q ${x+4} ${y-13} ${x+12} ${y-9} L${x+12} ${y+8} Q ${x+4} ${y+4} ${x} ${y+8} Q ${x-4} ${y+4} ${x-12} ${y+8} Z" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-9}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="1.8"/>`,
+  bubbleSay:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-8}" y1="${y-2}" x2="${x+8}" y2="${y-2}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  bubbleQ:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="14" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  bubbleThink:(c,x,y)=>`<circle cx="${x}" cy="${y-6}" r="12" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><circle cx="${x}" cy="${y-6}" r="6" fill="none" stroke="${c.ink}" stroke-width="1.6" stroke-opacity=".4"/><circle cx="${x-10}" cy="${y+9}" r="2.6" fill="${c.ink}" fill-opacity=".55"/><circle cx="${x-15}" cy="${y+15}" r="1.8" fill="${c.ink}" fill-opacity=".4"/>`,
+  bubbleOff:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-30 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  hammer:(c,x,y)=>`<g transform="rotate(-35 ${x} ${y})"><rect x="${x-4}" y="${y-14}" width="8" height="12" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><rect x="${x-1.6}" y="${y-2}" width="3.2" height="16" rx="1.6" fill="${c.ink}"/></g>`,
+  bulb:(c,x,y)=>`<path d="M${x} ${y-14} a8.5 8.5 0 0 0 -5 15.4 c 1.4 1 1.8 2 1.8 3.4 h6.4 c0-1.4 .4-2.4 1.8-3.4 a8.5 8.5 0 0 0 -5 -15.4z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x-3}" y1="${y+7}" x2="${x+3}" y2="${y+7}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  fork2:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.8" fill="none" stroke-linecap="round"><path d="M${x} ${y+10} L${x} ${y} L${x-10} ${y-10}"/><path d="M${x} ${y} L${x+10} ${y-10}"/><path d="M${x-10} ${y-10} l-3 -1M${x-10} ${y-10} l1 -3"/><path d="M${x+10} ${y-10} l3 -1M${x+10} ${y-10} l-1 -3"/></g>`,
+  startLine:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-30}" stroke="${c.ink}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/><rect x="${x+2}" y="${y-30}" width="14" height="9" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}/>`,
+  magnifier:(c,x,y)=>`<circle cx="${x-3}" cy="${y-4}" r="8.5" fill="rgba(160,210,235,.4)" stroke="${c.ink}" stroke-width="2.8"/><line x1="${x+3}" y1="${y+3}" x2="${x+11}" y2="${y+11}" stroke="${c.ink}" stroke-width="3.4" stroke-linecap="round"/><circle cx="${x-5}" cy="${y-6}" r="2.2" fill="${c.acc}"/>`,
+  person2:(c,x,y)=>person(c,"stand",x,y),
+  tagPrice:(c,x,y)=>`<g transform="rotate(18 ${x} ${y})"><path d="M${x-10} ${y-8} h12 l8 8 -8 8 h-12 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x+6}" cy="${y}" r="1.8" fill="${c.ink}"/></g>`,
+  coinS:(c,x,y)=>`<circle r="7" cx="${x}" cy="${y}" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800" fill="${c.ink}">€</text>`,
+  trophyDown:(c,x,y)=>`<g transform="rotate(180 ${x} ${y})"><path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><rect x="${x-2.5}" y="${y+5}" width="5" height="6" fill="${c.ink}" fill-opacity=".7"/></g><line x1="${x+12}" y1="${y-10}" x2="${x+12}" y2="${y+6}" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x+9} ${y+3} l3 3 l3 -3" fill="none" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/>`,
+  trophy:(c,x,y)=>`<path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-8} ${y-6} h-4 a4 4 0 0 0 4 5M${x+8} ${y-6} h4 a4 4 0 0 1 -4 5" fill="none" stroke="${c.ink}" stroke-width="2.2"/><rect x="${x-2.5}" y="${y+5}" width="5" height="5" fill="${c.ink}" fill-opacity=".7"/><rect x="${x-6}" y="${y+10}" width="12" height="3" rx="1.5" fill="${c.ink}" fill-opacity=".7"/>`,
+  frameWall:(c,x,y)=>`<rect x="${x-11}" y="${y-26}" width="22" height="17" rx="2" fill="${c.sw?"rgba(255,255,255,.4)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-7} ${y-14} l5 -5 l4 4 l5 -6" fill="none" stroke="${c.ink}" stroke-width="1.8"/><line x1="${x-4}" y1="${y-30}" x2="${x-4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/><line x1="${x+4}" y1="${y-30}" x2="${x+4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/>`,
+  tombstone:(c,x,y)=>`<path d="M${x-10} ${y} v-14 a10 10 0 0 1 20 0 v14 z" fill="${c.sw?"rgba(255,255,255,.35)":"#cfd4dc"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-16}" x2="${x}" y2="${y-6}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-5}" y1="${y-11}" x2="${x+5}" y2="${y-11}" stroke="${c.ink}" stroke-width="2.4"/>`,
+  padlock:(c,x,y)=>`<rect x="${x-9}" y="${y-6}" width="18" height="14" rx="3" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-5} ${y-6} v-4 a5 5 0 0 1 10 0 v4" fill="none" stroke="${c.ink}" stroke-width="2.6"/><circle cx="${x}" cy="${y+1}" r="2" fill="${c.ink}"/>`,
+  car:(c,x,y)=>`<path d="M${x-20} ${y-4} l4 -8 h16 l6 8 h6 v9 h-32 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x-10}" cy="${y+6}" r="4.5" fill="${c.ink}"/><circle cx="${x+11}" cy="${y+6}" r="4.5" fill="${c.ink}"/>`,
+  ropePull:(c,x,y)=>`<path d="M${x-34} ${y-24} Q ${x-16} ${y-16} ${x-4} ${y-20}" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><circle cx="${x-34}" cy="${y-24}" r="3" fill="${c.ink}" fill-opacity=".6"/>`,
+  notes:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x}" cy="${y+6}" r="3"/><rect x="${x+2.2}" y="${y-10}" width="2.2" height="16"/><circle cx="${x+12}" cy="${y+2}" r="3"/><rect x="${x+14.2}" y="${y-14}" width="2.2" height="16"/><path d="M${x+2.2} ${y-10} l14 -4" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  balloon:(c,x,y)=>`<ellipse cx="${x}" cy="${y-8}" rx="9" ry="11" fill="${c.sw?"rgba(255,150,100,.3)":c.body}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y+3} q 2 4 0 8" fill="none" stroke="${c.ink}" stroke-width="1.8"/><path d="M${x+13} ${y-12} l4 -4M${x+16} ${y-6} l5 -2" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"/>`,
+  iceCube:(c,x,y)=>`<rect x="${x-9}" y="${y-12}" width="18" height="16" rx="3" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-14} ${y+10} q7 5 14 0 t14 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/><circle cx="${x+6}" cy="${y-18}" r="2" fill="${c.ink}" fill-opacity=".5"/>`,
+  jugPour:(c,x,y)=>`<path d="M${x-8} ${y-14} h14 l-2 12 h-10 z" fill="${c.sw?"rgba(160,210,235,.45)":"#a8cfe2"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-8} ${y-14} l-6 6" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x-16}" cy="${y+4}" r="1.8" fill="${c.ink}" fill-opacity=".5"/><circle cx="${x-14}" cy="${y+10}" r="1.8" fill="${c.ink}" fill-opacity=".5"/>`,
+  strawGlass:(c,x,y)=>`<path d="M${x-7} ${y-10} L${x-5} ${y+10} L${x+5} ${y+10} L${x+7} ${y-10} Z" fill="rgba(160,210,235,.5)" stroke="${c.ink}" stroke-width="2.2"/><line x1="${x+2}" y1="${y-8}" x2="${x+9}" y2="${y-22}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/><circle cx="${x+10}" cy="${y-25}" r="1.6" fill="${c.ink}" fill-opacity=".4"/>`,
+  towelZig:(c,x,y)=>`<path d="M${x-14} ${y-4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x-14} ${y+4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".55"/>`,
+  ropeKnot:(c,x,y)=>`<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${c.ink}" stroke-width="3.4"/><path d="M${x-14} ${y-6} q6 6 14 4M${x+14} ${y+6} q-6 -6 -14 -4" fill="none" stroke="${c.ink}" stroke-width="2.8" stroke-linecap="round"/>`,
+  envelope:(c,x,y)=>`<rect x="${x-12}" y="${y-8}" width="24" height="16" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-12} ${y-8} l12 8 l12 -8" fill="none" stroke="${c.ink}" stroke-width="2"/>`,
+  appleBite:(c,x,y)=>apple(c,x,y)+`<path d="M${x+7} ${y+2} q3 2 2 5M${x+10} ${y-1} q3 2 2 5" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".6"/>`,
+  inwardArrows:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M${x-22} ${y-8} l10 6M${x-12} ${y-2} l-4 1"/><path d="M${x+22} ${y-8} l-10 6M${x+12} ${y-2} l4 1"/></g>`,
+  burstJump:(c,x,y)=>`<g stroke="${c.acc}" stroke-width="2.8" stroke-linecap="round"><line x1="${x-14}" y1="${y-2}" x2="${x-20}" y2="${y-8}"/><line x1="${x+14}" y1="${y-2}" x2="${x+20}" y2="${y-8}"/><line x1="${x}" y1="${y-8}" x2="${x}" y2="${y-16}"/></g>`,
+  noteBell:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x-4}" cy="${y+6}" r="3.2"/><rect x="${x-1.6}" y="${y-12}" width="2.4" height="18"/><path d="M${x-1.6} ${y-12} q8 2 8 8" fill="none" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  boatSink:(c,x,y)=>`<g transform="rotate(-12 ${x} ${y})"><path d="M${x-16} ${y-6} h32 l-5 8 h-22 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x}" y1="${y-6}" x2="${x}" y2="${y-18}" stroke="${c.ink}" stroke-width="2.4"/></g><path d="M${x-18} ${y+6} q6 4 12 0 t12 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"/>`,
+  rainCloud:(c,x,y)=>`<path d="M${x-14} ${y-6} a7 7 0 0 1 7 -9 a8 8 0 0 1 15 2 a6 6 0 0 1 -2 7 z" fill="${c.sw?"rgba(255,255,255,.4)":"#dfe6f2"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-8}" y1="${y+2}" x2="${x-10}" y2="${y+8}"/><line x1="${x}" y1="${y+2}" x2="${x-2}" y2="${y+8}"/><line x1="${x+8}" y1="${y+2}" x2="${x+6}" y2="${y+8}"/></g>`,
+  starBurst:(c,x,y)=>sparkles(c,x,y)+sparkles(c,x+14,y-6),
+  boxS:(c,x,y)=>box(c,x,y),
+  swords:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="3" stroke-linecap="round"><line x1="${x-12}" y1="${y-12}" x2="${x+10}" y2="${y+10}"/><line x1="${x+12}" y1="${y-12}" x2="${x-10}" y2="${y+10}"/></g><g stroke="${c.ink}" stroke-width="4" stroke-linecap="round"><line x1="${x-9}" y1="${y+5}" x2="${x-4}" y2="${y+5}"/><line x1="${x+9}" y1="${y+5}" x2="${x+4}" y2="${y+5}"/></g>`,
+  starBig:(c,x,y)=>`<path d="M${x} ${y-12} l3.4 7 7.6 1 -5.5 5.4 1.3 7.6 -6.8 -3.6 -6.8 3.6 1.3 -7.6 -5.5 -5.4 7.6 -1 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/>`,
+  heartCross:(c,x,y)=>`<path d="M${x} ${y-2} C ${x-7} ${y-10}, ${x-14} ${y-4}, ${x-7} ${y+2} L${x} ${y+8} L${x+7} ${y+2} C ${x+14} ${y-4}, ${x+7} ${y-10}, ${x} ${y-2} Z" fill="${c.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y-6} v10M${x-5} ${y-1} h10" stroke="${c.sw?c.ink:"#fff"}" stroke-width="2.6" stroke-linecap="round"/>`,
+  scaleBalance:(c,x,y)=>`<line x1="${x}" y1="${y-16}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="2.6"/><line x1="${x-14}" y1="${y-12}" x2="${x+14}" y2="${y-12}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/><path d="M${x+19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/><rect x="${x-7}" y="${y+8}" width="14" height="3.5" rx="1.7" fill="${c.ink}" fill-opacity=".7"/>`,
+  footprints:(c,x,y)=>`<g fill="${c.ink}" fill-opacity=".55"><ellipse cx="${x-8}" cy="${y-4}" rx="4.5" ry="6" transform="rotate(-14 ${x-8} ${y-4})"/><ellipse cx="${x+4}" cy="${y+6}" rx="4.5" ry="6" transform="rotate(-14 ${x+4} ${y+6})"/></g>`,
+  brokenCircle:(c,x,y)=>`<path d="M${x} ${y-13} a13 13 0 1 1 -9 4" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><line x1="${x+4}" y1="${y-6}" x2="${x+12}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/><line x1="${x+12}" y1="${y-6}" x2="${x+4}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/>`,
+  checkCircle:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="12" fill="none" stroke="${c.ink}" stroke-width="2.8"/><path d="M${x-6} ${y-4} l4 5 l8 -9" fill="none" stroke="${c.sw?c.ink:"#3f9e6e"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+  snowflake:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"><line x1="${x}" y1="${y-12}" x2="${x}" y2="${y+12}"/><line x1="${x-10.4}" y1="${y-6}" x2="${x+10.4}" y2="${y+6}"/><line x1="${x-10.4}" y1="${y+6}" x2="${x+10.4}" y2="${y-6}"/><line x1="${x}" y1="${y-12}" x2="${x-3}" y2="${y-8}"/><line x1="${x}" y1="${y-12}" x2="${x+3}" y2="${y-8}"/></g>`,
+  bangMark:(c,x,y)=>`<circle cx="${x}" cy="${y+8}" r="2" fill="${c.ink}"/><path d="M${x} ${y-12} l1.6 12 h-3.2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="1.6"/><g stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-10}" y1="${y-8}" x2="${x-14}" y2="${y-12}"/><line x1="${x+10}" y1="${y-8}" x2="${x+14}" y2="${y-12}"/></g>`,
+  pathCurve:(c,x,y)=>`<path d="M${x-24} ${y+8} q 14 -10 8 -18 q -6 -8 6 -14" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/><path d="M${x-14} ${y-22} l6 -4 l0 7z" fill="${c.ink}"/>`,
+  dashedQ:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-dasharray="5 5"/><text x="${x}" y="${y+1}" text-anchor="middle" font-size="15" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  paperLines:(c,x,y)=>`<rect x="${x-13}" y="${y-10}" width="26" height="20" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="1.6" stroke-opacity=".55"><line x1="${x-9}" y1="${y-5}" x2="${x+9}" y2="${y-5}"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}"/><line x1="${x-9}" y1="${y+5}" x2="${x+4}" y2="${y+5}"/></g>`,
+  forbidSign:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="#d64541" stroke-width="3.4"/><line x1="${x-9}" y1="${y-13}" x2="${x+9}" y2="${y+5}" stroke="#d64541" stroke-width="3.4"/>`,
+  stairs:(c,x,y)=>`<g fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}><rect x="${x-2}" y="${y-8}" width="14" height="8"/><rect x="${x+6}" y="${y-16}" width="14" height="8"/><rect x="${x+14}" y="${y-24}" width="14" height="8"/></g>`,
+  wallBar:(c,x,y)=>`<rect x="${x+2}" y="${y-30}" width="10" height="30" rx="2" fill="${c.sw?"rgba(255,255,255,.3)":"#d8cfc0"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55"><line x1="${x-14}" y1="${y-18}" x2="${x-4}" y2="${y-18}"/><line x1="${x-14}" y1="${y-12}" x2="${x-6}" y2="${y-12}"/></g>`,
+  stinkApple:(c,x,y)=>apple(c,x,y)+`<path d="M${x+9} ${y-4} q4 -2 3 -6M${x+11} ${y+4} q4 -2 3 -6" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/>`,
+  coinBehind:(c,x,y)=>coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  arrowsMeet:(c,x,y)=>arrow(c,x-24,y+8,x-4,y)+arrow(c,x+24,y+8,x+4,y)+sparkles(c,x,y-6),
+};
+
+/* ---- 场景组合表:pose + 道具(73 个新词) ---- */
+const SCENES={
+  drinken:{p:"sit",pr:[["glass",80,76]]},
+  zitten:{p:"sit",pr:[["chair",58,96]]},
+  liggen:{p:"lie",px:44,py:104,pr:[["rug",50,104]]},
+  staan:{p:"stand",pr:[["lamppost",86,96]]},
+  lezen:{p:"sit",pr:[["book",78,76]]},
+  spreken:{p:"stand",pr:[["bubbleSay",82,48]]},
+  doen:{p:"stand",pr:[["hammer",80,72]]},
+  weten:{p:"stand",pr:[["bulb",56,26]]},
+  zeggen:{p:"stand",pr:[["bubbleSay",84,48]]},
+  houden:{p:"open",pr:[["boxS",60,34]]},
+  kiezen:{p:"stand",pr:[["fork2",62,42]]},
+  beginnen:{p:"walk",pr:[["startLine",36,96]]},
+  begrijpen:{p:"stand",pr:[["bulb",58,24],["sparkles",84,52]]},
+  brengen:{p:"walk",pr:[["gift",80,76],["arrowR",18,64]]},
+  denken:{p:"stand",pr:[["bubbleThink",82,44]]},
+  vinden:{p:"stand",pr:[["magnifier",80,72]]},
+  helpen:{p:"reach",pr:[["person2",86,96],["heart",66,58]]},
+  kopen:{p:"stand",pr:[["tagPrice",80,72],["coinS",62,80]]},
+  krijgen:{p:"hold",pr:[["gift",74,74],["arrowL",100,66]]},
+  vragen:{p:"stand",pr:[["bubbleQ",84,46]]},
+  wassen:{p:"stand",pr:[["apple",82,60],["glass",88,78]]},
+  dragen:{p:"hold",pr:[["boxS",72,66]]},
+  verliezen:{p:"stand",pr:[["trophyDown",82,66]]},
+  winnen:{p:"open",pr:[["trophy",60,30]]},
+  hangen:{p:"stand",pr:[["frameWall",84,52]]},
+  sterven:{p:"stand",pr:[["tombstone",82,84]]},
+  vergeten:{p:"stand",pr:[["bubbleQ",84,46],["dashedCircle",58,64,18]]},
+  bieden:{p:"reach",pr:[["envelope",76,72]]},
+  trekken:{p:"reach",pr:[["ropePull",58,72]]},
+  zingen:{p:"stand",pr:[["notes",82,44]]},
+  vallen:{p:"jump",pr:[["arrowD",88,44]]},
+  sluiten:{p:"stand",pr:[["padlock",80,70]]},
+  rijden:{p:"hold",pr:[["car",72,82]]},
+  zwijgen:{p:"stand",pr:[["bubbleOff",84,48]]},
+  wijzen:{p:"reach",pr:[["arrowR",72,56]]},
+  werpen:{p:"hold",pr:[["ball",90,54],["ropePull",86,50]]},
+  gelden:{p:"stand",pr:[["paperLines",80,70],["checkCircle",88,58]]},
+  smelten:{p:"stand",pr:[["iceCube",80,76]]},
+  zwellen:{p:"stand",pr:[["balloon",80,58]]},
+  binden:{p:"hold",pr:[["ropeKnot",80,72]]},
+  zenden:{p:"hold",pr:[["envelope",76,70],["arrowR",88,58]]},
+  bijten:{p:"stand",pr:[["appleBite",80,74]]},
+  gieten:{p:"stand",pr:[["jugPour",80,66]]},
+  wringen:{p:"hold",pr:[["towelZig",80,72]]},
+  zuigen:{p:"stand",pr:[["strawGlass",80,74]]},
+  krimpen:{p:"stand",pr:[["inwardArrows",58,58]]},
+  springen:{p:"jump",pr:[["burstJump",60,80]]},
+  klinken:{p:"stand",pr:[["noteBell",82,46]]},
+  zinken:{p:"stand",pr:[["boatSink",80,78]]},
+  lijden:{p:"stand",pr:[["rainCloud",82,42]]},
+  scheppen:{p:"open",pr:[["starBurst",60,30]]},
+  heffen:{p:"open",pr:[["boxS",60,32],["arrowR",88,50]]},
+  vriezen:{p:"stand",pr:[["snowflake",82,48]]},
+  schrikken:{p:"stand",pr:[["bangMark",82,44]]},
+  vechten:{p:"stand",pr:[["swords",80,70]]},
+  prijzen:{p:"stand",pr:[["starBig",82,44]]},
+  genezen:{p:"stand",pr:[["heartCross",80,70]]},
+  wegen:{p:"stand",pr:[["scaleBalance",80,62]]},
+  treden:{p:"walk",pr:[["footprints",80,88]]},
+  schenden:{p:"stand",pr:[["brokenCircle",80,66]]},
+  besluiten:{p:"stand",pr:[["checkCircle",80,66]]},
+  bedriegen:{p:"hold",pr:[["coinBehind",30,72]]},
+  bederven:{p:"stand",pr:[["stinkApple",80,74]]},
+  ontbreken:{p:"stand",pr:[["dashedQ",80,62]]},
+  beschrijven:{p:"stand",pr:[["paperLines",80,70],["pencilPaper",88,74]]},
+  vermijden:{p:"duck",pr:[["arrowR",84,52]]},
+  wijken:{p:"duck",pr:[["arrowR",84,44]]},
+  schuiven:{p:"hold",pr:[["boxS",78,80],["speedLines",70,74]]},
+  klimmen:{p:"walk",pr:[["stairs",72,96]]},
+  dringen:{p:"hold",pr:[["wallBar",86,96]]},
+  verbieden:{p:"stand",pr:[["forbidSign",80,52]]},
+  verlopen:{p:"walk",pr:[["pathCurve",36,92]]},
+  treffen:{p:"open",pr:[["arrowsMeet",60,46]]},
+};
+function sceneSVG(vIdx,c){
+  const V=VERBS[vIdx];
+  const sc=SCENES[V.inf]||{};
+  const pose=sc.p||"stand";
+  const px=sc.px||54, py=sc.py||96;
+  let inner=bgCircle(c,V.hue)+ground(c);
+  inner+=person(c,pose,px,py,!!sc.f);
+  if(sc.pr) for(const [name,x,y] of sc.pr){
+    if(PROP[name]) inner+=PROP[name](c,x,y);
+  }
+  return inner;
+}
 function artSVG(verbIdx,style){
   const c=ctxOf(style);
   const bespoke=ART[VERBS[verbIdx].inf];
-  return `<g>${bespoke?bespoke(c):genericArt(verbIdx,c)}</g>`;
+  if(bespoke) return `<g>${bespoke(c)}</g>`;
+  if(SCENES[VERBS[verbIdx].inf]) return `<g>${sceneSVG(verbIdx,c)}</g>`;
+  return `<g>${genericArt(verbIdx,c)}</g>`;
 }
 
 /* ================= 音效(合成,音量可调) ================= */
@@ -1186,9 +1403,12 @@ function buildBoardDOM(){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
 }
 
+const HUE_PALETTE=[215,12,275,160,48,330,65,190,130,356,250,300];
 function beginSession(){
   collectedRun=new Set(); selected=null; pendingHint=false;
   scoreRun=0; zettenRun=0; streak=0; lastScoreShown=-1;
+  // 本会话激活动词按调色板取色,保证同盘绝不撞色
+  level.verbs.forEach((vi,k)=>{ VERBS[vi].hue=HUE_PALETTE[k%HUE_PALETTE.length]; });
   updateHUD();
   busy=true;
   boardEl.style.setProperty("--cols",COLS);
@@ -1326,13 +1546,9 @@ async function resolve(runs){
     for(const v of verbSet) collectedRun.add(v);                             // 关卡目标按本次对局计
     updateHUD();
     for(const v of fresh){ await showCard(v); }
-    // 关卡模式:教学横幅(不阻挡);无尽/每日:中央闪现(都是已收集词)
-    if(mode==='levels'){
-      for(const v of verbSet){
-        if(!fresh.includes(v)) showLearnBanner(v);
-      }
-    }else{
-      flashShow(verbSet.map(v=>VERBS[v].inf).join(" · "));
+    // 所有模式:教学横幅(不阻挡操作);首次解锁的刚看过完整卡片,跳过
+    for(const v of verbSet){
+      if(!fresh.includes(v)) showLearnBanner(v);
     }
     await sleep(340);
     boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
@@ -1527,6 +1743,7 @@ function checkEnd(){
     const oldBest=save.best[level.id]||0;
     const newBest=scoreRun>oldBest;
     if(newBest){ save.best[level.id]=scoreRun; }
+    save.done[level.id]=true;
     persist();
     showResult(hasNext,newBest,oldBest);
   }
@@ -1636,7 +1853,11 @@ function openMenu(){
     mode='levels'; level=null;
   }
   showMenuView("main");
-  document.getElementById("mContinue").style.display=save.lastLevel?"":"none";
+  const mc=document.getElementById("mContinue");
+  // 继续游戏 = 第一个未完成的已解锁关卡(全部完成则回到最高解锁关)
+  const nextLv = LEVELS.find((l,i)=> (i+1)<=save.unlocked && !save.done[l.id]) || LEVELS[Math.min(save.unlocked,LEVELS.length)-1];
+  window.__continueId = nextLv ? nextLv.id : null;
+  mc.style.display = nextLv ? "" : "none";
   const unlockedModes=save.unlocked>=MODE_UNLOCK;
   document.getElementById("mDaily").classList.toggle("locked",!unlockedModes);
   document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
@@ -1687,40 +1908,53 @@ function renderSettings(){
   const S=save.settings;
   updateVoiceName();
   seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
-  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"]],S.uiLang,v=>S.uiLang=v);
+  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"],["en","English"]],S.uiLang,v=>S.uiLang=v);
   const vol=document.getElementById("setVolume"); vol.value=S.volume;
   const tts=document.getElementById("setTts"); tts.value=S.ttsVolume;
-  seg(document.getElementById("setHintWait"),
-    [[5,"5 s"],[10,"10 s"],[15,"15 s"],[30,"30 s"],[0,t("opt.off")]],S.hintWait,v=>S.hintWait=+v);
+  const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;
+  document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
   seg(document.getElementById("setColor"),[[true,t("opt.on")],[false,t("opt.off")]],S.colorHint,v=>S.colorHint=(v===true||v==="true"));
   seg(document.getElementById("setShape"),[[true,t("opt.on")],[false,t("opt.off")]],S.shapeHint,v=>S.shapeHint=(v===true||v==="true"));
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
 
 /* ---- 图鉴 ---- */
+const bookCollapsed={};
+function toggleBookGroup(gid){
+  bookCollapsed[gid]=!bookCollapsed[gid];
+  openBook();
+}
 function openBook(){
   const list=document.getElementById("bookList");
   list.innerHTML="";
-  const groups=[...new Set(LEVELS.map(l=>l.id))];
-  for(const gid of groups){
-    const lv=LEVELS.find(l=>l.id===gid);
-    const h=document.createElement("div");
-    h.className="book-group";
-    h.textContent=gid;
-    list.appendChild(h);
-    VERBS.forEach((V,i)=>{
-      if(!lv.verbs.includes(i)) return;
-      const got=save.collected.includes(V.inf);
-      const row=document.createElement("div");
-      row.className="book-row"+(got?" viewable":"");
-      row.innerHTML=got
-        ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
-          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
-          <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
-        :`<div class="book-art empty">?</div>
-          <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
-      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(i); }
-      list.appendChild(row);
+  const bands=[...new Set(LEVELS.map(l=>l.id.split(".")[0]))];   // A1 / A2 / B1
+  for(const band of bands){
+    const collapsed=!!bookCollapsed[band];
+    const head=document.createElement("button");
+    head.className="book-group book-toggle";
+    head.innerHTML=`<i>${collapsed?"▸":"▾"}</i> ${band}`;
+    head.onclick=()=>toggleBookGroup(band);
+    list.appendChild(head);
+    if(collapsed) continue;
+    LEVELS.filter(l=>l.id.split(".")[0]===band).forEach(lv=>{
+      const lvh=document.createElement("div");
+      lvh.className="book-sub";
+      lvh.textContent=lv.id;
+      list.appendChild(lvh);
+      VERBS.forEach((V,i)=>{
+        if(!lv.verbs.includes(i)) return;
+        const got=save.collected.includes(V.inf);
+        const row=document.createElement("div");
+        row.className="book-row"+(got?" viewable":"");
+        row.innerHTML=got
+          ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
+            <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+            <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
+          :`<div class="book-art empty">?</div>
+            <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
+        if(got){ row.title=t("book.view"); row.onclick=()=>showCard(i); }
+        list.appendChild(row);
+      });
     });
   }
   document.getElementById("bookDrawer").classList.add("on");
@@ -1733,8 +1967,7 @@ document.getElementById("btnBook").onclick=openBook;
 document.getElementById("mNew").onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(LEVELS[0].id); };
 document.getElementById("mContinue").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
-  const id=LEVELS.some(l=>l.id===save.lastLevel)?save.lastLevel:LEVELS[0].id;
-  startLevel(id);
+  startLevel(window.__continueId||LEVELS[0].id);
 };
 document.getElementById("mLevels").onclick=()=>showMenuView("levels");
 document.getElementById("mDaily").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startDaily(); };
@@ -1746,6 +1979,10 @@ document.getElementById("learnBanner").onclick=hideBanner;
 document.getElementById("btnVoiceTest").onclick=()=>speakVerb(VERBS[8]);   // lopen 四形试听
 document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
 document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
+document.getElementById("setHintWait").oninput=e=>{
+  save.settings.hintWait=+e.target.value; persist();
+  document.getElementById("hintWaitVal").textContent=save.settings.hintWait>0?`${save.settings.hintWait} s`:t("opt.off");
+};
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
 document.getElementById("cardPanel").onclick=()=>{
   const m=document.getElementById("cardModal");
