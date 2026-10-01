@@ -243,6 +243,11 @@
   .menu-btn:active{transform:scale(.97);}
   .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
   .menu-btn.ghost{background:var(--paper);}
+  .menu-btn .m-label{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .menu-btn small{font-size:10.5px; font-weight:600; color:#8b93a3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .menu-btn.primary small{color:rgba(255,255,255,.8);}
+  .menu-btn.locked{opacity:.5;}
+  .menu-btn.locked small{color:#c05621;}
   .back-btn{
     border:none; background:none; color:var(--ink); font-size:20px;
     padding:4px 8px; margin-left:-8px; cursor:pointer;
@@ -383,6 +388,7 @@
     <div class="hud-center">
       <span class="tag" id="lvlTag">A2.1</span>
       <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">🎯 0/4</span></span>
+      <span class="tag" id="timerTag" style="display:none;">⏱ 3:00</span>
     </div>
     <div class="hud-right">
       <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
@@ -419,6 +425,8 @@
       <button class="menu-btn primary" id="mNew"><svg class="ic" viewBox="0 0 24 24"><path d="M9.2 7.4v9.2l7.6-4.6z" fill="currentColor"/></svg><span data-i18n="menu.new">Nieuw spel</span></button>
       <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><rect x="14.5" y="4" width="6.5" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h8M7.6 8.4L11.2 12l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
+      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
+      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
@@ -531,33 +539,127 @@
 <script>
 "use strict";
 /* ================= 数据 ================= */
+// A1 档(0-14):最核心的强变化动词
+// A2 档(7,10,11 及 18-44):高频扩展
+// B1 档(45-84):进阶
 const VERBS=[
   {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215, lv:1},
   {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12,  lv:1},
   {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275, lv:1},
   {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160, lv:1},
-  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48,  lv:2},
-  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330, lv:2},
-  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65,  lv:2},
-  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190, lv:3},
-  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130, lv:3},
-  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356, lv:2},
-  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250, lv:3},
-  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300, lv:3},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48,  lv:1},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330, lv:1},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65,  lv:1},
+  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190, lv:2},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130, lv:1},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356, lv:1},
+  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250, lv:2},
+  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300, lv:2},
+  {inf:"drinken",  sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝",    lv:1},
+  {inf:"zitten",   sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐",    lv:1},
+  {inf:"liggen",   sg:"lag",     pl:"lagen",    pp:"gelegen",    en:"to lie",   zh:"躺",    lv:1},
+  {inf:"staan",    sg:"stond",   pl:"stonden",  pp:"gestaan",    en:"to stand", zh:"站",    lv:1},
+  {inf:"lezen",    sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读",    lv:1},
+  {inf:"spreken",  sg:"sprak",   pl:"spraken",  pp:"gesproken",  en:"to speak", zh:"说",    lv:1},
+  {inf:"doen",     sg:"deed",    pl:"deden",    pp:"gedaan",     en:"to do",    zh:"做",    lv:2},
+  {inf:"weten",    sg:"wist",    pl:"wisten",   pp:"geweten",    en:"to know",  zh:"知道",  lv:2},
+  {inf:"zeggen",   sg:"zei",     pl:"zeiden",   pp:"gezegd",     en:"to say",   zh:"说(话)", lv:2},
+  {inf:"houden",   sg:"hield",   pl:"hielden",  pp:"gehouden",   en:"to hold",  zh:"拿住",  lv:2},
+  {inf:"kiezen",   sg:"koos",    pl:"kozen",    pp:"gekozen",    en:"to choose",zh:"选择",  lv:2},
+  {inf:"beginnen", sg:"begon",   pl:"begonnen", pp:"begonnen",   en:"to begin", zh:"开始",  lv:2},
+  {inf:"begrijpen",sg:"begreep", pl:"begrepen", pp:"begrepen",   en:"to understand", zh:"理解", lv:2},
+  {inf:"brengen",  sg:"bracht",  pl:"brachten", pp:"gebracht",   en:"to bring", zh:"带来",  lv:2},
+  {inf:"denken",   sg:"dacht",   pl:"dachten",  pp:"gedacht",    en:"to think", zh:"想",    lv:2},
+  {inf:"vinden",   sg:"vond",    pl:"vonden",   pp:"gevonden",   en:"to find",  zh:"找到",  lv:2},
+  {inf:"helpen",   sg:"hielp",   pl:"hielpen",  pp:"geholpen",   en:"to help",  zh:"帮助",  lv:2},
+  {inf:"kopen",    sg:"kocht",   pl:"kochten",  pp:"gekocht",    en:"to buy",   zh:"买",    lv:2},
+  {inf:"krijgen",  sg:"kreeg",   pl:"kregen",   pp:"gekregen",   en:"to get",   zh:"得到",  lv:2},
+  {inf:"vragen",   sg:"vroeg",   pl:"vroegen",  pp:"gevraagd",   en:"to ask",   zh:"问",    lv:2},
+  {inf:"wassen",   sg:"waste",   pl:"wasten",   pp:"gewassen",   en:"to wash",  zh:"洗",    lv:2},
+  {inf:"dragen",   sg:"droeg",   pl:"droegen",  pp:"gedragen",   en:"to carry", zh:"携带",  lv:2},
+  {inf:"verliezen",sg:"verloor", pl:"verloren", pp:"verloren",   en:"to lose",  zh:"失去",  lv:2},
+  {inf:"winnen",   sg:"won",     pl:"wonnen",   pp:"gewonnen",   en:"to win",   zh:"赢得",  lv:2},
+  {inf:"hangen",   sg:"hing",    pl:"hingen",   pp:"gehangen",   en:"to hang",  zh:"挂",    lv:2},
+  {inf:"sterven",  sg:"stierf",  pl:"stierven", pp:"gestorven",  en:"to die",   zh:"死亡",  lv:2},
+  {inf:"vergeten", sg:"vergat",  pl:"vergaten", pp:"vergeten",   en:"to forget",zh:"忘记",  lv:2},
+  {inf:"bieden",   sg:"bood",    pl:"boden",    pp:"geboden",    en:"to offer", zh:"提供",  lv:2},
+  {inf:"trekken",  sg:"trok",    pl:"trokken",  pp:"getrokken",  en:"to pull",  zh:"拉",    lv:2},
+  {inf:"zingen",   sg:"zong",    pl:"zongen",   pp:"gezongen",   en:"to sing",  zh:"唱",    lv:2},
+  {inf:"vallen",   sg:"viel",    pl:"vielen",   pp:"gevallen",   en:"to fall",  zh:"落下",  lv:2},
+  {inf:"sluiten",  sg:"sloot",   pl:"sloten",   pp:"gesloten",   en:"to close", zh:"关闭",  lv:2},
+  {inf:"rijden",   sg:"reed",    pl:"reden",    pp:"gereden",    en:"to ride",  zh:"骑/开", lv:2},
+  {inf:"zwijgen",  sg:"zweg",    pl:"zwegen",   pp:"gezwegen",   en:"to keep silent", zh:"沉默", lv:3},
+  {inf:"wijzen",   sg:"wees",    pl:"wezen",    pp:"gewezen",    en:"to point", zh:"指",    lv:3},
+  {inf:"werpen",   sg:"wierp",   pl:"wierpen",  pp:"geworpen",   en:"to throw", zh:"投掷",  lv:3},
+  {inf:"gelden",   sg:"gold",    pl:"golden",   pp:"gegolden",   en:"to be valid", zh:"有效", lv:3},
+  {inf:"smelten",  sg:"smolt",   pl:"smolten",  pp:"gesmolten",  en:"to melt",  zh:"融化",  lv:3},
+  {inf:"zwellen",  sg:"zwol",    pl:"zwollen",  pp:"gezwollen",  en:"to swell", zh:"膨胀",  lv:3},
+  {inf:"binden",   sg:"bond",    pl:"bonden",   pp:"gebonden",   en:"to bind",  zh:"绑",    lv:3},
+  {inf:"zenden",   sg:"zond",    pl:"zonden",   pp:"gezonden",   en:"to send",  zh:"发送",  lv:3},
+  {inf:"bijten",   sg:"beet",    pl:"beten",    pp:"gebeten",    en:"to bite",  zh:"咬",    lv:3},
+  {inf:"gieten",   sg:"goot",    pl:"goten",    pp:"gegoten",    en:"to pour",  zh:"倒",    lv:3},
+  {inf:"wringen",  sg:"wrong",   pl:"wrongen",  pp:"gewrongen",  en:"to wring", zh:"拧",    lv:3},
+  {inf:"zuigen",   sg:"zoog",    pl:"zogen",    pp:"gezogen",    en:"to suck",  zh:"吸",    lv:3},
+  {inf:"krimpen",  sg:"kromp",   pl:"krompen",  pp:"gekrompen",  en:"to shrink",zh:"收缩",  lv:3},
+  {inf:"springen", sg:"sprong",  pl:"sprongen", pp:"gesprongen", en:"to jump",  zh:"跳",    lv:3},
+  {inf:"klinken",  sg:"klonk",   pl:"klonken",  pp:"geklonken",  en:"to sound", zh:"响",    lv:3},
+  {inf:"zinken",   sg:"zonk",    pl:"zonken",   pp:"gezonken",   en:"to sink",  zh:"下沉",  lv:3},
+  {inf:"lijden",   sg:"leed",    pl:"leden",    pp:"geleden",    en:"to suffer",zh:"遭受",  lv:3},
+  {inf:"scheppen", sg:"schiep",  pl:"schiepen", pp:"geschapen",  en:"to create",zh:"创造",  lv:3},
+  {inf:"heffen",   sg:"hief",    pl:"hieven",   pp:"geheven",    en:"to lift",  zh:"举起",  lv:3},
+  {inf:"vriezen",  sg:"vroor",   pl:"vroren",   pp:"gevroren",   en:"to freeze",zh:"结冰",  lv:3},
+  {inf:"schrikken",sg:"schrok",  pl:"schrokken",pp:"geschrokken",en:"to startle",zh:"受惊", lv:3},
+  {inf:"vechten",  sg:"vocht",   pl:"vochten",  pp:"gevochten",  en:"to fight", zh:"战斗",  lv:3},
+  {inf:"prijzen",  sg:"prees",   pl:"prezen",   pp:"geprezen",   en:"to praise",zh:"称赞",  lv:3},
+  {inf:"genezen",  sg:"genas",   pl:"genazen",  pp:"genezen",    en:"to heal",  zh:"治愈",  lv:3},
+  {inf:"wegen",    sg:"woog",    pl:"wogen",    pp:"gewogen",    en:"to weigh", zh:"称重",  lv:3},
+  {inf:"treden",   sg:"trad",    pl:"traden",   pp:"getreden",   en:"to step",  zh:"踏",    lv:3},
+  {inf:"schenden", sg:"schond",  pl:"schonden", pp:"geschonden", en:"to violate",zh:"侵犯", lv:3},
+  {inf:"besluiten",sg:"besloot", pl:"besloten", pp:"besloten",   en:"to decide",zh:"决定",  lv:3},
+  {inf:"bedriegen",sg:"bedroog", pl:"bedrogen", pp:"bedrogen",   en:"to deceive",zh:"欺骗", lv:3},
+  {inf:"bederven", sg:"bedierf", pl:"bedierven",pp:"bedorven",   en:"to spoil", zh:"损坏",  lv:3},
+  {inf:"ontbreken",sg:"ontbrak", pl:"ontbraken",pp:"ontbroken",  en:"to be missing",zh:"缺少", lv:3},
+  {inf:"beschrijven",sg:"beschreef",pl:"beschreven",pp:"beschreven",en:"to describe",zh:"描写", lv:3},
+  {inf:"vermijden",sg:"vermeed", pl:"vermeden", pp:"vermeden",   en:"to avoid", zh:"避免",  lv:3},
+  {inf:"wijken",   sg:"week",    pl:"weken",    pp:"geweken",    en:"to give way",zh:"退让", lv:3},
+  {inf:"schuiven", sg:"schoof",  pl:"schoven",  pp:"geschoven",  en:"to shift", zh:"推",    lv:3},
+  {inf:"klimmen",  sg:"klom",    pl:"klommen",  pp:"geklommen",  en:"to climb", zh:"爬",    lv:3},
+  {inf:"dringen",  sg:"drong",   pl:"drongen",  pp:"gedrongen",  en:"to push",  zh:"挤",    lv:3},
+  {inf:"verbieden",sg:"verbood", pl:"verboden", pp:"verboden",   en:"to forbid",zh:"禁止",  lv:3},
+  {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen",   en:"to proceed",zh:"进行", lv:3},
+  {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen",  en:"to meet",  zh:"遇到",  lv:3},
 ];
-// 手机优先:4×4 小盘 + 每关 3 个动词(9 种词形/16 格),格子更大、词更大更完整
+// 未手配色相的新词:黄金角散列,保证同关 5 词色相拉开
+VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
+
+// 每关 5 词:A1 3 关 + A2 6 关 + B1 8 关 = 17 关(85 词)
 const LEVELS=[
-  {id:"A2.1", verbs:[0,1,2,3],   goal:4},
-  {id:"A2.2", verbs:[4,5,6,9],   goal:4},
-  {id:"B1.1", verbs:[7,8,10,11], goal:4},
+  {id:"A1.1", verbs:[0,1,2,3,9],     goal:5},
+  {id:"A1.2", verbs:[12,4,5,6,8],    goal:5},
+  {id:"A1.3", verbs:[13,14,15,16,17], goal:5},
+  {id:"A2.1", verbs:[7,10,11,18,19],  goal:5},
+  {id:"A2.2", verbs:[20,21,22,23,24], goal:5},
+  {id:"A2.3", verbs:[25,26,27,28,29], goal:5},
+  {id:"A2.4", verbs:[30,31,32,33,34], goal:5},
+  {id:"A2.5", verbs:[35,36,37,38,39], goal:5},
+  {id:"A2.6", verbs:[40,41,42,43,44], goal:5},
+  {id:"B1.1", verbs:[45,46,47,48,49], goal:5},
+  {id:"B1.2", verbs:[50,51,52,53,54], goal:5},
+  {id:"B1.3", verbs:[55,56,57,58,59], goal:5},
+  {id:"B1.4", verbs:[60,61,62,63,64], goal:5},
+  {id:"B1.5", verbs:[65,66,67,68,69], goal:5},
+  {id:"B1.6", verbs:[70,71,72,73,74], goal:5},
+  {id:"B1.7", verbs:[75,76,77,78,79], goal:5},
+  {id:"B1.8", verbs:[80,81,82,83,84], goal:5},
 ];
 const COLS=4, ROWS=9, SG=0, PL=1, PP=2;
+const MODE_UNLOCK=2;               // 通过第 1 关(unlocked≥2)后解锁无尽/每日
 const IDLE_HINT_MS_DEFAULT=7000;
 
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
 const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:7, colorHint:true, shapeHint:true, dark:false};
-let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
+let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
@@ -568,6 +670,8 @@ function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 const I18N={
   nl:{
     "menu.new":"Nieuw spel","menu.continue":"Verder spelen","menu.levels":"Levels",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Nieuwe puzzel elke dag","menu.endlessnew":"Punten jagen met jouw verzameling",
+    "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd",
@@ -595,6 +699,8 @@ const I18N={
   },
   zh:{
     "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分",
+    "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长",
@@ -676,9 +782,10 @@ function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthe
 
 /* ================= SVG 插画元素库 ================= */
 function ctxOf(style){
+  const dark=document.body.classList.contains("dark");
   return style==="B"
-    ? {ink:"#3a4750", sw:4, body:"none", acc:"rgba(255,150,100,.25)", teal:"rgba(84,184,165,.25)", white:"rgba(255,255,255,.45)"}
-    : {ink:"#39424e", sw:0, body:"#ff8a66", acc:"#ffc94d", teal:"#54b8a5", white:"#ffffff"};
+    ? {ink: dark?"#cfd8e3":"#3a4750", sw:4, body:"none", acc:"rgba(255,150,100,.25)", teal:"rgba(84,184,165,.25)", white:"rgba(255,255,255,.45)"}
+    : {ink: dark?"#e8edf5":"#39424e", sw:0, body: dark?"#ff9d7a":"#ff8a66", acc:"#ffc94d", teal:"#54b8a5", white:"#ffffff"};
 }
 function limb(ctx,pts){
   const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
@@ -842,9 +949,21 @@ const ART={
   schrijven:c=>bgCircle(c,250)+pencilPaper(c,58,74),
   slapen:c=>bgCircle(c,300)+bedMoon(c,60,86)+person(c,"lie",48,106),
 };
+// 通用插画:首字母纹章(词长决定装饰密度),风格感知
+function genericArt(vIdx,c){
+  const V=VERBS[vIdx];
+  const letter=V.inf[0].toUpperCase();
+  let deco=`<circle cx="35" cy="31" r="3.2" fill="${c.acc}"/><circle cx="88" cy="38" r="2.6" fill="${c.acc}"/><circle cx="83" cy="89" r="3.2" fill="${c.teal}"/>`;
+  if(V.inf.length>=7) deco+=`<path d="M28 94 Q 60 102 92 94" stroke="${c.ink}" stroke-opacity=".3" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  const txt = c.sw
+    ? `<text x="60" y="75" text-anchor="middle" font-weight="800" font-size="52" font-family="inherit" fill="none" stroke="${c.ink}" stroke-width="1.6">${letter}</text>`
+    : `<text x="60" y="75" text-anchor="middle" font-weight="800" font-size="52" font-family="inherit" fill="${c.ink}">${letter}</text>`;
+  return bgCircle(c,V.hue)+txt+deco+ground(c);
+}
 function artSVG(verbIdx,style){
   const c=ctxOf(style);
-  return `<g>${ART[VERBS[verbIdx].inf](c)}</g>`;
+  const bespoke=ART[VERBS[verbIdx].inf];
+  return `<g>${bespoke?bespoke(c):genericArt(verbIdx,c)}</g>`;
 }
 
 /* ================= 音效(合成,音量可调) ================= */
@@ -869,6 +988,33 @@ const flashEl=document.getElementById("flash");
 let board=[], busy=false, level=null, collectedRun=new Set(), selected=null;
 let scoreRun=0, zettenRun=0, streak=0;       // 本局得分 / 用掉的交换数 / 连击
 let levelFont=13, pendingHint=false, lastAction=Date.now();
+let mode='levels';                            // levels | endless | daily
+let rng=Math.random;                          // 每日挑战用日期种子驱动
+function dailySeed(){
+  const d=new Date();
+  const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  let h=1779033703 ^ key.length;
+  for(const ch of key){ h=Math.imul(h^ch.charCodeAt(0),3432918353); h=((h<<13)|(h>>>19))>>>0; }
+  return ()=>{ h=Math.imul(h^(h>>>16),2246822507); h=Math.imul(h^(h>>>13),3266489909); h^=h>>>16; return (h>>>0)/4294967296; };
+}
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function collectedPool(){
+  const idx=VERBS.map((v,i)=>i).filter(i=>save.collected.includes(VERBS[i].inf));
+  return idx.length>=4?idx:[0,1,2,3];
+}
+function sampleVerbs(pool,count,r){
+  const arr=[...pool];
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor((r?r():Math.random())*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr.slice(0,Math.min(count,arr.length));
+}
+function syncWidths(){
+  const w=document.getElementById("boardWrap").clientWidth+"px";
+  document.getElementById("hud").style.width=w;
+  document.getElementById("dock").style.width=w;
+}
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function anyOverlayOpen(){
@@ -1040,26 +1186,44 @@ function buildBoardDOM(){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
 }
 
-async function startLevel(id){
-  const lv=LEVELS.find(l=>l.id===id);
-  if(!lv) return;
-  level=lv; collectedRun=new Set(); selected=null; pendingHint=false;
-  scoreRun=0; zettenRun=0; streak=0;
-  save.lastLevel=lv.id; persist();
-  document.getElementById("lvlTag").textContent=lv.id;
+function beginSession(){
+  collectedRun=new Set(); selected=null; pendingHint=false;
+  scoreRun=0; zettenRun=0; streak=0; lastScoreShown=-1;
   updateHUD();
   busy=true;
   boardEl.style.setProperty("--cols",COLS);
   boardEl.style.setProperty("--rows",ROWS);
+  syncWidths();
   // 开局保底:至少两个可行组合
   let ok=false;
   for(let i=0;i<120&&!ok;i++){ fillBoard(); if(countMoves()>=2) ok=true; }
   if(!ok) forceTwoNearMiss();
   computeLevelFont();
   buildBoardDOM();
-  await sleep(200);
-  busy=false;
-  lastAction=Date.now();
+  return sleep(200).then(()=>{ busy=false; lastAction=Date.now(); });
+}
+async function startLevel(id){
+  const lv=LEVELS.find(l=>l.id===id);
+  if(!lv) return;
+  mode='levels'; rng=Math.random; stopDailyTimer();
+  level=lv;
+  save.lastLevel=lv.id; persist();
+  document.getElementById("lvlTag").textContent=lv.id;
+  await beginSession();
+}
+function startEndless(){
+  if(save.unlocked<MODE_UNLOCK) return;
+  mode='endless'; rng=Math.random; stopDailyTimer();
+  level={id:"Oneindig", verbs:sampleVerbs(collectedPool(),6), goal:Infinity};
+  document.getElementById("lvlTag").textContent=t("mode.endless");
+  beginSession();
+}
+function startDaily(){
+  if(save.unlocked<MODE_UNLOCK) return;
+  mode='daily'; rng=dailySeed();
+  level={id:"Dagelijks", verbs:sampleVerbs(collectedPool(),6,rng), goal:Infinity};
+  document.getElementById("lvlTag").textContent=t("mode.daily");
+  beginSession().then(startDailyTimer);
 }
 
 // 兜底:手工埋两个「差一块就成线」的布局
@@ -1081,8 +1245,13 @@ function forceTwoNearMiss(){
 
 let lastScoreShown=-1;
 function updateHUD(){
-  document.getElementById("goalTxt").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
-  document.getElementById("goalBar").style.width=Math.round(collectedRun.size/level.goal*100)+"%";
+  const isLevels=(mode==='levels');
+  document.getElementById("goalTag").style.display=isLevels?"":"none";
+  document.getElementById("timerTag").style.display=(mode==='daily')?"":"none";
+  if(isLevels){
+    document.getElementById("goalTxt").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
+    document.getElementById("goalBar").style.width=Math.round(collectedRun.size/level.goal*100)+"%";
+  }
   const st=document.getElementById("scoreTag");
   st.textContent=`⭐ ${scoreRun}`;
   if(scoreRun!==lastScoreShown){ st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun; }
@@ -1157,9 +1326,13 @@ async function resolve(runs){
     for(const v of verbSet) collectedRun.add(v);                             // 关卡目标按本次对局计
     updateHUD();
     for(const v of fresh){ await showCard(v); }
-    // 普通关卡:每个被消动词弹教学横幅(不阻挡操作;首次解锁的刚看过完整卡片,跳过)
-    for(const v of verbSet){
-      if(!fresh.includes(v)) showLearnBanner(v);
+    // 关卡模式:教学横幅(不阻挡);无尽/每日:中央闪现(都是已收集词)
+    if(mode==='levels'){
+      for(const v of verbSet){
+        if(!fresh.includes(v)) showLearnBanner(v);
+      }
+    }else{
+      flashShow(verbSet.map(v=>VERBS[v].inf).join(" · "));
     }
     await sleep(340);
     boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
@@ -1303,7 +1476,50 @@ function closeCard(){
   if(cardResolve){ const r=cardResolve; cardResolve=null; r(); }
 }
 
+/* ---- 每日挑战计时 ---- */
+const DAILY_SECONDS=180;
+let dailyLeft=0, dailyIv=null;
+function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } }
+function updateTimerTag(){
+  const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
+  document.getElementById("timerTag").textContent=`⏱ ${m}:${s}`;
+}
+function startDailyTimer(){
+  dailyLeft=DAILY_SECONDS; updateTimerTag();
+  stopDailyTimer();
+  dailyIv=setInterval(()=>{
+    if(mode!=='daily'){ stopDailyTimer(); return; }
+    dailyLeft--; updateTimerTag();
+    if(dailyLeft<=0){ stopDailyTimer(); endTimeUp(); }
+  },1000);
+}
+function endTimeUp(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const key=todayKey();
+    const prev=save.dailyBest[key]||0;
+    const rec=scoreRun>prev;
+    if(rec){ save.dailyBest[key]=scoreRun; persist(); }
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
+    b2.onclick=()=>{hideResult(); startDaily();};
+    btns.appendChild(b2);
+    const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
+    b3.onclick=()=>{hideResult(); openMenu();};
+    btns.appendChild(b3);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
+
 function checkEnd(){
+  if(mode!=='levels') return;
   if(collectedRun.size>=level.goal){
     const idx=LEVELS.findIndex(l=>l.id===level.id);
     const hasNext=idx>=0 && idx<LEVELS.length-1;
@@ -1411,8 +1627,27 @@ function toast(msg){
 
 /* ================= 菜单/设置/图鉴 ================= */
 function openMenu(){
+  if(mode!=='levels'){
+    if(mode==='endless'){
+      const prev=save.best["Oneindig"]||0;
+      if(scoreRun>prev){ save.best["Oneindig"]=scoreRun; persist(); }
+    }
+    stopDailyTimer(); stopSpeech(); hideBanner();
+    mode='levels'; level=null;
+  }
   showMenuView("main");
   document.getElementById("mContinue").style.display=save.lastLevel?"":"none";
+  const unlockedModes=save.unlocked>=MODE_UNLOCK;
+  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes);
+  document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
+  const dBest=save.dailyBest[todayKey()];
+  document.getElementById("mDailySub").textContent=unlockedModes
+    ?(dBest?`${t("result.today")}: ${dBest}`:t("menu.newdaily"))
+    :t("menu.needlevel");
+  const eBest=save.best["Oneindig"];
+  document.getElementById("mEndlessSub").textContent=unlockedModes
+    ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
+    :t("menu.needlevel");
   document.getElementById("menuScreen").classList.add("on");
 }
 function showMenuView(v){
@@ -1502,6 +1737,8 @@ document.getElementById("mContinue").onclick=()=>{
   startLevel(id);
 };
 document.getElementById("mLevels").onclick=()=>showMenuView("levels");
+document.getElementById("mDaily").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startDaily(); };
+document.getElementById("mEndless").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startEndless(); };
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mSettings").onclick=openSettings;
@@ -1520,6 +1757,7 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".o
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
 });
 window.addEventListener("resize",()=>{
+  syncWidths();
   if(!level) return;
   computeLevelFont();
   applyFontToAll();
@@ -1535,6 +1773,7 @@ window.NLM3={
   countMoves:()=>countMoves(),
   getLastAction:()=>lastAction,
   setLastAction:v=>lastAction=v,
+  forceTimeUp:()=>{ dailyLeft=1; },
   settings:()=>({...save.settings}),
   banner:()=>document.getElementById("learnBanner").className,
 };
