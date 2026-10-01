@@ -422,6 +422,7 @@
   <div class="panel">
     <div id="menuMain">
       <h1 style="margin-bottom:14px;">Sterke werkwoorden</h1>
+      <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
       <button class="menu-btn primary" id="mNew"><svg class="ic" viewBox="0 0 24 24"><path d="M9.2 7.4v9.2l7.6-4.6z" fill="currentColor"/></svg><span data-i18n="menu.new">Nieuw spel</span></button>
       <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><rect x="14.5" y="4" width="6.5" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h8M7.6 8.4L11.2 12l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
@@ -677,6 +678,7 @@ const I18N={
   nl:{
     "menu.new":"Nieuw spel","menu.continue":"Verder spelen","menu.levels":"Levels",
     "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Nieuwe puzzel elke dag","menu.endlessnew":"Punten jagen met jouw verzameling",
+    "menu.back":"Terug naar spel",
     "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
@@ -706,6 +708,7 @@ const I18N={
   zh:{
     "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
     "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分",
+    "menu.back":"回到当前游戏",
     "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
@@ -736,6 +739,7 @@ const I18N={
     "menu.new":"New game","menu.continue":"Continue","menu.levels":"Levels",
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
     "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock",
+    "menu.back":"Back to game",
     "menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection",
     "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
@@ -1425,7 +1429,8 @@ function beginSession(){
 async function startLevel(id){
   const lv=LEVELS.find(l=>l.id===id);
   if(!lv) return;
-  mode='levels'; rng=Math.random; stopDailyTimer();
+  abandonSession();
+  mode='levels'; rng=Math.random;
   level=lv;
   save.lastLevel=lv.id; persist();
   document.getElementById("lvlTag").textContent=lv.id;
@@ -1433,13 +1438,15 @@ async function startLevel(id){
 }
 function startEndless(){
   if(save.unlocked<MODE_UNLOCK) return;
-  mode='endless'; rng=Math.random; stopDailyTimer();
+  abandonSession();
+  mode='endless'; rng=Math.random;
   level={id:"Oneindig", verbs:sampleVerbs(collectedPool(),6), goal:Infinity};
   document.getElementById("lvlTag").textContent=t("mode.endless");
   beginSession();
 }
 function startDaily(){
   if(save.unlocked<MODE_UNLOCK) return;
+  abandonSession();
   mode='daily'; rng=dailySeed();
   level={id:"Dagelijks", verbs:sampleVerbs(collectedPool(),6,rng), goal:Infinity};
   document.getElementById("lvlTag").textContent=t("mode.daily");
@@ -1474,7 +1481,12 @@ function updateHUD(){
   }
   const st=document.getElementById("scoreTag");
   st.textContent=`⭐ ${scoreRun}`;
-  if(scoreRun!==lastScoreShown){ st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun; }
+  if(scoreRun!==lastScoreShown){
+    st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun;
+    // 无尽/每日:最佳分实时记录(中途离开/刷新也不丢)
+    if(mode==='endless' && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
+    if(mode==='daily'){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
+  }
   const ct=document.getElementById("comboTag");
   if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
   else ct.style.display="none";
@@ -1701,7 +1713,11 @@ function updateTimerTag(){
   document.getElementById("timerTag").textContent=`⏱ ${m}:${s}`;
 }
 function startDailyTimer(){
-  dailyLeft=DAILY_SECONDS; updateTimerTag();
+  dailyLeft=DAILY_SECONDS;
+  resumeDailyTimer();
+}
+function resumeDailyTimer(){
+  updateTimerTag();
   stopDailyTimer();
   dailyIv=setInterval(()=>{
     if(mode!=='daily'){ stopDailyTimer(); return; }
@@ -1717,6 +1733,7 @@ function endTimeUp(){
     const prev=save.dailyBest[key]||0;
     const rec=scoreRun>prev;
     if(rec){ save.dailyBest[key]=scoreRun; persist(); }
+    level=null;
     document.getElementById("resultTitle").textContent=t("result.timeup");
     document.getElementById("resultText").innerHTML=
       `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
@@ -1749,6 +1766,8 @@ function checkEnd(){
   }
 }
 function showResult(hasNext,newBest,oldBest){
+  const finishedId=level && level.id;      // 按钮闭包用
+  level=null;                              // 会话结束:菜单不再显示"回到当前游戏"
   document.getElementById("resultTitle").textContent=t("result.title");
   const bestTxt=newBest?` — ${t("result.record")}`:` (${t("result.best")}: ${oldBest})`;
   document.getElementById("resultText").innerHTML=
@@ -1756,9 +1775,9 @@ function showResult(hasNext,newBest,oldBest){
     `⭐ <b>${scoreRun}</b>${bestTxt} · ${zettenRun} ${t("result.zetten")}`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
-  if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next"); b.onclick=()=>{hideResult(); startLevel(LEVELS[LEVELS.findIndex(l=>l.id===level.id)+1].id);}; btns.appendChild(b); }
+  if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next"); b.onclick=()=>{hideResult(); startLevel(LEVELS[LEVELS.findIndex(l=>l.id===finishedId)+1].id);}; btns.appendChild(b); }
   const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
-  b2.onclick=()=>{hideResult(); startLevel(level.id);};
+  b2.onclick=()=>{hideResult(); startLevel(finishedId);};
   btns.appendChild(b2);
   const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
   b3.onclick=()=>{hideResult(); openMenu();};
@@ -1843,21 +1862,40 @@ function toast(msg){
 }
 
 /* ================= 菜单/设置/图鉴 ================= */
-function openMenu(){
-  if(mode!=='levels'){
-    if(mode==='endless'){
-      const prev=save.best["Oneindig"]||0;
-      if(scoreRun>prev){ save.best["Oneindig"]=scoreRun; persist(); }
-    }
-    stopDailyTimer(); stopSpeech(); hideBanner();
-    mode='levels'; level=null;
+/* 离开当前会话时记录未完成的最佳分 */
+function abandonSession(){
+  if(mode==='endless'){
+    const prev=save.best["Oneindig"]||0;
+    if(scoreRun>prev){ save.best["Oneindig"]=scoreRun; persist(); }
   }
+  if(mode==='daily'){
+    const k=todayKey(); const prev=save.dailyBest[k]||0;
+    if(scoreRun>prev){ save.dailyBest[k]=scoreRun; persist(); }
+  }
+  stopDailyTimer(); stopSpeech(); hideBanner();
+}
+function openMenu(){
+  // 会话保持存活:无尽/每日暂停计时,关卡保留棋盘;菜单提供"回到当前游戏"
+  if(mode==='daily') stopDailyTimer();
+  if(mode==='endless'){
+    const prev=save.best["Oneindig"]||0;
+    if(scoreRun>prev){ save.best["Oneindig"]=scoreRun; persist(); }
+  }
+  stopSpeech(); hideBanner();
   showMenuView("main");
+  // 有进行中的会话 → 显示"回到当前游戏",隐藏"继续游戏"(避免误触去别的关)
+  const resume=document.getElementById("mResume");
+  const inSession=!!level;
+  resume.style.display=inSession?"flex":"none";
+  if(inSession) resume.onclick=()=>{ 
+    document.getElementById("menuScreen").classList.remove("on");
+    if(mode==='daily') resumeDailyTimer();
+  };
   const mc=document.getElementById("mContinue");
   // 继续游戏 = 第一个未完成的已解锁关卡(全部完成则回到最高解锁关)
   const nextLv = LEVELS.find((l,i)=> (i+1)<=save.unlocked && !save.done[l.id]) || LEVELS[Math.min(save.unlocked,LEVELS.length)-1];
   window.__continueId = nextLv ? nextLv.id : null;
-  mc.style.display = nextLv ? "" : "none";
+  mc.style.display = (nextLv && !inSession) ? "" : "none";
   const unlockedModes=save.unlocked>=MODE_UNLOCK;
   document.getElementById("mDaily").classList.toggle("locked",!unlockedModes);
   document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
