@@ -40,11 +40,45 @@
     background:var(--card); border:1px solid var(--line); border-radius:10px;
     padding:6px 10px; font-size:13px; font-weight:600; white-space:nowrap;
   }
-  #movesTag.low{color:#c0392b; border-color:#e8b2ab;}
+  #scoreTag{min-width:60px; text-align:center;}
+  .combo-tag{
+    background:#fff4e8; border-color:#f2c9a8; color:#c05621;
+    animation:comboPop .25s ease;
+  }
+  @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
   @media (max-width:430px){
     .hud-btn{width:30px; height:30px; font-size:14px;}
     .tag{padding:5px 7px; font-size:11.5px;}
     #hud{padding-top:8px; gap:4px;}
+  }
+
+  /* ---------- 底部操作坞(拇指区) ---------- */
+  #dock{
+    display:flex; gap:12px; justify-content:center;
+    padding:2px 0 calc(10px + env(safe-area-inset-bottom));
+  }
+  .dock-btn{
+    display:flex; align-items:center; gap:7px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:14px; padding:10px 18px; font-size:14px; font-weight:700;
+    box-shadow:0 2px 8px rgba(51,65,92,.06);
+  }
+  .dock-btn:active{transform:scale(.95);}
+  .dock-btn .ico{font-size:16px;}
+
+  /* ---------- 计分弹字 ---------- */
+  .score-pop{
+    position:absolute; z-index:15; pointer-events:none;
+    transform:translate(-50%,-50%);
+    font-weight:800; color:#fff; font-size:15px;
+    text-shadow:0 1px 4px rgba(51,65,92,.55), 0 0 2px rgba(51,65,92,.4);
+    animation:popUp .9s ease-out forwards; white-space:nowrap;
+  }
+  .score-pop.big{font-size:19px; color:#ffd166;}
+  @keyframes popUp{
+    0%{opacity:0; transform:translate(-50%,-30%) scale(.7);}
+    25%{opacity:1; transform:translate(-50%,-60%) scale(1.05);}
+    100%{opacity:0; transform:translate(-50%,-160%) scale(1);}
   }
 
   /* ---------- Board (4:3 tiles → 4:3 board) ---------- */
@@ -191,6 +225,8 @@
     display:flex; align-items:center; gap:10px;
     padding:8px 6px; border-bottom:1px dashed var(--line);
   }
+  .book-row.viewable{cursor:pointer; border-radius:10px;}
+  .book-row.viewable:active{background:var(--paper);}
   .book-art{width:44px; height:44px; flex:none;}
   .book-art.empty{
     border-radius:12px; background:var(--paper); border:1px dashed var(--line);
@@ -198,8 +234,19 @@
   }
   .book-main b{font-size:15px;}
   .book-main small{display:block; color:#8b93a3; font-size:11.5px; margin-top:2px;}
-  .book-tag{margin-left:auto; font-size:11px; color:#8b93a3; flex:none; text-align:right;}
+  .book-tag{margin-left:auto; font-size:11px; color:#8b93a3; flex:none; text-align:right; line-height:1.5;}
+  .book-count{
+    display:inline-block; background:var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#5a6577;
+  }
   .book-group{font-size:12px; color:#98a1b0; margin:14px 0 2px; font-weight:700;}
+  @media (max-width:520px){
+    #bookDrawer{align-items:flex-end;}
+    #bookDrawer .panel{
+      width:100%; height:auto; max-height:74vh;
+      border-radius:20px 20px 0 0; padding:16px 16px calc(14px + env(safe-area-inset-bottom));
+    }
+  }
 
   /* result */
   #resultModal .panel{text-align:center;}
@@ -222,6 +269,17 @@
 
   .rule-legend{display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;}
   .rule-legend .leg{color:#5a6577; font-size:12px;}
+
+  /* ---------- 手机竖屏:顶栏贴顶、棋盘居中、操作坞贴底 ---------- */
+  @media (max-width:520px){
+    body{justify-content:flex-start;}
+    #app{
+      width:100%; height:100dvh;
+      display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+      padding-top:env(safe-area-inset-top);
+    }
+    #hud{width:min(96vw,640px);}
+  }
 </style>
 </head>
 <body>
@@ -234,11 +292,10 @@
     </div>
     <div class="hud-group">
       <span class="tag" id="goalTag">🎯 0/6</span>
-      <span class="tag" id="movesTag">Zetten: 26</span>
+      <span class="tag combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
+      <span class="tag" id="scoreTag">⭐ 0</span>
     </div>
     <div class="hud-group">
-      <button class="hud-btn" id="btnHint" title="Hint">💡</button>
-      <button class="hud-btn" id="btnBook" title="Verzameling">📖</button>
       <button class="hud-btn" id="btnHelp" title="Speluitleg">?</button>
     </div>
   </header>
@@ -252,6 +309,11 @@
     <span class="leg"><i class="s-sg"></i>verl. tijd enk.</span>
     <span class="leg"><i class="s-pl"></i>verl. tijd mv.</span>
     <span class="leg"><i class="s-pp"></i>voltooid deelwoord</span>
+  </div>
+
+  <div id="dock">
+    <button class="dock-btn" id="btnHint"><span class="ico">💡</span>Hint</button>
+    <button class="dock-btn" id="btnBook"><span class="ico">📖</span>Verzameling</button>
   </div>
 </div>
 
@@ -302,7 +364,8 @@
   <div class="panel">
     <button class="close-x" data-close>✕</button>
     <h2>Speluitleg</h2>
-    <p><strong>Doel:</strong> verzamel alle werkwoorden van dit niveau voordat je zetten op zijn. Een werkwoord verzamel je door er één geldige combinatie mee te maken.</p>
+    <p><strong>Doel:</strong> verzamel alle werkwoorden van dit niveau. Een werkwoord verzamel je door er één geldige combinatie mee te maken.</p>
+    <p><strong>Score:</strong> elk blok dat verdwijnt levert 10 punten op. Ketens (blokken die daarna vanzelf mee vallen) vermenigvuldigen de punten, en opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus. Een zet zonder combinatie verbreekt de reeks.</p>
     <p><strong>Zetten:</strong> wissel twee aangrenzende blokken. Een rij telt alleen als er 3 of meer blokken van hetzelfde werkwoord staan én alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.</p>
     <p><strong>Vorm = tijdsvorm</strong></p>
     <div class="rule-legend">
@@ -335,15 +398,15 @@ const VERBS=[
   {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", hue:300, lv:2},
 ];
 const LEVELS=[
-  {n:1, verbs:[0,1,2,3,4,5],  goal:6, moves:26},
-  {n:2, verbs:[6,7,8,9,10,11], goal:6, moves:28},
+  {n:1, verbs:[0,1,2,3,4,5],  goal:6},
+  {n:2, verbs:[6,7,8,9,10,11], goal:6},
 ];
 const SIZE=6, SG=0, PL=1, PP=2;
 const IDLE_HINT_MS=7000;
 
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
-let save={unlocked:1, collected:[], style:"A"};
+let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s}; }
@@ -541,7 +604,8 @@ function blip(freq,dur=.08,type="sine",gain=.12){
 /* ================= 棋盘引擎 ================= */
 const boardEl=document.getElementById("board");
 const flashEl=document.getElementById("flash");
-let board=[], busy=false, level=null, movesLeft=0, collectedRun=new Set(), selected=null;
+let board=[], busy=false, level=null, collectedRun=new Set(), selected=null;
+let scoreRun=0, zettenRun=0, streak=0;       // 本局得分 / 用掉的交换数 / 连击
 let levelFont=13, pendingHint=false, lastAction=Date.now();
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -710,7 +774,8 @@ function buildBoardDOM(){
 async function startLevel(n){
   const lv=LEVELS.find(l=>l.n===n);
   if(!lv) return;
-  level=lv; movesLeft=lv.moves; collectedRun=new Set(); selected=null; pendingHint=false;
+  level=lv; collectedRun=new Set(); selected=null; pendingHint=false;
+  scoreRun=0; zettenRun=0; streak=0;
   document.getElementById("lvlTag").textContent=`Niveau ${lv.n}`;
   updateHUD();
   busy=true;
@@ -745,9 +810,10 @@ function forceTwoNearMiss(){
 
 function updateHUD(){
   document.getElementById("goalTag").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
-  const mt=document.getElementById("movesTag");
-  mt.textContent=`Zetten: ${movesLeft}`;
-  mt.classList.toggle("low",movesLeft<=5);
+  document.getElementById("scoreTag").textContent=`⭐ ${scoreRun}`;
+  const ct=document.getElementById("comboTag");
+  if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
+  else ct.style.display="none";
 }
 
 /* ---- 交换与消除 ---- */
@@ -765,13 +831,21 @@ async function trySwap(r1,c1,r2,c2){
     board[r1][c1]=a; board[r2][c2]=b;
     placeTile(a,r1,c1); placeTile(b,r2,c2);
     blip(180,.08,"sine",.05);
+    if(streak>0){ streak=0; updateHUD(); }      // 无效交换打断连击
     await sleep(180);
     busy=false;
     lastAction=Date.now();
     return false;
   }
-  movesLeft--; updateHUD();
+  zettenRun++;
   await resolve(runs);
+  streak++;                                     // 成功交换延续连击
+  if(streak>=2){
+    const bonus=25*(streak-1);
+    scoreRun+=bonus;
+    popScore(0.6, SIZE/2-0.5, `🔥 combo +${bonus}`, true);
+  }
+  updateHUD();
   busy=false;
   if(pendingHint){ pendingHint=false; hint(); }
   checkEnd();
@@ -779,7 +853,9 @@ async function trySwap(r1,c1,r2,c2){
 }
 
 async function resolve(runs){
+  let chain=0;
   while(runs.length){
+    chain++;
     const verbSet=[...new Set(runs.flatMap(run=>run.cells.map(([r,c])=>board[r][c].v)))];
     const cells=runs.flatMap(run=>run.cells);
     blip(520+Math.min(cells.length,6)*40,.1,"triangle",.09);
@@ -788,6 +864,17 @@ async function resolve(runs){
       t.el.classList.add("burst");
       board[r][c]=null;
     }
+    // 计分:每块 10 分 × 连锁倍数;每词消除次数 +1
+    const pts=cells.length*10*chain;
+    scoreRun+=pts;
+    const cr=cells.reduce((s,[r,c])=>s+r,0)/cells.length;
+    const cc=cells.reduce((s,[r,c])=>s+c,0)/cells.length;
+    popScore(cr, cc, `+${pts}${chain>1?` ×${chain}`:""}`, chain>1);
+    for(const v of verbSet){
+      const inf=VERBS[v].inf;
+      save.counts[inf]=(save.counts[inf]||0)+1;
+    }
+    persist();
     const fresh=verbSet.filter(v=>!save.collected.includes(VERBS[v].inf));   // 全局首次解锁才弹卡
     for(const v of fresh){
       save.collected.push(VERBS[v].inf); persist();
@@ -807,6 +894,18 @@ async function resolve(runs){
     await sleep(500);
     await reshuffle();
   }
+}
+
+// 计分弹字:(r,c) 为棋盘坐标(可为小数),在 boardWrap 内浮起消失
+function popScore(r,c,text,big=false){
+  const wrap=document.getElementById("boardWrap");
+  const el=document.createElement("div");
+  el.className="score-pop"+(big?" big":"");
+  el.textContent=text;
+  el.style.left=((c+0.5)/SIZE*100)+"%";
+  el.style.top=((r+0.5)/SIZE*100)+"%";
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(),950);
 }
 
 async function gravityRefill(){
@@ -900,20 +999,22 @@ function closeCard(){
 function checkEnd(){
   if(collectedRun.size>=level.goal){
     const hasNext=LEVELS.some(l=>l.n===level.n+1);
-    if(level.n+1>save.unlocked){ save.unlocked=level.n+1; persist(); }
-    showResult(true,hasNext);
-  }else if(movesLeft<=0){
-    showResult(false,false);
+    if(level.n+1>save.unlocked){ save.unlocked=level.n+1; }
+    const oldBest=save.best[level.n]||0;
+    const newBest=scoreRun>oldBest;
+    if(newBest){ save.best[level.n]=scoreRun; }
+    persist();
+    showResult(hasNext,newBest,oldBest);
   }
 }
-function showResult(win,hasNext){
-  document.getElementById("resultTitle").textContent=win?"Level gehaald! 🎉":"Geen zetten meer";
-  document.getElementById("resultText").textContent=win
-    ?`Alle ${level.goal} werkwoorden verzameld.`
-    :`Je verzamelde ${collectedRun.size} van ${level.goal} werkwoorden. Probeer het opnieuw!`;
+function showResult(hasNext,newBest,oldBest){
+  document.getElementById("resultTitle").textContent="Level gehaald! 🎉";
+  document.getElementById("resultText").innerHTML=
+    `Alle ${level.goal} werkwoorden verzameld.<br>`+
+    `Score: <b>${scoreRun}</b>${newBest?" — nieuw record! 🏆":` (beste: ${oldBest})`} · ${zettenRun} zetten`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
-  if(win&&hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent="Volgende niveau →"; b.onclick=()=>{hideResult(); startLevel(level.n+1);}; btns.appendChild(b); }
+  if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent="Volgende niveau →"; b.onclick=()=>{hideResult(); startLevel(level.n+1);}; btns.appendChild(b); }
   const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent="Opnieuw";
   b2.onclick=()=>{hideResult(); startLevel(level.n);};
   btns.appendChild(b2);
@@ -921,7 +1022,7 @@ function showResult(win,hasNext){
   b3.onclick=()=>{hideResult(); openMenu();};
   btns.appendChild(b3);
   document.getElementById("resultModal").classList.add("on");
-  if(win){ blip(523,.1); setTimeout(()=>blip(659,.1),110); setTimeout(()=>blip(784,.16),220); }
+  if(scoreRun>0){ blip(523,.1); setTimeout(()=>blip(659,.1),110); setTimeout(()=>blip(784,.16),220); }
 }
 function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
 
@@ -1006,7 +1107,9 @@ function openMenu(){
     const b=document.createElement("button");
     const locked=lv.n>save.unlocked;
     b.className="lv-btn"+(locked?" locked":"");
-    b.innerHTML=`<b>Niveau ${lv.n}</b><small>A2 · ${lv.verbs.map(i=>VERBS[i].inf).slice(0,3).join(" / ")} …</small>`;
+    const best=save.best[lv.n];
+    b.innerHTML=`<b>Niveau ${lv.n}</b><small>A2 · ${lv.verbs.map(i=>VERBS[i].inf).slice(0,3).join(" / ")} …</small>`+
+      (best?`<small>⭐ beste: ${best}</small>`:"");
     b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(lv.n); };
     g.appendChild(b);
   }
@@ -1039,13 +1142,14 @@ function openBook(){
       if(V.lv!==lv) return;
       const got=save.collected.includes(V.inf);
       const row=document.createElement("div");
-      row.className="book-row";
+      row.className="book-row"+(got?" viewable":"");
       row.innerHTML=got
         ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
           <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
-          <span class="book-tag">${V.en}</span>`
+          <span class="book-tag">${V.en}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
           <div class="book-main"><b>Nog niet verzameld</b><small>Maak een combinatie met dit werkwoord.</small></div>`;
+      if(got){ row.title="Tik om de kaart te bekijken"; row.onclick=()=>showCard(i); }
       list.appendChild(row);
     });
   }
@@ -1076,7 +1180,7 @@ window.addEventListener("resize",()=>{
 
 /* ---- 调试钩子(自动化测试用) ---- */
 window.NLM3={
-  state:()=>({level:level&&level.n, moves:movesLeft, collected:[...collectedRun], busy,
+  state:()=>({level:level&&level.n, score:scoreRun, zetten:zettenRun, streak, collected:[...collectedRun], busy,
     board:board.map(row=>row.map(t=>t?[t.v,t.f]:null))}),
   verbs:VERBS, levels:LEVELS,
   swap:async(r1,c1,r2,c2)=>trySwap(r1,c1,r2,c2),
