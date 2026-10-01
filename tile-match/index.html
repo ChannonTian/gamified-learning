@@ -11,6 +11,16 @@
     --card:#ffffff;
     --line:#e4dfd4;
     --accent:#e8734a;
+    --dim:rgba(51,65,92,.42);
+    --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
+  }
+  body.dark{
+    --ink:#dfe5f0;
+    --paper:#222834;
+    --card:#2b3342;
+    --line:#3d4757;
+    --dim:rgba(10,14,22,.55);
+    --tile-s:30%; --tile-l:26%; --tile-ink:84%; --tile-edge:15%;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0; height:100%;}
@@ -84,7 +94,7 @@
   /* ---------- Board (4:3 tiles → 4:3 board) ---------- */
   #boardWrap{
     position:relative;
-    width:min(94vw,80vh,640px);
+    width:min(94vw,70vh,460px);
     aspect-ratio:4/3;
     background:var(--card);
     border:1px solid var(--line);
@@ -106,9 +116,9 @@
   .face{
     width:92%; height:90%; margin:4% 4%;
     display:flex; align-items:center; justify-content:center;
-    background:hsl(var(--h) 42% 92%);
-    color:hsl(var(--h) 45% 28%);
-    box-shadow:inset 0 -3px 0 hsl(var(--h) 42% 80%);
+    background:hsl(var(--h) var(--tile-s) var(--tile-l));
+    color:hsl(var(--h) 45% var(--tile-ink));
+    box-shadow:inset 0 -3px 0 hsl(var(--h) var(--tile-s) var(--tile-edge));
     font-weight:700; line-height:1.05; text-align:center;
     overflow:hidden; padding:0 2px;
     border-radius:18%;                     /* enk.: afgeronde hoeken */
@@ -118,6 +128,14 @@
   .tile.f-pp .face{                        /* v.d.: afgesneden hoeken */
     border-radius:0;
     clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);
+  }
+  /* 设置里关闭形状/颜色提示 */
+  body.no-shape .tile.f-pl .face,
+  body.no-shape .tile.f-pp .face{border-radius:18%; clip-path:none;}
+  body.no-color .face{
+    background:hsl(215 8% var(--tile-l));
+    color:hsl(215 12% var(--tile-ink));
+    box-shadow:inset 0 -3px 0 hsl(215 8% var(--tile-edge));
   }
   .tile.sel .face{
     scale:1.07;
@@ -167,7 +185,7 @@
   /* ---------- overlays ---------- */
   .overlay{
     position:fixed; inset:0; z-index:50;
-    background:rgba(51,65,92,.42);
+    background:var(--dim);
     display:flex; align-items:center; justify-content:center;
     opacity:0; pointer-events:none; transition:opacity .22s;
   }
@@ -186,22 +204,76 @@
     border:none; background:none; font-size:18px; color:#98a1b0;
   }
 
-  /* menu */
-  #menuScreen .panel{width:min(90vw,420px);}
-  .lv-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0 6px;}
+  /* menu (standaard startscherm) */
+  #menuScreen .panel{width:min(90vw,380px);}
+  .menu-btn{
+    display:block; width:100%; padding:14px; margin:9px 0;
+    border-radius:14px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
+    font-size:16px; font-weight:700; text-align:center;
+  }
+  .menu-btn:active{transform:scale(.97);}
+  .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .menu-btn.ghost{background:var(--paper);}
+  .back-btn{
+    border:none; background:none; color:var(--ink); font-size:20px;
+    padding:4px 8px; margin-left:-8px; cursor:pointer;
+  }
+  .lv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:14px 0 6px;}
   .lv-btn{
     border:1px solid var(--line); background:var(--paper); border-radius:14px;
-    padding:12px 8px; text-align:center; color:var(--ink);
+    padding:14px 6px; text-align:center; color:var(--ink); font-weight:800; font-size:15px;
   }
-  .lv-btn b{display:block; font-size:16px;}
-  .lv-btn small{color:#8b93a3; font-size:11px;}
-  .lv-btn.locked{opacity:.45; pointer-events:none;}
+  .lv-btn small{display:block; color:#8b93a3; font-size:10.5px; font-weight:600; margin-top:3px;}
+  .lv-btn.locked{opacity:.4; pointer-events:none;}
   .style-row{display:flex; gap:10px; margin-top:8px;}
   .style-opt{
     flex:1; border:2px solid var(--line); border-radius:14px; padding:8px 6px 6px;
     background:var(--paper); text-align:center; font-size:11px; color:#5a6577;
   }
   .style-opt.sel{border-color:var(--accent);}
+
+  /* instellingen */
+  .set-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0; border-bottom:1px dashed var(--line); font-size:13.5px;
+  }
+  .set-row:last-child{border-bottom:none;}
+  .set-row>label{font-weight:700;}
+  .seg{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+  .seg button{
+    padding:7px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;
+  }
+  .seg button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .set-row input[type=range]{width:140px; accent-color:var(--accent);}
+  .set-row select{
+    padding:7px 10px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:600;
+  }
+
+  /* leerbanner (niveaumodus) */
+  #learnBanner{
+    position:fixed; left:50%; bottom:calc(76px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(150%);
+    width:min(94vw,480px); z-index:40;
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px rgba(20,30,50,.3);
+    display:flex; align-items:center; gap:12px;
+    padding:10px 14px 13px; cursor:pointer; overflow:hidden;
+    opacity:0; visibility:hidden;
+    transition:transform .28s cubic-bezier(.3,1.2,.5,1), opacity .25s, visibility .28s;
+  }
+  #learnBanner.show{transform:translateX(-50%) translateY(0); opacity:1; visibility:visible;}
+  #bannerArt{width:58px; height:58px; flex:none;}
+  .b-main{flex:1; min-width:0;}
+  .b-main b{font-size:26px; font-weight:800; line-height:1.1;}
+  #bannerForms{font-size:13px; color:#8b93a3; margin-top:2px;}
+  #bannerGloss{font-size:12.5px; color:var(--ink); opacity:.75; margin-top:1px;}
+  .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
+  .b-progress i{display:block; height:100%; width:100%; background:var(--accent);}
+  #learnBanner.show .b-progress i{animation:bprog var(--bdur,3s) linear forwards;}
+  @keyframes bprog{ from{width:100%;} to{width:0;} }
 
   /* collection card (eerste keer) */
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
@@ -306,28 +378,84 @@
   </div>
 
   <div id="legend">
-    <span class="leg"><i class="s-sg"></i>verl. tijd enk.</span>
-    <span class="leg"><i class="s-pl"></i>verl. tijd mv.</span>
-    <span class="leg"><i class="s-pp"></i>voltooid deelwoord</span>
+    <span class="leg"><i class="s-sg"></i><span data-i18n="legend.sg">verl. tijd enk.</span></span>
+    <span class="leg"><i class="s-pl"></i><span data-i18n="legend.pl">verl. tijd mv.</span></span>
+    <span class="leg"><i class="s-pp"></i><span data-i18n="legend.pp">voltooid deelwoord</span></span>
   </div>
 
   <div id="dock">
-    <button class="dock-btn" id="btnHint"><span class="ico">💡</span>Hint</button>
-    <button class="dock-btn" id="btnBook"><span class="ico">📖</span>Verzameling</button>
+    <button class="dock-btn" id="btnHint"><span class="ico">💡</span><span data-i18n="dock.hint">Hint</span></button>
+    <button class="dock-btn" id="btnBook"><span class="ico">📖</span><span data-i18n="dock.book">Verzameling</span></button>
   </div>
 </div>
 
 <!-- Hoofdmenu -->
 <div class="overlay on" id="menuScreen">
   <div class="panel">
-    <h1>Sterke werkwoorden</h1>
-    <p>Wissel twee blokken en maak een rij van <strong>3 en meer blokken van hetzelfde werkwoord</strong>: de verleden tijd enkelvoud, de verleden tijd meervoud én het voltooid deelwoord samen in één rij. De rij verdwijnt en je ziet het hele werkwoord.<br>Vorm = tijdsvorm, kleur = werkwoord — maar allebei subtiel: <strong>goed lezen is de sleutel</strong>.</p>
-    <div class="lv-grid" id="lvGrid"></div>
-    <p style="margin:4px 0 0;"><button class="btn" id="btnResume" style="display:none;">Verder spelen</button></p>
-    <p style="margin-top:14px; font-weight:700; color:var(--ink);">Illustratiestijl (kies er één):</p>
-    <div class="style-row" id="styleRow"></div>
-    <p style="margin-top:12px;"><button class="btn ghost" id="btnHelp2">Speluitleg</button></p>
+    <div id="menuMain">
+      <h1 style="margin-bottom:14px;">Sterke werkwoorden</h1>
+      <button class="menu-btn primary" id="mNew" data-i18n="menu.new">Nieuw spel</button>
+      <button class="menu-btn" id="mContinue" data-i18n="menu.continue">Verder spelen</button>
+      <button class="menu-btn" id="mLevels"><span data-i18n="menu.levels">Levels</span> ›</button>
+      <button class="menu-btn ghost" id="mHelp" data-i18n="menu.help">Speluitleg</button>
+      <button class="menu-btn ghost" id="mSettings" data-i18n="menu.settings">Instellingen</button>
+    </div>
+    <div id="menuLevels" style="display:none;">
+      <h2><button class="back-btn" id="mBack">←</button><span data-i18n="menu.levels">Levels</span></h2>
+      <div class="lv-grid" id="lvGrid"></div>
+    </div>
   </div>
+</div>
+
+<!-- Instellingen -->
+<div class="overlay" id="settingsModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="set.title">Instellingen</h2>
+    <div class="set-row">
+      <label data-i18n="set.style">Illustratiestijl</label>
+      <div class="seg" id="setStyle"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.lang">Taal</label>
+      <div class="seg" id="setLang"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.sound">Geluid</label>
+      <input type="range" id="setVolume" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.tts">Voorlezen</label>
+      <input type="range" id="setTts" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.hintwait">Hint wachttijd</label>
+      <div class="seg" id="setHintWait"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.color">Kleurhint</label>
+      <div class="seg" id="setColor"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.shape">Vormhint</label>
+      <div class="seg" id="setShape"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.dark">Donkere modus</label>
+      <div class="seg" id="setDark"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Leerbanner (niveaumodus) -->
+<div id="learnBanner">
+  <svg id="bannerArt" viewBox="0 0 120 120"></svg>
+  <div class="b-main">
+    <b id="bannerInf"></b>
+    <div id="bannerForms"></div>
+    <div id="bannerGloss"></div>
+  </div>
+  <div class="b-progress"><i></i></div>
 </div>
 
 <!-- Verzamelkaart (eerste keer) -->
@@ -354,7 +482,7 @@
 <!-- Verzameling -->
 <div class="overlay" id="bookDrawer">
   <div class="panel">
-    <h2>Verzameling</h2>
+    <h2 data-i18n="book.title">Verzameling</h2>
     <div id="bookList"></div>
   </div>
 </div>
@@ -363,18 +491,19 @@
 <div class="overlay" id="helpModal">
   <div class="panel">
     <button class="close-x" data-close>✕</button>
-    <h2>Speluitleg</h2>
-    <p><strong>Doel:</strong> verzamel alle werkwoorden van dit niveau. Een werkwoord verzamel je door er één geldige combinatie mee te maken.</p>
-    <p><strong>Score:</strong> elk blok dat verdwijnt levert 10 punten op. Ketens (blokken die daarna vanzelf mee vallen) vermenigvuldigen de punten, en opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus. Een zet zonder combinatie verbreekt de reeks.</p>
-    <p><strong>Zetten:</strong> wissel twee aangrenzende blokken. Een rij telt alleen als er 3 of meer blokken van hetzelfde werkwoord staan én alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.</p>
-    <p><strong>Vorm = tijdsvorm</strong></p>
+    <h2 data-i18n="help.title">Speluitleg</h2>
+    <p data-i18n="help.p1"></p>
+    <p data-i18n="help.goal"></p>
+    <p data-i18n="help.score"></p>
+    <p data-i18n="help.moves"></p>
+    <p data-i18n="help.form"></p>
     <div class="rule-legend">
-      <span class="leg"><i class="s-sg"></i>afgerond = verl. tijd enk.</span>
-      <span class="leg"><i class="s-pl"></i>recht = verl. tijd mv.</span>
-      <span class="leg"><i class="s-pp"></i>afgesneden = voltooid deelwoord</span>
+      <span class="leg"><i class="s-sg"></i><span data-i18n="help.l.sg"></span></span>
+      <span class="leg"><i class="s-pl"></i><span data-i18n="help.l.pl"></span></span>
+      <span class="leg"><i class="s-pp"></i><span data-i18n="help.l.pp"></span></span>
     </div>
-    <p><strong>Kleur = werkwoord:</strong> alle vormen van één werkwoord hebben dezelfde (subtiele) kleur. Goed lezen is belangrijker dan kijken.</p>
-    <p><strong>Vastgelopen?</strong> Tik op 💡 voor een hint — of wacht even, dan komt er automatisch een. Zit er geen combinatie meer in, dan wordt het bord opnieuw geschud.</p>
+    <p data-i18n="help.color"></p>
+    <p data-i18n="help.stuck"></p>
   </div>
 </div>
 
@@ -384,34 +513,136 @@
 "use strict";
 /* ================= 数据 ================= */
 const VERBS=[
-  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    hue:215, lv:1},
-  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  hue:12,  lv:1},
-  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    hue:275, lv:1},
-  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  hue:160, lv:1},
-  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   hue:48,  lv:1},
-  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  hue:330, lv:1},
-  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  hue:65,  lv:2},
-  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  hue:190, lv:2},
-  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  hue:130, lv:2},
-  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   hue:356, lv:2},
-  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", hue:250, lv:2},
-  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", hue:300, lv:2},
+  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215, lv:1},
+  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12,  lv:1},
+  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275, lv:1},
+  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160, lv:1},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48,  lv:2},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330, lv:2},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65,  lv:2},
+  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190, lv:3},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130, lv:3},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356, lv:2},
+  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250, lv:3},
+  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300, lv:3},
 ];
+// 手机优先:4×4 小盘 + 每关 3 个动词(9 种词形/16 格),格子更大、词更大更完整
 const LEVELS=[
-  {n:1, verbs:[0,1,2,3,4,5],  goal:6},
-  {n:2, verbs:[6,7,8,9,10,11], goal:6},
+  {id:"A1.1", verbs:[0,1,2],   goal:3},
+  {id:"A1.2", verbs:[3,4,5],   goal:3},
+  {id:"A1.3", verbs:[6,9,7],   goal:3},
+  {id:"B1.1", verbs:[8,10,11], goal:3},
 ];
-const SIZE=6, SG=0, PL=1, PP=2;
-const IDLE_HINT_MS=7000;
+const SIZE=4, SG=0, PL=1, PP=2;
+const IDLE_HINT_MS_DEFAULT=7000;
 
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
-let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}};
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:7, colorHint:true, shapeHint:true, dark:false};
+let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
-  if(s && typeof s==="object"){ save={...save,...s}; }
+  if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
 }catch(e){}
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+
+/* ================= i18n ================= */
+const I18N={
+  nl:{
+    "menu.new":"Nieuw spel","menu.continue":"Verder spelen","menu.levels":"Levels",
+    "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
+    "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd",
+    "set.color":"Kleurhint","set.shape":"Vormhint","set.dark":"Donkere modus",
+    "opt.off":"Uit","opt.on":"Aan",
+    "card.tip":"Tik op de kaart voor de betekenis","card.tip2":"Tik nogmaals om verder te spelen",
+    "result.title":"Level gehaald! 🎉","result.done":"Alle {n} werkwoorden verzameld.",
+    "result.record":"nieuw record! 🏆","result.best":"beste","result.zetten":"zetten",
+    "btn.next":"Volgende niveau →","btn.again":"Opnieuw","btn.menu":"Menu",
+    "toast.shuffle":"Geen combinatie meer — nieuw bord!",
+    "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
+    "book.title":"Verzameling","book.locked":"Nog niet verzameld",
+    "book.lockedsub":"Maak een combinatie met dit werkwoord.","book.view":"Tik om de kaart te bekijken",
+    "help.title":"Speluitleg",
+    "help.p1":"Sterke werkwoorden matchen: wissel twee aangrenzende blokken en maak een rij van 3 of meer blokken van hetzelfde werkwoord, met de verleden tijd enkelvoud, de verleden tijd meervoud én het voltooid deelwoord in één rij. De rij verdwijnt en je ziet het hele werkwoord.",
+    "help.goal":"Doel: verzamel alle werkwoorden van dit niveau. Een werkwoord verzamel je door er één geldige combinatie mee te maken.",
+    "help.score":"Score: elk blok levert 10 punten op. Ketens vermenigvuldigen de punten, en opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus. Een zet zonder combinatie verbreekt de reeks.",
+    "help.moves":"Zetten: een rij telt alleen als alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.",
+    "help.form":"Vorm = tijdsvorm",
+    "help.l.sg":"afgerond = verl. tijd enk.","help.l.pl":"recht = verl. tijd mv.","help.l.pp":"afgesneden = voltooid deelwoord",
+    "help.color":"Kleur = werkwoord: alle vormen van één werkwoord hebben dezelfde (subtiele) kleur. Goed lezen is belangrijker dan kijken.",
+    "help.stuck":"Vastgelopen? Tik op 💡 voor een hint — of wacht even, dan komt er automatisch een. In de niveaumodus verschijnt na elke combinatie een leerkaart met voorlezen.",
+  },
+  zh:{
+    "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
+    "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
+    "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长",
+    "set.color":"颜色提示","set.shape":"形状提示","set.dark":"深色模式",
+    "opt.off":"关","opt.on":"开",
+    "card.tip":"点击卡片查看释义","card.tip2":"再点一下继续游戏",
+    "result.title":"过关! 🎉","result.done":"已收集本关全部 {n} 个动词。",
+    "result.record":"新纪录! 🏆","result.best":"最佳","result.zetten":"步",
+    "btn.next":"下一关 →","btn.again":"再来一次","btn.menu":"回菜单",
+    "toast.shuffle":"没有可行组合了,重新洗牌!",
+    "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
+    "book.title":"词典图鉴","book.locked":"未收集",
+    "book.lockedsub":"在棋盘上消除它来解锁","book.view":"点击查看卡片",
+    "help.title":"玩法介绍",
+    "help.p1":"匹配强变化动词:交换相邻两个词块,让同一动词的 3 个及以上词块连成一线,且必须同时包含单数过去式、复数过去式和过去分词。连线消除后展示动词原形。",
+    "help.goal":"目标:收集本关全部动词——每完成一次有效消除即收集一个。",
+    "help.score":"计分:每消一块 +10 分;连锁按倍数放大;连续有效交换有 🔥 连击加成,无效交换会打断连击。",
+    "help.moves":"交换:三种变位形式齐全才会消除;形式不齐则静默弹回。",
+    "help.form":"形状 = 变位类型",
+    "help.l.sg":"圆角 = 单数过去式","help.l.pl":"直角 = 复数过去式","help.l.pp":"切角 = 过去分词",
+    "help.color":"颜色 = 源动词:同一动词同色。颜色很淡,认读词形才是关键。",
+    "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻自动提示。普通关卡每次消除后会弹出教学卡并朗读单词。",
+  },
+};
+function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
+function glossOf(V){ return save.settings.uiLang==="zh" ? V.zh : V.en; }
+function applyI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); });
+}
+
+/* ================= 设置应用 ================= */
+function applySettings(){
+  const S=save.settings;
+  document.body.classList.toggle("dark",!!S.dark);
+  document.body.classList.toggle("no-color",!S.colorHint);
+  document.body.classList.toggle("no-shape",!S.shapeHint);
+  document.getElementById("legend").style.display=S.shapeHint?"":"none";
+  applyI18n();
+}
+
+/* ================= 语音(Web Speech API) ================= */
+let nlVoice=null;
+function initVoices(){
+  if(!("speechSynthesis" in window)) return;
+  const pick=()=>{ const vs=window.speechSynthesis.getVoices(); nlVoice=vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl"))||null; };
+  pick();
+  window.speechSynthesis.onvoiceschanged=pick;
+}
+function speakVerb(V){
+  return new Promise(res=>{
+    if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
+    try{
+      window.speechSynthesis.cancel();
+      const seq=[V.inf,V.sg,V.pl,V.pp];
+      let i=0;
+      const next=()=>{
+        if(i>=seq.length){ res(); return; }
+        const u=new SpeechSynthesisUtterance(seq[i++]);
+        u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+        u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+        u.onend=next; u.onerror=next;
+        window.speechSynthesis.speak(u);
+      };
+      next();
+    }catch(e){ res(); }
+  });
+}
+function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
 
 /* ================= SVG 插画元素库 ================= */
 function ctxOf(style){
@@ -586,15 +817,16 @@ function artSVG(verbIdx,style){
   return `<g>${ART[VERBS[verbIdx].inf](c)}</g>`;
 }
 
-/* ================= 音效(合成,可静音) ================= */
-let audioOn=true, actx=null;
+/* ================= 音效(合成,音量可调) ================= */
+let actx=null;
 function blip(freq,dur=.08,type="sine",gain=.12){
-  if(!audioOn) return;
+  const vol=(save.settings?save.settings.volume:70)/100;
+  if(vol<=0) return;
   try{
     actx=actx||new (window.AudioContext||window.webkitAudioContext)();
     const o=actx.createOscillator(), g=actx.createGain();
     o.type=type; o.frequency.value=freq;
-    g.gain.setValueAtTime(gain,actx.currentTime);
+    g.gain.setValueAtTime(gain*vol,actx.currentTime);
     g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);
     o.connect(g).connect(actx.destination);
     o.start(); o.stop(actx.currentTime+dur);
@@ -615,12 +847,19 @@ function anyOverlayOpen(){
 
 function wordOf(t){ return VERBS[t.v][["sg","pl","pp"][t.f]]; }
 
+const measureCanvas=document.createElement("canvas");
 function computeLevelFont(){
-  const maxLen=Math.max(...level.verbs.flatMap(v=>{
-    const V=VERBS[v]; return [V.sg.length,V.pl.length,V.pp.length];
-  }));
+  // 用 canvas 实测本关最长词的渲染宽度,统一字号保证任何词都完整显示
+  const ctx=measureCanvas.getContext("2d");
+  ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
   const cellW=boardEl.clientWidth/SIZE;
-  levelFont=Math.max(9,Math.min(16, cellW*0.9/(maxLen*0.54)));
+  const usable=cellW*0.92-6;                 // face 宽度减内边距
+  let maxW=1;
+  for(const v of level.verbs){
+    const V=VERBS[v];
+    for(const w of [V.sg,V.pl,V.pp]) maxW=Math.max(maxW, ctx.measureText(w).width);
+  }
+  levelFont=Math.max(9,Math.min(22, 100*usable/maxW));
 }
 function applyFontToAll(){
   for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
@@ -771,12 +1010,13 @@ function buildBoardDOM(){
   for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
 }
 
-async function startLevel(n){
-  const lv=LEVELS.find(l=>l.n===n);
+async function startLevel(id){
+  const lv=LEVELS.find(l=>l.id===id);
   if(!lv) return;
   level=lv; collectedRun=new Set(); selected=null; pendingHint=false;
   scoreRun=0; zettenRun=0; streak=0;
-  document.getElementById("lvlTag").textContent=`Niveau ${lv.n}`;
+  save.lastLevel=lv.id; persist();
+  document.getElementById("lvlTag").textContent=lv.id;
   updateHUD();
   busy=true;
   boardEl.style.setProperty("--n",SIZE);
@@ -854,6 +1094,7 @@ async function trySwap(r1,c1,r2,c2){
 
 async function resolve(runs){
   let chain=0;
+  const learnQueue=[];
   while(runs.length){
     chain++;
     const verbSet=[...new Set(runs.flatMap(run=>run.cells.map(([r,c])=>board[r][c].v)))];
@@ -882,15 +1123,18 @@ async function resolve(runs){
     for(const v of verbSet) collectedRun.add(v);                             // 关卡目标按本次对局计
     updateHUD();
     for(const v of fresh){ await showCard(v); }
-    const rep=verbSet.filter(v=>!fresh.includes(v));
-    if(rep.length){ flashShow(rep.map(v=>VERBS[v].inf).join(" · ")); }
+    // 普通关卡:每个被消动词进入教学横幅队列(首次解锁的刚看过完整卡片,跳过)
+    for(const v of verbSet){
+      if(!fresh.includes(v) && !learnQueue.includes(v)) learnQueue.push(v);
+    }
     await sleep(340);
     boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
     await gravityRefill();
     runs=scan(board);
   }
+  if(learnQueue.length){ await playLearnQueue(learnQueue); }
   if(!findHintMove()){
-    toast("Geen combinatie meer — nieuw bord!");
+    toast(t("toast.shuffle"));
     await sleep(500);
     await reshuffle();
   }
@@ -906,6 +1150,33 @@ function popScore(r,c,text,big=false){
   el.style.top=((r+0.5)/SIZE*100)+"%";
   wrap.appendChild(el);
   setTimeout(()=>el.remove(),950);
+}
+
+/* ---- 教学横幅 + 朗读(普通关卡) ---- */
+function showLearnBanner(v){
+  return new Promise(res=>{
+    const V=VERBS[v];
+    const b=document.getElementById("learnBanner");
+    document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
+    document.getElementById("bannerInf").textContent=V.inf;
+    document.getElementById("bannerForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
+    document.getElementById("bannerGloss").textContent=glossOf(V);
+    let done=false, timer=null;
+    const finish=()=>{
+      if(done) return; done=true;
+      clearTimeout(timer); b.onclick=null; stopSpeech();
+      b.classList.remove("show");
+      setTimeout(res,300);
+    };
+    b.onclick=finish;
+    b.style.setProperty("--bdur","3.6s");
+    requestAnimationFrame(()=>b.classList.add("show"));
+    timer=setTimeout(finish,3600);
+    speakVerb(V);      // 依次朗读 原形 → 单数 → 复数 → 分词;横幅至少停留 3.6s,点按可提前关
+  });
+}
+async function playLearnQueue(q){
+  for(const v of q){ await showLearnBanner(v); }
 }
 
 async function gravityRefill(){
@@ -984,41 +1255,45 @@ function showCard(v){
     document.getElementById("cardArt").innerHTML=artSVG(v,save.style);
     document.getElementById("cardInf").textContent=V.inf;
     document.getElementById("cardForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
-    document.getElementById("cardGloss").textContent=V.en;
+    document.getElementById("cardGloss").textContent=glossOf(V);
     document.getElementById("cardModal").classList.remove("gloss-open");
-    document.getElementById("cardTip").textContent="Tik op de kaart voor de betekenis";
+    document.getElementById("cardTip").textContent=t("card.tip");
     document.getElementById("cardModal").classList.add("on");
     blip(660,.12,"sine",.1); setTimeout(()=>blip(880,.14,"sine",.1),90);
+    speakVerb(V);
   });
 }
 function closeCard(){
   document.getElementById("cardModal").classList.remove("on");
+  stopSpeech();
   if(cardResolve){ const r=cardResolve; cardResolve=null; r(); }
 }
 
 function checkEnd(){
   if(collectedRun.size>=level.goal){
-    const hasNext=LEVELS.some(l=>l.n===level.n+1);
-    if(level.n+1>save.unlocked){ save.unlocked=level.n+1; }
-    const oldBest=save.best[level.n]||0;
+    const idx=LEVELS.findIndex(l=>l.id===level.id);
+    const hasNext=idx>=0 && idx<LEVELS.length-1;
+    if(idx>=0 && idx+2>save.unlocked){ save.unlocked=idx+2; }
+    const oldBest=save.best[level.id]||0;
     const newBest=scoreRun>oldBest;
-    if(newBest){ save.best[level.n]=scoreRun; }
+    if(newBest){ save.best[level.id]=scoreRun; }
     persist();
     showResult(hasNext,newBest,oldBest);
   }
 }
 function showResult(hasNext,newBest,oldBest){
-  document.getElementById("resultTitle").textContent="Level gehaald! 🎉";
+  document.getElementById("resultTitle").textContent=t("result.title");
+  const bestTxt=newBest?` — ${t("result.record")}`:` (${t("result.best")}: ${oldBest})`;
   document.getElementById("resultText").innerHTML=
-    `Alle ${level.goal} werkwoorden verzameld.<br>`+
-    `Score: <b>${scoreRun}</b>${newBest?" — nieuw record! 🏆":` (beste: ${oldBest})`} · ${zettenRun} zetten`;
+    t("result.done").replace("{n}",level.goal)+"<br>"+
+    `⭐ <b>${scoreRun}</b>${bestTxt} · ${zettenRun} ${t("result.zetten")}`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
-  if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent="Volgende niveau →"; b.onclick=()=>{hideResult(); startLevel(level.n+1);}; btns.appendChild(b); }
-  const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent="Opnieuw";
-  b2.onclick=()=>{hideResult(); startLevel(level.n);};
+  if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next"); b.onclick=()=>{hideResult(); startLevel(LEVELS[LEVELS.findIndex(l=>l.id===level.id)+1].id);}; btns.appendChild(b); }
+  const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
+  b2.onclick=()=>{hideResult(); startLevel(level.id);};
   btns.appendChild(b2);
-  const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent="Menu";
+  const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
   b3.onclick=()=>{hideResult(); openMenu();};
   btns.appendChild(b3);
   document.getElementById("resultModal").classList.add("on");
@@ -1071,7 +1346,7 @@ async function hint(){
   if(!level) return;
   if(busy){ pendingHint=true; return; }        // 对局动画中:排队,结束后自动弹
   const m=findHintMove();
-  if(!m){ toast("Geen combinatie meer — nieuw bord!"); await reshuffle(); return; }
+  if(!m){ toast(t("toast.shuffle")); await reshuffle(); return; }
   clearHint();
   const t=board[m.answer[0]][m.answer[1]];
   t.el.classList.add("hint");
@@ -1082,9 +1357,10 @@ function clearHint(){
   boardEl.querySelectorAll(".hint").forEach(el=>el.classList.remove("hint"));
 }
 
-/* ---- 自动提示:闲置一段时间后轻推一下 ---- */
+/* ---- 自动提示:闲置一段时间后轻推一下(时长可在设置中调整/关闭) ---- */
 setInterval(()=>{
-  if(level && !busy && !anyOverlayOpen() && !boardEl.querySelector(".hint") && Date.now()-lastAction>IDLE_HINT_MS){
+  const wait=(save.settings.hintWait||0)*1000;
+  if(wait>0 && level && !busy && !anyOverlayOpen() && !boardEl.querySelector(".hint") && Date.now()-lastAction>wait){
     lastAction=Date.now();
     hint();
   }
@@ -1099,57 +1375,81 @@ function toast(msg){
   toastTimer=setTimeout(()=>t.classList.remove("on"),1800);
 }
 
-/* ================= 菜单/图鉴/帮助 ================= */
+/* ================= 菜单/设置/图鉴 ================= */
 function openMenu(){
-  const g=document.getElementById("lvGrid");
-  g.innerHTML="";
-  for(const lv of LEVELS){
-    const b=document.createElement("button");
-    const locked=lv.n>save.unlocked;
-    b.className="lv-btn"+(locked?" locked":"");
-    const best=save.best[lv.n];
-    b.innerHTML=`<b>Niveau ${lv.n}</b><small>A2 · ${lv.verbs.map(i=>VERBS[i].inf).slice(0,3).join(" / ")} …</small>`+
-      (best?`<small>⭐ beste: ${best}</small>`:"");
-    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(lv.n); };
-    g.appendChild(b);
-  }
-  const resume=document.getElementById("btnResume");
-  if(level){ resume.style.display="inline-block"; resume.onclick=()=>document.getElementById("menuScreen").classList.remove("on"); }
-  else resume.style.display="none";
-  renderStyleRow();
+  showMenuView("main");
+  document.getElementById("mContinue").style.display=save.lastLevel?"":"none";
   document.getElementById("menuScreen").classList.add("on");
 }
-function renderStyleRow(){
-  const row=document.getElementById("styleRow");
-  row.innerHTML="";
-  for(const st of ["A","B"]){
-    const d=document.createElement("div");
-    d.className="style-opt"+(save.style===st?" sel":"");
-    d.innerHTML=`<svg viewBox="0 0 120 120" style="width:100%;height:auto;display:block">${artSVG(8,st)}</svg><svg viewBox="0 0 120 120" style="width:100%;height:auto;display:block">${artSVG(11,st)}</svg><div>Stijl ${st}</div>`;
-    d.onclick=()=>{ save.style=st; persist(); renderStyleRow(); };
-    row.appendChild(d);
+function showMenuView(v){
+  document.getElementById("menuMain").style.display=v==="main"?"":"none";
+  document.getElementById("menuLevels").style.display=v==="levels"?"":"none";
+  if(v==="levels") renderLevelGrid();
+}
+function renderLevelGrid(){
+  const g=document.getElementById("lvGrid");
+  g.innerHTML="";
+  LEVELS.forEach((lv,i)=>{
+    const b=document.createElement("button");
+    const locked=(i+1)>save.unlocked;
+    b.className="lv-btn"+(locked?" locked":"");
+    b.innerHTML=lv.id+(save.best[lv.id]?`<small>⭐ ${save.best[lv.id]}</small>`:"");
+    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(lv.id); };
+    g.appendChild(b);
+  });
+}
+
+/* ---- 设置面板 ---- */
+function seg(el,opts,cur,cb){
+  el.innerHTML="";
+  for(const [val,label] of opts){
+    const btn=document.createElement("button");
+    btn.textContent=label;
+    if(String(val)===String(cur)) btn.classList.add("sel");
+    btn.onclick=()=>{ cb(val); persist(); applySettings(); renderSettings(); };
+    el.appendChild(btn);
   }
 }
+function openSettings(){
+  renderSettings();
+  document.getElementById("settingsModal").classList.add("on");
+}
+function renderSettings(){
+  const S=save.settings;
+  seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
+  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"]],S.uiLang,v=>S.uiLang=v);
+  const vol=document.getElementById("setVolume"); vol.value=S.volume;
+  const tts=document.getElementById("setTts"); tts.value=S.ttsVolume;
+  seg(document.getElementById("setHintWait"),
+    [[5,"5 s"],[10,"10 s"],[15,"15 s"],[30,"30 s"],[0,t("opt.off")]],S.hintWait,v=>S.hintWait=+v);
+  seg(document.getElementById("setColor"),[[true,t("opt.on")],[false,t("opt.off")]],S.colorHint,v=>S.colorHint=(v===true||v==="true"));
+  seg(document.getElementById("setShape"),[[true,t("opt.on")],[false,t("opt.off")]],S.shapeHint,v=>S.shapeHint=(v===true||v==="true"));
+  seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
+}
+
+/* ---- 图鉴 ---- */
 function openBook(){
   const list=document.getElementById("bookList");
   list.innerHTML="";
-  for(const lv of [1,2]){
+  const groups=[...new Set(LEVELS.map(l=>l.id))];
+  for(const gid of groups){
+    const lv=LEVELS.find(l=>l.id===gid);
     const h=document.createElement("div");
     h.className="book-group";
-    h.textContent=`Niveau ${lv} · A2`;
+    h.textContent=gid;
     list.appendChild(h);
     VERBS.forEach((V,i)=>{
-      if(V.lv!==lv) return;
+      if(!lv.verbs.includes(i)) return;
       const got=save.collected.includes(V.inf);
       const row=document.createElement("div");
       row.className="book-row"+(got?" viewable":"");
       row.innerHTML=got
         ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
           <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
-          <span class="book-tag">${V.en}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
+          <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
-          <div class="book-main"><b>Nog niet verzameld</b><small>Maak een combinatie met dit werkwoord.</small></div>`;
-      if(got){ row.title="Tik om de kaart te bekijken"; row.onclick=()=>showCard(i); }
+          <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
+      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(i); }
       list.appendChild(row);
     });
   }
@@ -1161,15 +1461,26 @@ document.getElementById("btnMenu").onclick=openMenu;
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
 document.getElementById("btnHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
-document.getElementById("btnHelp2").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("mNew").onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(LEVELS[0].id); };
+document.getElementById("mContinue").onclick=()=>{
+  document.getElementById("menuScreen").classList.remove("on");
+  const id=LEVELS.some(l=>l.id===save.lastLevel)?save.lastLevel:LEVELS[0].id;
+  startLevel(id);
+};
+document.getElementById("mLevels").onclick=()=>showMenuView("levels");
+document.getElementById("mBack").onclick=()=>showMenuView("main");
+document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("mSettings").onclick=openSettings;
+document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
+document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
 document.getElementById("cardPanel").onclick=()=>{
   const m=document.getElementById("cardModal");
-  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="Tik nogmaals om verder te spelen"; }
+  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent=t("card.tip2"); }
   else closeCard();
 };
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
-["bookDrawer","helpModal"].forEach(id=>{
+["bookDrawer","helpModal","settingsModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
 });
 window.addEventListener("resize",()=>{
@@ -1180,7 +1491,7 @@ window.addEventListener("resize",()=>{
 
 /* ---- 调试钩子(自动化测试用) ---- */
 window.NLM3={
-  state:()=>({level:level&&level.n, score:scoreRun, zetten:zettenRun, streak, collected:[...collectedRun], busy,
+  state:()=>({level:level&&level.id, score:scoreRun, zetten:zettenRun, streak, collected:[...collectedRun], busy,
     board:board.map(row=>row.map(t=>t?[t.v,t.f]:null))}),
   verbs:VERBS, levels:LEVELS,
   swap:async(r1,c1,r2,c2)=>trySwap(r1,c1,r2,c2),
@@ -1188,8 +1499,12 @@ window.NLM3={
   countMoves:()=>countMoves(),
   getLastAction:()=>lastAction,
   setLastAction:v=>lastAction=v,
+  settings:()=>({...save.settings}),
+  banner:()=>document.getElementById("learnBanner").className,
 };
 
+initVoices();
+applySettings();
 openMenu();
 </script>
 </body>
