@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Sterke werkwoorden · match-3</title>
+<style>
+  :root{
+    --ink:#33415c;
+    --paper:#f7f5f0;
+    --card:#ffffff;
+    --line:#e4dfd4;
+    --accent:#e8734a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    background:var(--paper); color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    user-select:none; -webkit-user-select:none;
+    overflow:hidden;
+  }
+  button{font-family:inherit; cursor:pointer;}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    width:min(94vw,640px);
+    display:flex; align-items:center; justify-content:space-between; gap:6px;
+    padding:10px 2px 6px;
+  }
+  .hud-group{display:flex; align-items:center; gap:6px;}
+  .hud-btn{
+    width:34px; height:34px; border-radius:10px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); font-size:16px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hud-btn:active{transform:scale(.94);}
+  .tag{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:6px 10px; font-size:13px; font-weight:600; white-space:nowrap;
+  }
+  #movesTag.low{color:#c0392b; border-color:#e8b2ab;}
+  @media (max-width:430px){
+    .hud-btn{width:30px; height:30px; font-size:14px;}
+    .tag{padding:5px 7px; font-size:11.5px;}
+    #hud{padding-top:8px; gap:4px;}
+  }
+
+  /* ---------- Board (4:3 tiles → 4:3 board) ---------- */
+  #boardWrap{
+    position:relative;
+    width:min(94vw,80vh,640px);
+    aspect-ratio:4/3;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:6px;
+    box-shadow:0 6px 24px rgba(51,65,92,.06);
+  }
+  #board{
+    position:relative; width:100%; height:100%;
+    touch-action:none;
+  }
+  .tile{
+    position:absolute; left:0; top:0;
+    width:calc(100%/var(--n)); height:calc(100%/var(--n));
+    transition:transform .16s cubic-bezier(.35,1.25,.55,1);
+    will-change:transform;
+  }
+  .tile.spawn{transition:transform .22s cubic-bezier(.3,1.2,.5,1);}
+  .face{
+    width:92%; height:90%; margin:4% 4%;
+    display:flex; align-items:center; justify-content:center;
+    background:hsl(var(--h) 42% 92%);
+    color:hsl(var(--h) 45% 28%);
+    box-shadow:inset 0 -3px 0 hsl(var(--h) 42% 80%);
+    font-weight:700; line-height:1.05; text-align:center;
+    overflow:hidden; padding:0 2px;
+    border-radius:18%;                     /* enk.: afgeronde hoeken */
+    transition:filter .15s, scale .15s;
+  }
+  .tile.f-pl .face{border-radius:6%;}      /* mv.: (bijna) rechte hoeken */
+  .tile.f-pp .face{                        /* v.d.: afgesneden hoeken */
+    border-radius:0;
+    clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);
+  }
+  .tile.sel .face{
+    scale:1.07;
+    filter:drop-shadow(0 0 4px hsl(var(--h) 55% 45%));
+  }
+  .tile.hint .face{animation:hintPulse 1.1s ease-in-out 3;}
+  @keyframes hintPulse{
+    0%,100%{filter:none; scale:1;}
+    50%{filter:drop-shadow(0 0 7px hsl(var(--h) 60% 50%)); scale:1.09;}
+  }
+  .tile.burst{z-index:5;}
+  .tile.burst .face{animation:burstAnim .3s ease forwards;}
+  @keyframes burstAnim{ to{ scale:1.45; opacity:0; } }
+
+  /* ---------- flash (herhaalde werkwoorden) ---------- */
+  #flash{
+    position:absolute; inset:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0;
+    font-size:clamp(26px,8vw,44px); font-weight:800; color:var(--ink);
+    text-shadow:0 0 14px var(--paper),0 0 24px var(--paper),0 0 34px var(--paper);
+    text-align:center; padding:0 12px;
+  }
+  #flash.show{animation:flashAnim 1.05s ease forwards;}
+  @keyframes flashAnim{
+    0%{opacity:0; transform:scale(.7);}
+    22%{opacity:1; transform:scale(1.04);}
+    70%{opacity:1; transform:scale(1);}
+    100%{opacity:0; transform:scale(1.02);}
+  }
+
+  /* ---------- legend ---------- */
+  #legend{
+    width:min(94vw,640px);
+    display:flex; gap:14px; justify-content:center; align-items:center;
+    padding:8px 0 10px; font-size:12px; color:#7a8496; flex-wrap:wrap;
+  }
+  .leg{display:flex; align-items:center; gap:5px;}
+  .leg i{
+    width:15px; height:12px; display:inline-block; flex:none;
+    background:#dfe6f2; box-shadow:inset 0 -2px 0 #c3cfe4;
+    border-radius:18%;
+  }
+  .leg i.s-pl{border-radius:6%;}
+  .leg i.s-pp{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:50;
+    background:rgba(51,65,92,.42);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .22s;
+  }
+  .overlay.on{opacity:1; pointer-events:auto;}
+  .panel{
+    background:var(--card); border-radius:20px;
+    padding:22px 22px 20px; width:min(88vw,380px);
+    box-shadow:0 18px 50px rgba(20,30,50,.25);
+    position:relative; max-height:86vh; overflow:auto;
+  }
+  .panel h1{margin:0 0 4px; font-size:22px;}
+  .panel h2{margin:0 0 10px; font-size:17px;}
+  .panel p{font-size:13px; line-height:1.65; color:#5a6577; margin:8px 0;}
+  .close-x{
+    position:absolute; top:10px; right:10px; width:30px; height:30px;
+    border:none; background:none; font-size:18px; color:#98a1b0;
+  }
+
+  /* menu */
+  #menuScreen .panel{width:min(90vw,420px);}
+  .lv-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0 6px;}
+  .lv-btn{
+    border:1px solid var(--line); background:var(--paper); border-radius:14px;
+    padding:12px 8px; text-align:center; color:var(--ink);
+  }
+  .lv-btn b{display:block; font-size:16px;}
+  .lv-btn small{color:#8b93a3; font-size:11px;}
+  .lv-btn.locked{opacity:.45; pointer-events:none;}
+  .style-row{display:flex; gap:10px; margin-top:8px;}
+  .style-opt{
+    flex:1; border:2px solid var(--line); border-radius:14px; padding:8px 6px 6px;
+    background:var(--paper); text-align:center; font-size:11px; color:#5a6577;
+  }
+  .style-opt.sel{border-color:var(--accent);}
+
+  /* collection card (eerste keer) */
+  #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
+  #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
+  #cardInf{font-size:34px; font-weight:800; letter-spacing:.5px;}
+  #cardForms{font-size:13px; color:#7a8496; margin-top:6px;}
+  #cardGloss{
+    margin-top:12px; padding:10px 12px; border-radius:12px;
+    background:var(--paper); font-size:14px; color:var(--ink); display:none;
+  }
+  #cardModal.gloss-open #cardGloss{display:block;}
+  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
+
+  /* book */
+  #bookDrawer{justify-content:flex-end; align-items:stretch;}
+  #bookDrawer .panel{
+    width:min(88vw,360px); height:100%; max-height:none;
+    border-radius:20px 0 0 20px; padding:18px 16px;
+  }
+  .book-row{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 6px; border-bottom:1px dashed var(--line);
+  }
+  .book-art{width:44px; height:44px; flex:none;}
+  .book-art.empty{
+    border-radius:12px; background:var(--paper); border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; color:#b6bdc9; font-size:16px;
+  }
+  .book-main b{font-size:15px;}
+  .book-main small{display:block; color:#8b93a3; font-size:11.5px; margin-top:2px;}
+  .book-tag{margin-left:auto; font-size:11px; color:#8b93a3; flex:none; text-align:right;}
+  .book-group{font-size:12px; color:#98a1b0; margin:14px 0 2px; font-weight:700;}
+
+  /* result */
+  #resultModal .panel{text-align:center;}
+  .btn{
+    display:inline-block; border:none; border-radius:12px;
+    padding:11px 20px; font-size:14px; font-weight:700; margin:6px 4px 0;
+    background:var(--accent); color:#fff;
+  }
+  .btn.ghost{background:var(--paper); color:var(--ink); border:1px solid var(--line);}
+  .btn:active{transform:scale(.96);}
+
+  /* toast */
+  #toast{
+    position:fixed; left:50%; bottom:9vh; transform:translateX(-50%) translateY(8px);
+    background:rgba(51,65,92,.88); color:#fff; font-size:13px;
+    padding:8px 16px; border-radius:20px; opacity:0; transition:.25s; z-index:80;
+    pointer-events:none; white-space:nowrap; max-width:92vw;
+  }
+  #toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .rule-legend{display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;}
+  .rule-legend .leg{color:#5a6577; font-size:12px;}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header id="hud">
+    <div class="hud-group">
+      <button class="hud-btn" id="btnMenu" title="Menu">☰</button>
+      <span class="tag" id="lvlTag">Niveau 1</span>
+    </div>
+    <div class="hud-group">
+      <span class="tag" id="goalTag">🎯 0/6</span>
+      <span class="tag" id="movesTag">Zetten: 26</span>
+    </div>
+    <div class="hud-group">
+      <button class="hud-btn" id="btnHint" title="Hint">💡</button>
+      <button class="hud-btn" id="btnBook" title="Verzameling">📖</button>
+      <button class="hud-btn" id="btnHelp" title="Speluitleg">?</button>
+    </div>
+  </header>
+
+  <div id="boardWrap">
+    <div id="board"></div>
+    <div id="flash"></div>
+  </div>
+
+  <div id="legend">
+    <span class="leg"><i class="s-sg"></i>verl. tijd enk.</span>
+    <span class="leg"><i class="s-pl"></i>verl. tijd mv.</span>
+    <span class="leg"><i class="s-pp"></i>voltooid deelwoord</span>
+  </div>
+</div>
+
+<!-- Hoofdmenu -->
+<div class="overlay on" id="menuScreen">
+  <div class="panel">
+    <h1>Sterke werkwoorden</h1>
+    <p>Wissel twee blokken en maak een rij van <strong>3 en meer blokken van hetzelfde werkwoord</strong>: de verleden tijd enkelvoud, de verleden tijd meervoud én het voltooid deelwoord samen in één rij. De rij verdwijnt en je ziet het hele werkwoord.<br>Vorm = tijdsvorm, kleur = werkwoord — maar allebei subtiel: <strong>goed lezen is de sleutel</strong>.</p>
+    <div class="lv-grid" id="lvGrid"></div>
+    <p style="margin:4px 0 0;"><button class="btn" id="btnResume" style="display:none;">Verder spelen</button></p>
+    <p style="margin-top:14px; font-weight:700; color:var(--ink);">Illustratiestijl (kies er één):</p>
+    <div class="style-row" id="styleRow"></div>
+    <p style="margin-top:12px;"><button class="btn ghost" id="btnHelp2">Speluitleg</button></p>
+  </div>
+</div>
+
+<!-- Verzamelkaart (eerste keer) -->
+<div class="overlay" id="cardModal">
+  <div class="panel" id="cardPanel">
+    <button class="close-x" id="cardClose">✕</button>
+    <svg id="cardArt" viewBox="0 0 120 120"></svg>
+    <div id="cardInf"></div>
+    <div id="cardForms"></div>
+    <div id="cardGloss"></div>
+    <div id="cardTip">Tik op de kaart voor de betekenis</div>
+  </div>
+</div>
+
+<!-- Resultaat -->
+<div class="overlay" id="resultModal">
+  <div class="panel">
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+    <div id="resultBtns"></div>
+  </div>
+</div>
+
+<!-- Verzameling -->
+<div class="overlay" id="bookDrawer">
+  <div class="panel">
+    <h2>Verzameling</h2>
+    <div id="bookList"></div>
+  </div>
+</div>
+
+<!-- Speluitleg -->
+<div class="overlay" id="helpModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2>Speluitleg</h2>
+    <p><strong>Doel:</strong> verzamel alle werkwoorden van dit niveau voordat je zetten op zijn. Een werkwoord verzamel je door er één geldige combinatie mee te maken.</p>
+    <p><strong>Zetten:</strong> wissel twee aangrenzende blokken. Een rij telt alleen als er 3 of meer blokken van hetzelfde werkwoord staan én alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.</p>
+    <p><strong>Vorm = tijdsvorm</strong></p>
+    <div class="rule-legend">
+      <span class="leg"><i class="s-sg"></i>afgerond = verl. tijd enk.</span>
+      <span class="leg"><i class="s-pl"></i>recht = verl. tijd mv.</span>
+      <span class="leg"><i class="s-pp"></i>afgesneden = voltooid deelwoord</span>
+    </div>
+    <p><strong>Kleur = werkwoord:</strong> alle vormen van één werkwoord hebben dezelfde (subtiele) kleur. Goed lezen is belangrijker dan kijken.</p>
+    <p><strong>Vastgelopen?</strong> Tik op 💡 voor een hint — of wacht even, dan komt er automatisch een. Zit er geen combinatie meer in, dan wordt het bord opnieuw geschud.</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================= 数据 ================= */
+const VERBS=[
+  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    hue:215, lv:1},
+  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  hue:12,  lv:1},
+  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    hue:275, lv:1},
+  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  hue:160, lv:1},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   hue:48,  lv:1},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  hue:330, lv:1},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  hue:65,  lv:2},
+  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  hue:190, lv:2},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  hue:130, lv:2},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   hue:356, lv:2},
+  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", hue:250, lv:2},
+  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", hue:300, lv:2},
+];
+const LEVELS=[
+  {n:1, verbs:[0,1,2,3,4,5],  goal:6, moves:26},
+  {n:2, verbs:[6,7,8,9,10,11], goal:6, moves:28},
+];
+const SIZE=6, SG=0, PL=1, PP=2;
+const IDLE_HINT_MS=7000;
+
+/* ================= 存档 ================= */
+const SAVE_KEY="nlm3.prototype.v1";
+let save={unlocked:1, collected:[], style:"A"};
+try{
+  const s=JSON.parse(localStorage.getItem(SAVE_KEY));
+  if(s && typeof s==="object"){ save={...save,...s}; }
+}catch(e){}
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+
+/* ================= SVG 插画元素库 ================= */
+function ctxOf(style){
+  return style==="B"
+    ? {ink:"#3a4750", sw:4, body:"none", acc:"rgba(255,150,100,.25)", teal:"rgba(84,184,165,.25)", white:"rgba(255,255,255,.45)"}
+    : {ink:"#39424e", sw:0, body:"#ff8a66", acc:"#ffc94d", teal:"#54b8a5", white:"#ffffff"};
+}
+function limb(ctx,pts){
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+  return `<path d="${d}" fill="none" stroke="${ctx.ink}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+function person(ctx,pose,x,y,flip=false){
+  const flipG=flip?` transform="translate(${2*x},0) scale(-1,1)"`:"";
+  let s="";
+  const head=(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="8.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>${ctx.sw?"":`<circle cx="${cx-2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/><circle cx="${cx+2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/>`}`;
+  if(pose==="lie"){
+    s+=limb(ctx,[[x-14,y-30],[x-26,y-27]])
+      +limb(ctx,[[x-6,y-31],[x-20,y-24]])
+      +`<rect x="${x-24}" y="${y-40}" width="34" height="13" rx="6.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>`
+      +head(x+18,y-34);
+    return `<g${flipG}>${s}</g>`;
+  }
+  const lean=pose==="run"?3:0;
+  s+=head(x+lean,y-38);
+  s+=limb(ctx,[[x+lean,y-29.5],[x,y-12]]);
+  const legEnds={
+    stand:[[-6,0],[6,0]], open:[[-6,0],[6,0]],
+    walk:[[-9,0],[8,-1]], run:[[-10,-1],[9,0]],
+    hold:[[-5,0],[6,0]],  reach:[[-5,0],[6,0]],
+  }[pose]||[[-6,0],[6,0]];
+  s+=limb(ctx,[[x,y-12],[x+legEnds[0][0],y+legEnds[0][1]]]);
+  s+=limb(ctx,[[x,y-12],[x+legEnds[1][0],y+legEnds[1][1]]]);
+  const armEnds={
+    stand:[[-8,-14],[8,-14]], open:[[-13,-33],[13,-33]],
+    walk:[[-9,-18],[9,-15]],  run:[[-9,-20],[13,-24]],
+    hold:[[10,-20],[12,-16]], reach:[[16,-24],[-7,-15]],
+  }[pose]||[[-8,-14],[8,-14]];
+  for(const e of armEnds) s+=limb(ctx,[[x+lean,y-26],[x+e[0],y+e[1]]]);
+  return `<g${flipG}>${s}</g>`;
+}
+function bgCircle(ctx,hue){
+  return `<circle cx="60" cy="60" r="52" fill="hsl(${hue} 45% 55% / ${ctx.sw?0.10:0.16})"/>`;
+}
+function ground(ctx,y=96){
+  return `<line x1="26" y1="${y}" x2="94" y2="${y}" stroke="${ctx.ink}" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+function gift(ctx,x,y,s=1){
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <rect x="-10" y="-9" width="20" height="17" rx="2.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <line x1="0" y1="-9" x2="0" y2="8" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/>
+    <path d="M0 -9 C -7 -16, -12 -10, 0 -9 C 12 -10, 7 -16, 0 -9" fill="none" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/>
+  </g>`;
+}
+function box(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <rect x="-9" y="-8" width="18" height="16" rx="2" fill="${ctx.teal}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <line x1="-9" y1="0" x2="9" y2="0" stroke="${ctx.ink}" stroke-width="2.2" stroke-opacity=".5"/>
+  </g>`;
+}
+function ball(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <circle r="7.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <path d="M-5 -4 A 6.5 6.5 0 0 1 5 -4" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".5"/>
+  </g>`;
+}
+function apple(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <circle r="8.5" fill="${ctx.sw?"rgba(255,107,87,.3)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <circle cx="6" cy="-5" r="3.2" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}"/>
+    <path d="M0 -8 Q 1 -12 4 -13" fill="none" stroke="${ctx.ink}" stroke-width="2"/>
+    <path d="M4 -13 Q 9 -14 9 -10 Q 5 -9 4 -13" fill="${ctx.sw?"rgba(84,184,165,.35)":"#54b8a5"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2"`:""}/>
+  </g>`;
+}
+function plateFork(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <ellipse cx="0" cy="8" rx="17" ry="5.5" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${ctx.sw?ctx.ink:"none"}" stroke-width="3"/>
+    <g stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".6" stroke-linecap="round">
+      <line x1="-24" y1="-6" x2="-24" y2="10"/><line x1="-27" y1="-6" x2="-27" y2="0"/><line x1="-21" y1="-6" x2="-21" y2="0"/><line x1="-24" y1="0" x2="-24" y2="10"/>
+    </g>
+  </g>`;
+}
+function pencilPaper(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <rect x="-26" y="-14" width="46" height="32" rx="3" fill="${ctx.sw?"rgba(255,255,255,.55)":"#fff"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2}" ${ctx.sw?"":'stroke-opacity=".35"'}/>
+    <path d="M-19 -5 q 5 4 10 0 t 10 0" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".55"/>
+    <path d="M-19 4 q 5 4 10 0 t 4 0" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".55"/>
+    <g transform="rotate(40 26 -10)">
+      <rect x="20" y="-26" width="6" height="22" rx="1.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>
+      <path d="M20 -4 L26 -4 L23 2 Z" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>
+    </g>
+  </g>`;
+}
+function bedMoon(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <path d="M28 -30 a 9 9 0 1 0 9 11 a 7.5 7.5 0 0 1 -9 -11" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <text x="44" y="-30" font-size="10" font-weight="700" fill="${ctx.ink}" fill-opacity=".6" font-family="sans-serif">z</text>
+    <text x="50" y="-38" font-size="8" font-weight="700" fill="${ctx.ink}" fill-opacity=".45" font-family="sans-serif">z</text>
+    <rect x="-34" y="-6" width="66" height="8" rx="3" fill="${ctx.teal}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <line x1="-32" y1="2" x2="-32" y2="10" stroke="${ctx.ink}" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="30" y1="2" x2="30" y2="10" stroke="${ctx.ink}" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="-32" y="-14" width="16" height="8" rx="4" fill="${ctx.sw?"rgba(255,255,255,.6)":"#fff"}" stroke="${ctx.sw?ctx.ink:"none"}" stroke-width="2.5"/>
+  </g>`;
+}
+function eyeBig(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <path d="M-26 0 Q 0 -22 26 0 Q 0 22 -26 0 Z" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${ctx.ink}" stroke-width="3.2"/>
+    <circle r="9.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <circle r="3.6" fill="${ctx.ink}"/>
+    <g stroke="${ctx.ink}" stroke-width="2.4" stroke-linecap="round">
+      <line x1="-12" y1="-15" x2="-15" y2="-20"/><line x1="0" y1="-18" x2="0" y2="-24"/><line x1="12" y1="-15" x2="15" y2="-20"/>
+    </g>
+  </g>`;
+}
+function door(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <rect x="-10" y="-34" width="20" height="34" rx="2.5" fill="${ctx.sw?"rgba(255,201,77,.35)":"#ffe3ad"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2.5}" ${ctx.sw?"":'stroke-opacity=".5"'}/>
+    <circle cx="5" cy="-17" r="1.8" fill="${ctx.ink}" fill-opacity=".6"/>
+  </g>`;
+}
+function arrow(ctx,x1,y1,x2,y2){
+  const a=Math.atan2(y2-y1,x2-x1),hl=6;
+  return `<g stroke="${ctx.ink}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" fill="none">
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>
+    <path d="M${x2-hl*Math.cos(a-.5)} ${y2-hl*Math.sin(a-.5)} L${x2} ${y2} L${x2-hl*Math.cos(a+.5)} ${y2-hl*Math.sin(a+.5)}"/>
+  </g>`;
+}
+function flagMound(ctx,x,y){
+  return `<g transform="translate(${x} ${y})">
+    <path d="M-20 10 Q 0 -8 20 10 Z" fill="${ctx.sw?"rgba(84,184,165,.3)":"#cfe8e0"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/>
+    <line x1="0" y1="-1" x2="0" y2="-24" stroke="${ctx.ink}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 -24 L14 -19 L0 -14 Z" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>
+  </g>`;
+}
+function dashedCircle(ctx,x,y,r){
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${ctx.ink}" stroke-opacity=".4" stroke-width="2" stroke-dasharray="4 5"/>`;
+}
+function speedLines(ctx,x,y){
+  return `<g stroke="${ctx.ink}" stroke-opacity=".45" stroke-width="3" stroke-linecap="round">
+    <line x1="${x-16}" y1="${y-10}" x2="${x-30}" y2="${y-10}"/>
+    <line x1="${x-12}" y1="${y-22}" x2="${x-28}" y2="${y-22}"/>
+    <line x1="${x-16}" y1="${y-34}" x2="${x-26}" y2="${y-34}"/>
+  </g>`;
+}
+function sparkles(ctx,x,y){
+  let s="";
+  const pts=[[x-18,y-40],[x+16,y-46],[x+22,y-26]];
+  for(const [px,py] of pts){
+    s+=`<path d="M${px} ${py-4} L${px+1.6} ${py-1.6} L${px+4} ${py} L${px+1.6} ${py+1.6} L${px} ${py+4} L${px-1.6} ${py+1.6} L${px-4} ${py} L${px-1.6} ${py-1.6} Z" fill="${ctx.acc}" stroke="${ctx.ink}" stroke-width="1.4" stroke-opacity=".4"/>`;
+  }
+  return s;
+}
+function heart(ctx,x,y,s=1){
+  return `<path transform="translate(${x} ${y}) scale(${s})" d="M0 3 C -6 -4, -12 1, -6 6 L0 11 L6 6 C 12 1, 6 -4, 0 3 Z" fill="${ctx.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>`;
+}
+
+const ART={
+  zijn:c=>bgCircle(c,215)+ground(c)+person(c,"open",60,96)+sparkles(c,60,60),
+  hebben:c=>bgCircle(c,12)+ground(c)+person(c,"hold",56,96)+box(c,72,78),
+  gaan:c=>bgCircle(c,275)+ground(c)+door(c,88,96)+person(c,"walk",46,96)+arrow(c,22,66,38,66),
+  komen:c=>bgCircle(c,160)+ground(c)+door(c,32,96)+person(c,"walk",74,96,true)+arrow(c,98,66,82,66),
+  zien:c=>bgCircle(c,48)+eyeBig(c,60,62)+sparkles(c,60,60),
+  geven:c=>bgCircle(c,330)+ground(c)+person(c,"reach",48,96)+gift(c,74,80)+heart(c,84,58,.9),
+  nemen:c=>bgCircle(c,65)+ground(c)+person(c,"hold",54,96)+ball(c,74,76)+`<path d="M96 56 Q 92 68 84 71" fill="none" stroke="${c.ink}" stroke-opacity=".5" stroke-width="2.5" stroke-dasharray="3 4" stroke-linecap="round"/>`,
+  blijven:c=>bgCircle(c,190)+flagMound(c,78,96)+person(c,"stand",58,94)+dashedCircle(c,58,68,26),
+  lopen:c=>bgCircle(c,130)+ground(c)+speedLines(c,52,74)+person(c,"run",62,96),
+  eten:c=>bgCircle(c,356)+plateFork(c,60,82)+apple(c,60,74),
+  schrijven:c=>bgCircle(c,250)+pencilPaper(c,58,74),
+  slapen:c=>bgCircle(c,300)+bedMoon(c,60,86)+person(c,"lie",48,106),
+};
+function artSVG(verbIdx,style){
+  const c=ctxOf(style);
+  return `<g>${ART[VERBS[verbIdx].inf](c)}</g>`;
+}
+
+/* ================= 音效(合成,可静音) ================= */
+let audioOn=true, actx=null;
+function blip(freq,dur=.08,type="sine",gain=.12){
+  if(!audioOn) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(gain,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);
+    o.connect(g).connect(actx.destination);
+    o.start(); o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+
+/* ================= 棋盘引擎 ================= */
+const boardEl=document.getElementById("board");
+const flashEl=document.getElementById("flash");
+let board=[], busy=false, level=null, movesLeft=0, collectedRun=new Set(), selected=null;
+let levelFont=13, pendingHint=false, lastAction=Date.now();
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function anyOverlayOpen(){
+  return [...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
+}
+
+function wordOf(t){ return VERBS[t.v][["sg","pl","pp"][t.f]]; }
+
+function computeLevelFont(){
+  const maxLen=Math.max(...level.verbs.flatMap(v=>{
+    const V=VERBS[v]; return [V.sg.length,V.pl.length,V.pp.length];
+  }));
+  const cellW=boardEl.clientWidth/SIZE;
+  levelFont=Math.max(9,Math.min(16, cellW*0.9/(maxLen*0.54)));
+}
+function applyFontToAll(){
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const t=board[r]&&board[r][c];
+    if(t&&t.el) t.el.firstChild.style.fontSize=levelFont+"px";
+  }
+}
+
+function makeTileEl(t,r,c){
+  const el=document.createElement("div");
+  el.className="tile f-"+["sg","pl","pp"][t.f];
+  el.style.setProperty("--h",VERBS[t.v].hue);
+  const face=document.createElement("div");
+  face.className="face";
+  face.textContent=wordOf(t);
+  face.style.fontSize=levelFont+"px";
+  el.appendChild(face);
+  el._t=t; t.el=el;
+  placeTile(t,r,c,true);
+  return el;
+}
+function placeTile(t,r,c,instant=false){
+  t.r=r; t.c=c;
+  if(t.el){ t.el.dataset.r=r; t.el.dataset.c=c;
+    if(instant) t.el.style.transition="none";
+    t.el.style.transform=`translate(${c*100}%, ${r*100}%)`;
+    if(instant){ void t.el.offsetWidth; t.el.style.transition=""; }
+  }
+}
+
+function pickRefillTile(nbrVerb){
+  const act=level.verbs;
+  const cnt={};
+  for(let r=0;r<SIZE;r++)for(let cc=0;cc<SIZE;cc++){const t=board[r][cc]; if(t) cnt[t.v*3+t.f]=(cnt[t.v*3+t.f]||0)+1;}
+  const per=SIZE*SIZE/(act.length*3);
+  const opts=[];
+  for(const v of act)for(let f=0;f<3;f++){
+    let w=Math.max(.2, per-(cnt[v*3+f]||0)+.6);
+    if(nbrVerb!=null && v===nbrVerb) w*=2.2;
+    opts.push({v,f,w});
+  }
+  let sum=opts.reduce((s,o)=>s+o.w,0), x=Math.random()*sum;
+  for(const o of opts){ x-=o.w; if(x<=0) return {v:o.v,f:o.f}; }
+  return opts[0];
+}
+
+function fillBoard(){
+  board=Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    let t=null;
+    for(let tries=0;tries<40;tries++){
+      const cand=randTileAt(r,c);
+      if(!createsTriple(cand,r,c)){ t=cand; break; }
+    }
+    if(!t){
+      const act=level.verbs;
+      const left=c>0?board[r][c-1]:null, up=r>0?board[r-1][c]:null;
+      let v; do{ v=act[Math.floor(Math.random()*act.length)]; }while((left&&left.v===v)||(up&&up.v===v));
+      t={v,f:Math.floor(Math.random()*3)};
+    }
+    board[r][c]=t;
+  }
+}
+function randTileAt(r,c){
+  const act=level.verbs;
+  let v;
+  const left=c>0?board[r][c-1]:null, up=r>0?board[r-1][c]:null;
+  if((left||up)&&Math.random()<0.62){          // 聚类偏置:让同动词词块更容易相邻
+    const src=(left&&up)?(Math.random()<.5?left:up):(left||up);
+    v=src.v;
+  }else{
+    v=act[Math.floor(Math.random()*act.length)];
+  }
+  return {v,f:Math.floor(Math.random()*3)};
+}
+function createsTriple(t,r,c){
+  const L1=c>0?board[r][c-1]:null, L2=c>1?board[r][c-2]:null;
+  if(L1&&L2&&L1.v===t.v&&L2.v===t.v) return true;
+  const U1=r>0?board[r-1][c]:null, U2=r>1?board[r-2][c]:null;
+  if(U1&&U2&&U1.v===t.v&&U2.v===t.v) return true;
+  return false;
+}
+
+// 值网格扫描:返回「三种形式齐全」的连段(≥3 个同动词连续,且 sg/pl/pp 各 ≥1)
+function scan(g){
+  const runs=[];
+  const consider=(cells)=>{
+    if(cells.length<3) return;
+    const forms=new Set(cells.map(([r,c])=>g[r][c].f));
+    if(forms.size===3) runs.push({cells,v:g[cells[0][0]][cells[0][1]].v});
+  };
+  for(let r=0;r<SIZE;r++){
+    let s=0;
+    for(let c=1;c<=SIZE;c++){
+      if(c===SIZE||g[r][c].v!==g[r][s].v){ consider(Array.from({length:c-s},(_,i)=>[r,s+i])); s=c; }
+    }
+  }
+  for(let c=0;c<SIZE;c++){
+    let s=0;
+    for(let r=1;r<=SIZE;r++){
+      if(r===SIZE||g[r][c].v!==g[s][c].v){ consider(Array.from({length:r-s},(_,i)=>[s+i,c])); s=r; }
+    }
+  }
+  return runs;
+}
+
+// 找一个可行交换 + 指出「补全连线的那一块」(提示只高亮它)
+function findHintMove(){
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    for(const [dr,dc] of [[0,1],[1,0]]){
+      const r2=r+dr,c2=c+dc;
+      if(r2>=SIZE||c2>=SIZE) continue;
+      const a=board[r][c], b=board[r2][c2];
+      board[r][c]=b; board[r2][c2]=a;
+      const runs=scan(board);
+      board[r][c]=a; board[r2][c2]=b;
+      if(runs.length){
+        let answer=null;
+        for(const run of runs){
+          if(run.cells.some(([rr,cc])=>rr===r2&&cc===c2)){ answer=[r,c]; break; }   // 原在 (r,c) 的块滑入成线
+          if(run.cells.some(([rr,cc])=>rr===r&&cc===c)){ answer=[r2,c2]; break; }   // 原在 (r2,c2) 的块滑入成线
+        }
+        if(!answer) answer=[r2,c2];
+        return {a:[r,c], b:[r2,c2], answer};
+      }
+    }
+  }
+  return null;
+}
+function countMoves(){
+  let n=0;
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    for(const [dr,dc] of [[0,1],[1,0]]){
+      const r2=r+dr,c2=c+dc;
+      if(r2>=SIZE||c2>=SIZE) continue;
+      const a=board[r][c], b=board[r2][c2];
+      board[r][c]=b; board[r2][c2]=a;
+      const ok=scan(board).length>0;
+      board[r][c]=a; board[r2][c2]=b;
+      if(ok) n++;
+    }
+  }
+  return n;
+}
+
+function buildBoardDOM(){
+  boardEl.innerHTML="";
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
+}
+
+async function startLevel(n){
+  const lv=LEVELS.find(l=>l.n===n);
+  if(!lv) return;
+  level=lv; movesLeft=lv.moves; collectedRun=new Set(); selected=null; pendingHint=false;
+  document.getElementById("lvlTag").textContent=`Niveau ${lv.n}`;
+  updateHUD();
+  busy=true;
+  boardEl.style.setProperty("--n",SIZE);
+  // 开局保底:至少两个可行组合
+  let ok=false;
+  for(let i=0;i<120&&!ok;i++){ fillBoard(); if(countMoves()>=2) ok=true; }
+  if(!ok) forceTwoNearMiss();
+  computeLevelFont();
+  buildBoardDOM();
+  await sleep(200);
+  busy=false;
+  lastAction=Date.now();
+}
+
+// 兜底:手工埋两个「差一块就成线」的布局
+function forceTwoNearMiss(){
+  fillBoard();
+  const [V1,V2]=level.verbs;
+  const others=level.verbs.filter(x=>x!==V1&&x!==V2);
+  const junk=(notV,notF)=>{
+    let t;
+    do{ t={v:others[Math.floor(Math.random()*others.length)],f:Math.floor(Math.random()*3)}; }
+    while(t.v===notV&&t.f===notF);
+    return t;
+  };
+  board[0][0]={v:V1,f:SG}; board[0][1]={v:V1,f:PL}; board[0][2]=junk(V1,PP); board[1][2]={v:V1,f:PP};
+  board[SIZE-3][SIZE-3]={v:V2,f:SG}; board[SIZE-3][SIZE-2]={v:V2,f:PL};
+  board[SIZE-3][SIZE-1]=junk(V2,PP); board[SIZE-2][SIZE-1]={v:V2,f:PP};
+  if(scan(board).length) forceTwoNearMiss();
+}
+
+function updateHUD(){
+  document.getElementById("goalTag").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
+  const mt=document.getElementById("movesTag");
+  mt.textContent=`Zetten: ${movesLeft}`;
+  mt.classList.toggle("low",movesLeft<=5);
+}
+
+/* ---- 交换与消除 ---- */
+async function trySwap(r1,c1,r2,c2){
+  if(busy) return false;
+  busy=true; clearSel();
+  lastAction=Date.now();
+  const a=board[r1][c1], b=board[r2][c2];
+  placeTile(a,r2,c2); placeTile(b,r1,c1);
+  blip(340,.05,"triangle",.06);
+  await sleep(170);
+  board[r1][c1]=b; board[r2][c2]=a;
+  const runs=scan(board);
+  if(!runs.length){
+    board[r1][c1]=a; board[r2][c2]=b;
+    placeTile(a,r1,c1); placeTile(b,r2,c2);
+    blip(180,.08,"sine",.05);
+    await sleep(180);
+    busy=false;
+    lastAction=Date.now();
+    return false;
+  }
+  movesLeft--; updateHUD();
+  await resolve(runs);
+  busy=false;
+  if(pendingHint){ pendingHint=false; hint(); }
+  checkEnd();
+  return true;
+}
+
+async function resolve(runs){
+  while(runs.length){
+    const verbSet=[...new Set(runs.flatMap(run=>run.cells.map(([r,c])=>board[r][c].v)))];
+    const cells=runs.flatMap(run=>run.cells);
+    blip(520+Math.min(cells.length,6)*40,.1,"triangle",.09);
+    for(const [r,c] of cells){
+      const t=board[r][c];
+      t.el.classList.add("burst");
+      board[r][c]=null;
+    }
+    const fresh=verbSet.filter(v=>!save.collected.includes(VERBS[v].inf));   // 全局首次解锁才弹卡
+    for(const v of fresh){
+      save.collected.push(VERBS[v].inf); persist();
+    }
+    for(const v of verbSet) collectedRun.add(v);                             // 关卡目标按本次对局计
+    updateHUD();
+    for(const v of fresh){ await showCard(v); }
+    const rep=verbSet.filter(v=>!fresh.includes(v));
+    if(rep.length){ flashShow(rep.map(v=>VERBS[v].inf).join(" · ")); }
+    await sleep(340);
+    boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
+    await gravityRefill();
+    runs=scan(board);
+  }
+  if(!findHintMove()){
+    toast("Geen combinatie meer — nieuw bord!");
+    await sleep(500);
+    await reshuffle();
+  }
+}
+
+async function gravityRefill(){
+  const spawned=[];
+  for(let c=0;c<SIZE;c++){
+    let write=SIZE-1;
+    for(let r=SIZE-1;r>=0;r--){
+      const t=board[r][c];
+      if(t){
+        if(write!==r){ board[write][c]=t; board[r][c]=null; placeTile(t,write,c); }
+        write--;
+      }
+    }
+    let above=1;
+    for(let r=write;r>=0;r--){
+      const nb=(r+1<SIZE&&board[r+1][c])?board[r+1][c].v:null;
+      const t=pickRefillTile(Math.random()<.35?nb:null);
+      board[r][c]=t;
+      const el=makeTileEl(t,r,c);
+      boardEl.appendChild(el);
+      el.classList.add("spawn");
+      el.style.transition="none";
+      el.style.transform=`translate(${c*100}%, -${above*100}%)`;
+      void el.offsetWidth;
+      el.style.transition="";
+      placeTile(t,r,c);
+      above++;
+      spawned.push(t);
+    }
+  }
+  if(spawned.length){
+    await sleep(120);
+    spawned.forEach(t=>t.el&&t.el.classList.remove("spawn"));
+    await sleep(160);
+  }else{
+    await sleep(60);
+  }
+}
+
+async function reshuffle(){
+  busy=true;
+  const vals=[];
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++) vals.push({v:board[r][c].v,f:board[r][c].f});
+  let placed=false;
+  for(let tries=0;tries<300&&!placed;tries++){
+    for(let i=vals.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [vals[i],vals[j]]=[vals[j],vals[i]]; }
+    for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){ board[r][c].v=vals[r*SIZE+c].v; board[r][c].f=vals[r*SIZE+c].f; }
+    if(!scan(board).length&&countMoves()>=2) placed=true;
+  }
+  boardEl.classList.add("fading");
+  await sleep(220);
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const t=board[r][c];
+    t.el.className="tile f-"+["sg","pl","pp"][t.f];
+    t.el.style.setProperty("--h",VERBS[t.v].hue);
+    t.el.firstChild.textContent=wordOf(t);
+    t.el.firstChild.style.fontSize=levelFont+"px";
+    placeTile(t,r,c,true);
+  }
+  boardEl.classList.remove("fading");
+  busy=false;
+}
+
+/* ---- 展示 ---- */
+function flashShow(text){
+  flashEl.textContent=text;
+  flashEl.classList.remove("show");
+  void flashEl.offsetWidth;
+  flashEl.classList.add("show");
+}
+let cardResolve=null;
+function showCard(v){
+  return new Promise(res=>{
+    cardResolve=res;
+    const V=VERBS[v];
+    document.getElementById("cardArt").innerHTML=artSVG(v,save.style);
+    document.getElementById("cardInf").textContent=V.inf;
+    document.getElementById("cardForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
+    document.getElementById("cardGloss").textContent=V.en;
+    document.getElementById("cardModal").classList.remove("gloss-open");
+    document.getElementById("cardTip").textContent="Tik op de kaart voor de betekenis";
+    document.getElementById("cardModal").classList.add("on");
+    blip(660,.12,"sine",.1); setTimeout(()=>blip(880,.14,"sine",.1),90);
+  });
+}
+function closeCard(){
+  document.getElementById("cardModal").classList.remove("on");
+  if(cardResolve){ const r=cardResolve; cardResolve=null; r(); }
+}
+
+function checkEnd(){
+  if(collectedRun.size>=level.goal){
+    const hasNext=LEVELS.some(l=>l.n===level.n+1);
+    if(level.n+1>save.unlocked){ save.unlocked=level.n+1; persist(); }
+    showResult(true,hasNext);
+  }else if(movesLeft<=0){
+    showResult(false,false);
+  }
+}
+function showResult(win,hasNext){
+  document.getElementById("resultTitle").textContent=win?"Level gehaald! 🎉":"Geen zetten meer";
+  document.getElementById("resultText").textContent=win
+    ?`Alle ${level.goal} werkwoorden verzameld.`
+    :`Je verzamelde ${collectedRun.size} van ${level.goal} werkwoorden. Probeer het opnieuw!`;
+  const btns=document.getElementById("resultBtns");
+  btns.innerHTML="";
+  if(win&&hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent="Volgende niveau →"; b.onclick=()=>{hideResult(); startLevel(level.n+1);}; btns.appendChild(b); }
+  const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent="Opnieuw";
+  b2.onclick=()=>{hideResult(); startLevel(level.n);};
+  btns.appendChild(b2);
+  const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent="Menu";
+  b3.onclick=()=>{hideResult(); openMenu();};
+  btns.appendChild(b3);
+  document.getElementById("resultModal").classList.add("on");
+  if(win){ blip(523,.1); setTimeout(()=>blip(659,.1),110); setTimeout(()=>blip(784,.16),220); }
+}
+function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
+
+/* ---- 选择/拖拽输入 ---- */
+let dragInfo=null;
+function clearSel(){ if(selected){ selected.el.classList.remove("sel"); selected=null; } }
+function selectTile(t){ clearSel(); selected=t; t.el.classList.add("sel"); blip(420,.04,"sine",.04); }
+boardEl.addEventListener("pointerdown",e=>{
+  lastAction=Date.now();
+  if(busy) return;
+  const el=e.target.closest(".tile");
+  if(!el) return;
+  dragInfo={t:el._t, x:e.clientX, y:e.clientY, moved:false};
+  el.setPointerCapture?.(e.pointerId);
+});
+boardEl.addEventListener("pointermove",e=>{
+  if(!dragInfo||busy) return;
+  const dx=e.clientX-dragInfo.x, dy=e.clientY-dragInfo.y;
+  if(Math.hypot(dx,dy)>14){
+    dragInfo.moved=true;
+    const t=dragInfo.t;
+    let dr=0,dc=0;
+    if(Math.abs(dx)>Math.abs(dy)) dc=dx>0?1:-1; else dr=dy>0?1:-1;
+    const r2=t.r+dr,c2=t.c+dc;
+    dragInfo=null;
+    if(r2>=0&&r2<SIZE&&c2>=0&&c2<SIZE) trySwap(t.r,t.c,r2,c2);
+  }
+});
+boardEl.addEventListener("pointerup",e=>{
+  lastAction=Date.now();
+  const info=dragInfo; dragInfo=null;
+  if(!info||info.moved||busy) return;
+  const t=info.t;
+  if(selected===t){ clearSel(); return; }
+  if(selected&&Math.abs(selected.r-t.r)+Math.abs(selected.c-t.c)===1){
+    const s=selected;
+    trySwap(s.r,s.c,t.r,t.c);
+  }else{
+    selectTile(t);
+  }
+});
+
+/* ---- 提示:只高亮「滑入后补全连线的那一块」 ---- */
+let hintTimer=null;
+async function hint(){
+  if(!level) return;
+  if(busy){ pendingHint=true; return; }        // 对局动画中:排队,结束后自动弹
+  const m=findHintMove();
+  if(!m){ toast("Geen combinatie meer — nieuw bord!"); await reshuffle(); return; }
+  clearHint();
+  const t=board[m.answer[0]][m.answer[1]];
+  t.el.classList.add("hint");
+  hintTimer=setTimeout(()=>t.el.classList.remove("hint"),3400);
+}
+function clearHint(){
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  boardEl.querySelectorAll(".hint").forEach(el=>el.classList.remove("hint"));
+}
+
+/* ---- 自动提示:闲置一段时间后轻推一下 ---- */
+setInterval(()=>{
+  if(level && !busy && !anyOverlayOpen() && !boardEl.querySelector(".hint") && Date.now()-lastAction>IDLE_HINT_MS){
+    lastAction=Date.now();
+    hint();
+  }
+},1000);
+
+/* ---- toast ---- */
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("on"),1800);
+}
+
+/* ================= 菜单/图鉴/帮助 ================= */
+function openMenu(){
+  const g=document.getElementById("lvGrid");
+  g.innerHTML="";
+  for(const lv of LEVELS){
+    const b=document.createElement("button");
+    const locked=lv.n>save.unlocked;
+    b.className="lv-btn"+(locked?" locked":"");
+    b.innerHTML=`<b>Niveau ${lv.n}</b><small>A2 · ${lv.verbs.map(i=>VERBS[i].inf).slice(0,3).join(" / ")} …</small>`;
+    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(lv.n); };
+    g.appendChild(b);
+  }
+  const resume=document.getElementById("btnResume");
+  if(level){ resume.style.display="inline-block"; resume.onclick=()=>document.getElementById("menuScreen").classList.remove("on"); }
+  else resume.style.display="none";
+  renderStyleRow();
+  document.getElementById("menuScreen").classList.add("on");
+}
+function renderStyleRow(){
+  const row=document.getElementById("styleRow");
+  row.innerHTML="";
+  for(const st of ["A","B"]){
+    const d=document.createElement("div");
+    d.className="style-opt"+(save.style===st?" sel":"");
+    d.innerHTML=`<svg viewBox="0 0 120 120" style="width:100%;height:auto;display:block">${artSVG(8,st)}</svg><svg viewBox="0 0 120 120" style="width:100%;height:auto;display:block">${artSVG(11,st)}</svg><div>Stijl ${st}</div>`;
+    d.onclick=()=>{ save.style=st; persist(); renderStyleRow(); };
+    row.appendChild(d);
+  }
+}
+function openBook(){
+  const list=document.getElementById("bookList");
+  list.innerHTML="";
+  for(const lv of [1,2]){
+    const h=document.createElement("div");
+    h.className="book-group";
+    h.textContent=`Niveau ${lv} · A2`;
+    list.appendChild(h);
+    VERBS.forEach((V,i)=>{
+      if(V.lv!==lv) return;
+      const got=save.collected.includes(V.inf);
+      const row=document.createElement("div");
+      row.className="book-row";
+      row.innerHTML=got
+        ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+          <span class="book-tag">${V.en}</span>`
+        :`<div class="book-art empty">?</div>
+          <div class="book-main"><b>Nog niet verzameld</b><small>Maak een combinatie met dit werkwoord.</small></div>`;
+      list.appendChild(row);
+    });
+  }
+  document.getElementById("bookDrawer").classList.add("on");
+}
+
+/* ---- 事件绑定 ---- */
+document.getElementById("btnMenu").onclick=openMenu;
+document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
+document.getElementById("btnBook").onclick=openBook;
+document.getElementById("btnHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("btnHelp2").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
+document.getElementById("cardPanel").onclick=()=>{
+  const m=document.getElementById("cardModal");
+  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="Tik nogmaals om verder te spelen"; }
+  else closeCard();
+};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
+["bookDrawer","helpModal"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
+});
+window.addEventListener("resize",()=>{
+  if(!level) return;
+  computeLevelFont();
+  applyFontToAll();
+});
+
+/* ---- 调试钩子(自动化测试用) ---- */
+window.NLM3={
+  state:()=>({level:level&&level.n, moves:movesLeft, collected:[...collectedRun], busy,
+    board:board.map(row=>row.map(t=>t?[t.v,t.f]:null))}),
+  verbs:VERBS, levels:LEVELS,
+  swap:async(r1,c1,r2,c2)=>trySwap(r1,c1,r2,c2),
+  findMove:()=>findHintMove(),
+  countMoves:()=>countMoves(),
+  getLastAction:()=>lastAction,
+  setLastAction:v=>lastAction=v,
+};
+
+openMenu();
+</script>
+</body>
+</html>
