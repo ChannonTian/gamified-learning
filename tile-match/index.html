@@ -126,7 +126,6 @@
     position:relative;
     width:min(94vw,400px);
     aspect-ratio:16/27;
-    max-height:calc(100dvh - 235px);
     background:var(--card);
     border:1px solid var(--line);
     border-radius:18px;
@@ -1232,9 +1231,15 @@ function sampleVerbs(pool,count,r){
   return arr.slice(0,Math.min(count,arr.length));
 }
 function syncWidths(){
-  const w=document.getElementById("boardWrap").clientWidth+"px";
-  document.getElementById("hud").style.width=w;
-  document.getElementById("dock").style.width=w;
+  const hud=document.getElementById("hud"), dock=document.getElementById("dock"), bw=document.getElementById("boardWrap");
+  const usedH=hud.offsetHeight + dock.offsetHeight + 30;
+  const availH=Math.max(280, window.innerHeight - usedH);
+  const w=Math.min(window.innerWidth*0.94, 400, availH*COLS*4/(ROWS*3));  /* 词块 4:3 */
+  bw.style.width=Math.round(w)+"px";
+  bw.style.maxHeight="none";
+  hud.style.width=Math.round(w)+"px";
+  dock.style.width=Math.round(w)+"px";
+  if(level){ computeLevelFont(); applyFontToAll(); }
 }
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -2055,6 +2060,8 @@ window.NLM3={
 
 initVoices();
 applySettings();
+syncWidths();
+window.addEventListener("orientationchange",()=>setTimeout(syncWidths,250));
 openMenu();
 </script>
 </body>
