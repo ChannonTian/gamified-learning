@@ -41,11 +41,14 @@
   }
   .hud-group{display:flex; align-items:center; gap:6px;}
   .hud-btn{
-    width:34px; height:34px; border-radius:10px; border:1px solid var(--line);
-    background:var(--card); color:var(--ink); font-size:16px; line-height:1;
+    width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
     display:flex; align-items:center; justify-content:center;
   }
   .hud-btn:active{transform:scale(.94);}
+  .ic{width:22px; height:22px; flex:none; display:block;}
+  .menu-btn .ic{width:24px; height:24px;}
+  .dock-btn .ic{width:22px; height:22px;}
   .tag{
     background:var(--card); border:1px solid var(--line); border-radius:10px;
     padding:6px 10px; font-size:13px; font-weight:600; white-space:nowrap;
@@ -57,7 +60,8 @@
   }
   @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
   @media (max-width:430px){
-    .hud-btn{width:30px; height:30px; font-size:14px;}
+    .hud-btn{width:36px; height:36px;}
+    .ic{width:20px; height:20px;}
     .tag{padding:5px 7px; font-size:11.5px;}
     #hud{padding-top:8px; gap:4px;}
   }
@@ -68,13 +72,12 @@
     padding:2px 0 calc(10px + env(safe-area-inset-bottom));
   }
   .dock-btn{
-    display:flex; align-items:center; gap:7px;
+    display:flex; align-items:center; gap:8px;
     border:1px solid var(--line); background:var(--card); color:var(--ink);
-    border-radius:14px; padding:10px 18px; font-size:14px; font-weight:700;
+    border-radius:14px; padding:12px 20px; font-size:15px; font-weight:700;
     box-shadow:0 2px 8px rgba(51,65,92,.06);
   }
   .dock-btn:active{transform:scale(.95);}
-  .dock-btn .ico{font-size:16px;}
 
   /* ---------- 计分弹字 ---------- */
   .score-pop{
@@ -168,12 +171,7 @@
     100%{opacity:0; transform:scale(1.02);}
   }
 
-  /* ---------- legend ---------- */
-  #legend{
-    width:min(94vw,640px);
-    display:flex; gap:14px; justify-content:center; align-items:center;
-    padding:8px 0 10px; font-size:12px; color:#7a8496; flex-wrap:wrap;
-  }
+  /* ---------- 图例(仅帮助弹窗内使用) ---------- */
   .leg{display:flex; align-items:center; gap:5px;}
   .leg i{
     width:15px; height:12px; display:inline-block; flex:none;
@@ -208,10 +206,11 @@
   /* menu (standaard startscherm) */
   #menuScreen .panel{width:min(90vw,380px);}
   .menu-btn{
-    display:block; width:100%; padding:14px; margin:9px 0;
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:13px 16px; margin:9px 0;
     border-radius:14px; border:1px solid var(--line);
     background:var(--card); color:var(--ink);
-    font-size:16px; font-weight:700; text-align:center;
+    font-size:15.5px; font-weight:700; text-align:left;
   }
   .menu-btn:active{transform:scale(.97);}
   .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
@@ -276,7 +275,8 @@
   #learnBanner.show .b-progress i{animation:bprog var(--bdur,3s) linear forwards;}
   @keyframes bprog{ from{width:100%;} to{width:0;} }
 
-  /* collection card (eerste keer) */
+  /* collection card (eerste keer) — z 级高于图鉴/结果,可直接关闭 */
+  #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
   #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
   #cardInf{font-size:34px; font-weight:800; letter-spacing:.5px;}
@@ -343,16 +343,6 @@
   .rule-legend{display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;}
   .rule-legend .leg{color:#5a6577; font-size:12px;}
 
-  /* ---------- 手机竖屏:顶栏贴顶、棋盘居中、操作坞贴底 ---------- */
-  @media (max-width:520px){
-    body{justify-content:flex-start;}
-    #app{
-      width:100%; height:100dvh;
-      display:flex; flex-direction:column; align-items:center; justify-content:space-between;
-      padding-top:env(safe-area-inset-top);
-    }
-    #hud{width:min(96vw,640px);}
-  }
 </style>
 </head>
 <body>
@@ -360,7 +350,7 @@
 <div id="app">
   <header id="hud">
     <div class="hud-group">
-      <button class="hud-btn" id="btnMenu" title="Menu">☰</button>
+      <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
       <span class="tag" id="lvlTag">Niveau 1</span>
     </div>
     <div class="hud-group">
@@ -369,7 +359,7 @@
       <span class="tag" id="scoreTag">⭐ 0</span>
     </div>
     <div class="hud-group">
-      <button class="hud-btn" id="btnHelp" title="Speluitleg">?</button>
+      <button class="hud-btn" id="btnHelp" title="Speluitleg"><svg class="ic" viewBox="0 0 24 24"><path d="M9.1 9a3 3 0 1 1 4.6 2.6c-.9.6-1.7 1.2-1.7 2.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17.9" r="1.5" fill="currentColor"/></svg></button>
     </div>
   </header>
 
@@ -378,15 +368,10 @@
     <div id="flash"></div>
   </div>
 
-  <div id="legend">
-    <span class="leg"><i class="s-sg"></i><span data-i18n="legend.sg">verl. tijd enk.</span></span>
-    <span class="leg"><i class="s-pl"></i><span data-i18n="legend.pl">verl. tijd mv.</span></span>
-    <span class="leg"><i class="s-pp"></i><span data-i18n="legend.pp">voltooid deelwoord</span></span>
-  </div>
 
   <div id="dock">
-    <button class="dock-btn" id="btnHint"><span class="ico">💡</span><span data-i18n="dock.hint">Hint</span></button>
-    <button class="dock-btn" id="btnBook"><span class="ico">📖</span><span data-i18n="dock.book">Verzameling</span></button>
+    <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
+    <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
   </div>
 </div>
 
@@ -395,11 +380,11 @@
   <div class="panel">
     <div id="menuMain">
       <h1 style="margin-bottom:14px;">Sterke werkwoorden</h1>
-      <button class="menu-btn primary" id="mNew" data-i18n="menu.new">Nieuw spel</button>
-      <button class="menu-btn" id="mContinue" data-i18n="menu.continue">Verder spelen</button>
-      <button class="menu-btn" id="mLevels"><span data-i18n="menu.levels">Levels</span> ›</button>
-      <button class="menu-btn ghost" id="mHelp" data-i18n="menu.help">Speluitleg</button>
-      <button class="menu-btn ghost" id="mSettings" data-i18n="menu.settings">Instellingen</button>
+      <button class="menu-btn primary" id="mNew"><svg class="ic" viewBox="0 0 24 24"><path d="M9.2 7.4v9.2l7.6-4.6z" fill="currentColor"/></svg><span data-i18n="menu.new">Nieuw spel</span></button>
+      <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><rect x="14.5" y="4" width="6.5" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h8M7.6 8.4L11.2 12l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
+      <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
+      <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
+      <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
     <div id="menuLevels" style="display:none;">
       <h2><button class="back-btn" id="mBack">←</button><span data-i18n="menu.levels">Levels</span></h2>
@@ -428,6 +413,14 @@
     <div class="set-row">
       <label data-i18n="set.tts">Voorlezen</label>
       <input type="range" id="setTts" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.voice">Stem</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="voiceName" style="font-size:11.5px; color:#8b93a3; max-width:150px; text-align:right; line-height:1.35;"></span>
+        <button class="seg" style="display:contents;"></button>
+        <button id="btnVoiceTest" style="display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;"><svg class="ic" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span data-i18n="set.voicetest">Probeer</span></button>
+      </div>
     </div>
     <div class="set-row">
       <label data-i18n="set.hintwait">Hint wachttijd</label>
@@ -572,6 +565,8 @@ const I18N={
     "help.l.sg":"afgerond = verl. tijd enk.","help.l.pl":"recht = verl. tijd mv.","help.l.pp":"afgesneden = voltooid deelwoord",
     "help.color":"Kleur = werkwoord: alle vormen van één werkwoord hebben dezelfde (subtiele) kleur. Goed lezen is belangrijker dan kijken.",
     "help.stuck":"Vastgelopen? Tik op 💡 voor een hint — of wacht even, dan komt er automatisch een. In de niveaumodus verschijnt na elke combinatie een leerkaart met voorlezen.",
+    "set.voice":"Stem","set.voicetest":"Probeer",
+    "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands toevoegen",
   },
   zh:{
     "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
@@ -597,6 +592,8 @@ const I18N={
     "help.l.sg":"圆角 = 单数过去式","help.l.pl":"直角 = 复数过去式","help.l.pp":"切角 = 过去分词",
     "help.color":"颜色 = 源动词:同一动词同色。颜色很淡,认读词形才是关键。",
     "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻自动提示。普通关卡每次消除后会弹出教学卡并朗读单词。",
+    "set.voice":"朗读语音","set.voicetest":"试听",
+    "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -611,15 +608,23 @@ function applySettings(){
   document.body.classList.toggle("dark",!!S.dark);
   document.body.classList.toggle("no-color",!S.colorHint);
   document.body.classList.toggle("no-shape",!S.shapeHint);
-  document.getElementById("legend").style.display=S.shapeHint?"":"none";
   applyI18n();
 }
 
 /* ================= 语音(Web Speech API) ================= */
 let nlVoice=null;
+function updateVoiceName(){
+  const el=document.getElementById("voiceName");
+  if(el) el.textContent = nlVoice ? nlVoice.name : t("set.novoice");
+}
 function initVoices(){
   if(!("speechSynthesis" in window)) return;
-  const pick=()=>{ const vs=window.speechSynthesis.getVoices(); nlVoice=vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl"))||null; };
+  const pick=()=>{
+    const vs=window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v=>(v.lang||"").toLowerCase().replace("_","-")==="nl-nl")
+           || vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl")) || null;
+    updateVoiceName();
+  };
   pick();
   window.speechSynthesis.onvoiceschanged=pick;
 }
@@ -1095,7 +1100,6 @@ async function trySwap(r1,c1,r2,c2){
 
 async function resolve(runs){
   let chain=0;
-  const learnQueue=[];
   while(runs.length){
     chain++;
     const verbSet=[...new Set(runs.flatMap(run=>run.cells.map(([r,c])=>board[r][c].v)))];
@@ -1124,16 +1128,15 @@ async function resolve(runs){
     for(const v of verbSet) collectedRun.add(v);                             // 关卡目标按本次对局计
     updateHUD();
     for(const v of fresh){ await showCard(v); }
-    // 普通关卡:每个被消动词进入教学横幅队列(首次解锁的刚看过完整卡片,跳过)
+    // 普通关卡:每个被消动词弹教学横幅(不阻挡操作;首次解锁的刚看过完整卡片,跳过)
     for(const v of verbSet){
-      if(!fresh.includes(v) && !learnQueue.includes(v)) learnQueue.push(v);
+      if(!fresh.includes(v)) showLearnBanner(v);
     }
     await sleep(340);
     boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
     await gravityRefill();
     runs=scan(board);
   }
-  if(learnQueue.length){ await playLearnQueue(learnQueue); }
   if(!findHintMove()){
     toast(t("toast.shuffle"));
     await sleep(500);
@@ -1153,33 +1156,30 @@ function popScore(r,c,text,big=false){
   setTimeout(()=>el.remove(),950);
 }
 
-/* ---- 教学横幅 + 朗读(普通关卡) ---- */
+/* ---- 教学横幅 + 朗读(普通关卡,不阻挡操作) ---- */
+let bannerTimer=null, bannerVerb=null;
+function hideBanner(){
+  clearTimeout(bannerTimer); bannerTimer=null; bannerVerb=null;
+  stopSpeech();
+  document.getElementById("learnBanner").classList.remove("show");
+}
 function showLearnBanner(v){
-  return new Promise(res=>{
+  const b=document.getElementById("learnBanner");
+  clearTimeout(bannerTimer);
+  const same=(bannerVerb===v && b.classList.contains("show"));
+  bannerVerb=v;
+  if(!same){
     const V=VERBS[v];
-    const b=document.getElementById("learnBanner");
     document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
     document.getElementById("bannerInf").textContent=V.inf;
     document.getElementById("bannerForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
     document.getElementById("bannerGloss").textContent=glossOf(V);
-    let done=false, timer=null;
-    const finish=()=>{
-      if(done) return; done=true;
-      clearTimeout(timer); b.onclick=null; stopSpeech();
-      b.classList.remove("show");
-      setTimeout(res,300);
-    };
-    b.onclick=finish;
-    b.style.setProperty("--bdur","3.6s");
     b.classList.remove("show");
     void b.offsetWidth;                    // 强制重流,不依赖 rAF(后台标签页也能触发)
     b.classList.add("show");
-    timer=setTimeout(finish,3600);
-    speakVerb(V);      // 依次朗读 原形 → 单数 → 复数 → 分词;横幅至少停留 3.6s,点按可提前关
-  });
-}
-async function playLearnQueue(q){
-  for(const v of q){ await showLearnBanner(v); }
+    speakVerb(V);                          // 依次朗读 原形 → 单数 → 复数 → 分词
+  }
+  bannerTimer=setTimeout(hideBanner,3600); // 同动词重复消除只重置停留时间
 }
 
 async function gravityRefill(){
@@ -1419,6 +1419,7 @@ function openSettings(){
 }
 function renderSettings(){
   const S=save.settings;
+  updateVoiceName();
   seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
   seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"]],S.uiLang,v=>S.uiLang=v);
   const vol=document.getElementById("setVolume"); vol.value=S.volume;
@@ -1474,6 +1475,8 @@ document.getElementById("mLevels").onclick=()=>showMenuView("levels");
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mSettings").onclick=openSettings;
+document.getElementById("learnBanner").onclick=hideBanner;
+document.getElementById("btnVoiceTest").onclick=()=>speakVerb(VERBS[8]);   // lopen 四形试听
 document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
 document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
