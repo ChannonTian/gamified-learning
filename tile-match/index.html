@@ -33,13 +33,12 @@
   }
   button{font-family:inherit; cursor:pointer;}
 
-  /* ---------- HUD ---------- */
+  /* ---------- HUD:两行状态 ---------- */
   #hud{
     width:min(94vw,640px);
-    display:flex; align-items:center; justify-content:space-between; gap:6px;
-    padding:10px 2px 8px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 2px 6px;
   }
-  .hud-group{display:flex; align-items:center; gap:7px;}
   .hud-btn{
     width:46px; height:46px; border-radius:14px; border:1px solid var(--line);
     background:var(--card); color:var(--ink);
@@ -49,27 +48,54 @@
   .ic{width:25px; height:25px; flex:none; display:block;}
   .menu-btn .ic{width:24px; height:24px;}
   .dock-btn .ic{width:22px; height:22px;}
+  #statusCol{display:flex; flex-direction:column; align-items:flex-end; gap:5px; min-width:0;}
+  .status-row{display:flex; align-items:center; gap:7px;}
   .tag{
     background:var(--card); border:1px solid var(--line); border-radius:12px;
-    padding:9px 13px; font-size:15px; font-weight:700; white-space:nowrap;
+    padding:7px 13px; font-size:15px; font-weight:800; white-space:nowrap;
   }
-  #scoreTag{min-width:74px; text-align:center;}
+  .goal-pill{
+    position:relative; overflow:hidden; min-width:96px;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; font-size:14px; font-weight:800; text-align:center;
+  }
+  .goal-pill i{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, hsl(150 55% 65% / .5), hsl(150 60% 48% / .8));
+    transition:width .45s cubic-bezier(.3,1.2,.5,1);
+  }
+  .goal-pill span{position:relative;}
+  .score-tag{
+    font-size:20px; font-weight:800; letter-spacing:.3px; line-height:1;
+    padding:3px 6px;
+    background:linear-gradient(135deg,#f5b942,#e8734a);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .score-tag.bump{animation:scoreBump .32s ease;}
+  @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
   .combo-tag{
-    background:#fff4e8; border-color:#f2c9a8; color:#c05621;
-    animation:comboPop .25s ease;
+    background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
+    padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
+    animation:comboPop .25s ease, comboGlow 1.6s ease-in-out infinite;
   }
   @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
+  @keyframes comboGlow{ 0%,100%{box-shadow:0 0 8px rgba(232,85,74,.35);} 50%{box-shadow:0 0 18px rgba(232,85,74,.6);} }
   @media (max-width:430px){
     .hud-btn{width:40px; height:40px;}
     .ic{width:22px; height:22px;}
-    .tag{padding:7px 10px; font-size:13.5px;}
-    #hud{padding-top:8px; gap:4px;}
+    .tag{padding:6px 10px; font-size:13.5px;}
+    .goal-pill{padding:6px 10px; font-size:13px; min-width:84px;}
+    .score-tag{font-size:17px;}
+    .combo-tag{padding:5px 11px; font-size:13px;}
+    #hud{padding-top:8px; gap:6px;}
   }
 
-  /* ---------- 底部操作坞(拇指区) ---------- */
+  /* ---------- 底部操作坞(拇指区,不贴屏幕底) ---------- */
   #dock{
+    position:relative;
     display:flex; gap:12px; justify-content:center;
-    padding:2px 0 calc(10px + env(safe-area-inset-bottom));
+    margin-top:10px;
+    padding:2px 14px calc(24px + env(safe-area-inset-bottom));
   }
   .dock-btn{
     display:flex; align-items:center; gap:8px;
@@ -99,11 +125,12 @@
     position:relative;
     width:min(94vw,400px);
     aspect-ratio:16/27;
-    max-height:calc(100dvh - 180px);
+    max-height:calc(100dvh - 235px);
     background:var(--card);
     border:1px solid var(--line);
     border-radius:18px;
     padding:6px;
+    margin:2px 0 10px;
     box-shadow:0 6px 24px rgba(51,65,92,.06);
   }
   #board{
@@ -252,27 +279,29 @@
     background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:600;
   }
 
-  /* leerbanner (niveaumodus) */
+  /* leerbanner:绝对定位覆盖操作坞(按钮+留白),不接触棋盘 */
   #learnBanner{
-    position:fixed; left:50%; bottom:calc(76px + env(safe-area-inset-bottom));
-    transform:translateX(-50%) translateY(150%);
-    width:min(94vw,480px); z-index:40;
+    position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
     background:var(--card); border:1px solid var(--line); border-radius:16px;
-    box-shadow:0 10px 30px rgba(20,30,50,.3);
-    display:flex; align-items:center; gap:12px;
-    padding:10px 14px 13px; cursor:pointer; overflow:hidden;
-    opacity:0; visibility:hidden;
-    transition:transform .28s cubic-bezier(.3,1.2,.5,1), opacity .25s, visibility .28s;
+    box-shadow:0 10px 30px rgba(20,30,50,.28);
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; cursor:pointer; overflow:hidden;
+    opacity:0; visibility:hidden; transform:translateY(16px);
+    transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s;
   }
-  #learnBanner.show{transform:translateX(-50%) translateY(0); opacity:1; visibility:visible;}
-  #bannerArt{width:58px; height:58px; flex:none;}
+  #learnBanner.show{opacity:1; visibility:visible; transform:none;}
+  #bannerArt{width:46px; height:46px; flex:none;}
   .b-main{flex:1; min-width:0;}
-  .b-main b{font-size:26px; font-weight:800; line-height:1.1;}
-  #bannerForms{font-size:13px; color:#8b93a3; margin-top:2px;}
-  #bannerGloss{font-size:12.5px; color:var(--ink); opacity:.75; margin-top:1px;}
+  .b-main b{font-size:24px; font-weight:800; line-height:1.1;}
+  #bannerForms{font-size:16px; font-weight:700; color:var(--ink); opacity:.85; margin-top:2px;}
+  #bannerGloss{
+    margin-left:auto; flex:none; max-width:34%;
+    font-size:12.5px; line-height:1.35; text-align:right;
+    color:var(--ink); opacity:.6;
+  }
   .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
-  .b-progress i{display:block; height:100%; width:100%; background:var(--accent);}
-  #learnBanner.show .b-progress i{animation:bprog var(--bdur,3s) linear forwards;}
+  .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
+  #learnBanner.show .b-progress i{animation:bprog var(--bdur,8s) linear forwards;}
   @keyframes bprog{ from{width:100%;} to{width:0;} }
 
   /* collection card (eerste keer) — z 级高于图鉴/结果,可直接关闭 */
@@ -349,17 +378,16 @@
 
 <div id="app">
   <header id="hud">
-    <div class="hud-group">
-      <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
-      <span class="tag" id="lvlTag">Niveau 1</span>
-    </div>
-    <div class="hud-group">
-      <span class="tag" id="goalTag">🎯 0/6</span>
-      <span class="tag combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
-      <span class="tag" id="scoreTag">⭐ 0</span>
-    </div>
-    <div class="hud-group">
-      <button class="hud-btn" id="btnHelp" title="Speluitleg"><svg class="ic" viewBox="0 0 24 24"><path d="M9.1 9a3 3 0 1 1 4.6 2.6c-.9.6-1.7 1.2-1.7 2.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17.9" r="1.5" fill="currentColor"/></svg></button>
+    <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
+    <div id="statusCol">
+      <div class="status-row">
+        <span class="tag" id="lvlTag">A1.1</span>
+        <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">🎯 0/4</span></span>
+      </div>
+      <div class="status-row">
+        <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
+        <span class="score-tag" id="scoreTag">⭐ 0</span>
+      </div>
     </div>
   </header>
 
@@ -372,6 +400,15 @@
   <div id="dock">
     <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
     <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
+    <div id="learnBanner">
+      <svg id="bannerArt" viewBox="0 0 120 120"></svg>
+      <div class="b-main">
+        <b id="bannerInf"></b>
+        <div id="bannerForms"></div>
+      </div>
+      <div id="bannerGloss"></div>
+      <div class="b-progress"><i></i></div>
+    </div>
   </div>
 </div>
 
@@ -439,17 +476,6 @@
       <div class="seg" id="setDark"></div>
     </div>
   </div>
-</div>
-
-<!-- Leerbanner (niveaumodus) -->
-<div id="learnBanner">
-  <svg id="bannerArt" viewBox="0 0 120 120"></svg>
-  <div class="b-main">
-    <b id="bannerInf"></b>
-    <div id="bannerForms"></div>
-    <div id="bannerGloss"></div>
-  </div>
-  <div class="b-progress"><i></i></div>
 </div>
 
 <!-- Verzamelkaart (eerste keer) -->
@@ -559,7 +585,7 @@ const I18N={
     "help.title":"Speluitleg",
     "help.p1":"Sterke werkwoorden matchen: wissel twee aangrenzende blokken en maak een rij van 3 of meer blokken van hetzelfde werkwoord, met de verleden tijd enkelvoud, de verleden tijd meervoud én het voltooid deelwoord in één rij. De rij verdwijnt en je ziet het hele werkwoord.",
     "help.goal":"Doel: verzamel alle werkwoorden van dit niveau. Een werkwoord verzamel je door er één geldige combinatie mee te maken.",
-    "help.score":"Score: elk blok levert 10 punten op. Ketens vermenigvuldigen de punten, en opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus. Een zet zonder combinatie verbreekt de reeks.",
+    "help.score":"Score: elk blok levert 10 punten op. Ketens vermenigvuldigen de punten. Opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus — de reeks vervalt zodra de leerkaart verdwijnt of een zet mislukt.",
     "help.moves":"Zetten: een rij telt alleen als alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.",
     "help.form":"Vorm = tijdsvorm",
     "help.l.sg":"afgerond = verl. tijd enk.","help.l.pl":"recht = verl. tijd mv.","help.l.pp":"afgesneden = voltooid deelwoord",
@@ -586,7 +612,7 @@ const I18N={
     "help.title":"玩法介绍",
     "help.p1":"匹配强变化动词:交换相邻两个词块,让同一动词的 3 个及以上词块连成一线,且必须同时包含单数过去式、复数过去式和过去分词。连线消除后展示动词原形。",
     "help.goal":"目标:收集本关全部动词——每完成一次有效消除即收集一个。",
-    "help.score":"计分:每消一块 +10 分;连锁按倍数放大;连续有效交换有 🔥 连击加成,无效交换会打断连击。",
+    "help.score":"计分:每消一块 +10 分;连锁按倍数放大;连续有效交换有 🔥 连击加成——教学卡消失或交换失败,连击即中断。",
     "help.moves":"交换:三种变位形式齐全才会消除;形式不齐则静默弹回。",
     "help.form":"形状 = 变位类型",
     "help.l.sg":"圆角 = 单数过去式","help.l.pl":"直角 = 复数过去式","help.l.pp":"切角 = 过去分词",
@@ -1054,9 +1080,13 @@ function forceTwoNearMiss(){
   if(scan(board).length) forceTwoNearMiss();
 }
 
+let lastScoreShown=-1;
 function updateHUD(){
-  document.getElementById("goalTag").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
-  document.getElementById("scoreTag").textContent=`⭐ ${scoreRun}`;
+  document.getElementById("goalTxt").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
+  document.getElementById("goalBar").style.width=Math.round(collectedRun.size/level.goal*100)+"%";
+  const st=document.getElementById("scoreTag");
+  st.textContent=`⭐ ${scoreRun}`;
+  if(scoreRun!==lastScoreShown){ st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun; }
   const ct=document.getElementById("comboTag");
   if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
   else ct.style.display="none";
@@ -1157,11 +1187,13 @@ function popScore(r,c,text,big=false){
 }
 
 /* ---- 教学横幅 + 朗读(普通关卡,不阻挡操作) ---- */
+const BANNER_MS=8000;
 let bannerTimer=null, bannerVerb=null;
 function hideBanner(){
   clearTimeout(bannerTimer); bannerTimer=null; bannerVerb=null;
   stopSpeech();
   document.getElementById("learnBanner").classList.remove("show");
+  if(streak>0){ streak=0; updateHUD(); }   // 连击倒计时随卡片结束
 }
 function showLearnBanner(v){
   const b=document.getElementById("learnBanner");
@@ -1179,7 +1211,7 @@ function showLearnBanner(v){
     b.classList.add("show");
     speakVerb(V);                          // 依次朗读 原形 → 单数 → 复数 → 分词
   }
-  bannerTimer=setTimeout(hideBanner,3600); // 同动词重复消除只重置停留时间
+  bannerTimer=setTimeout(hideBanner,BANNER_MS); // 同动词重复消除只重置连击倒计时
 }
 
 async function gravityRefill(){
@@ -1464,7 +1496,6 @@ function openBook(){
 document.getElementById("btnMenu").onclick=openMenu;
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
-document.getElementById("btnHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mNew").onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(LEVELS[0].id); };
 document.getElementById("mContinue").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
