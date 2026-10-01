@@ -14,6 +14,25 @@
 - 规则草案:无关卡目标,纯刷分;死局自动洗牌;结算进"最佳分"榜(按模式分键)。
 - 复用:引擎、计分、横幅/朗读(无尽模式用中央闪现而非横幅——见 DESIGN.md §5)。
 
+## 词库容量与关卡目标区间(2026-10-01 估算)
+
+荷兰语强变化/不规则动词总量约 **200-250**(Onzetaal"200+",含前缀派生);剔除古旧/极罕见/纯书面后,游戏中可用的约 **150-160**。按 CEFR 档估算(依据词频 + NT2 教材出现顺序;铺量阶段用 NT2Lex 精确校准):
+
+| 档 | 可用词(估) | 例 |
+|---|---|---|
+| A1 | ~15-20 | zijn, hebben, gaan, komen, zien, geven, nemen, eten, drinken, lopen, zitten, liggen, staan, lezen |
+| A2 | ~30-35 | blijven, schrijven, spreken, beginnen, begrijpen, brengen, denken, vinden, helpen, kopen, krijgen, vragen, wassen, dragen, verliezen, winnen, hangen |
+| B1 | ~45 | bedriegen, bederven, bevelen, bewegen, gelden, smelten, zwellen, wijken, weven, trekken, zwijgen, wijzen, werpen |
+| B2 | ~35 | 较低频书面词 |
+| C1 | ~15 | 低频文学词 |
+| C2 | ~10 | 古旧词( delven, erven 类) |
+
+**关卡设计推论**(现状:每关 4 词、目标=收齐本关):
+
+- 每关动词数区间 **4-6**:4×9=36 格,动词×3 形式 ≤18-20 种(密度 1.8-2.3)匹配不会太稀。
+- 池子→关卡数:A2 池(A1+A2 ≈50 词)≈12 关;B1 池 ≈11 关;到 B1 合计 ~23 关。
+- **四消分支可行**:加原形后每动词 4 形式,4 词×4 形 = 16 类型/36 格(密度 2.25),关卡结构不用改——若开对照分支,每关保持 4 词即可。
+
 ## 之后
 
 ### 3. 内容铺量(阶段二主体)

@@ -33,11 +33,11 @@
   }
   button{font-family:inherit; cursor:pointer;}
 
-  /* ---------- HUD:两行状态 ---------- */
+  /* ---------- HUD:三区(左菜单 / 中 关卡+目标 / 右 连击+分数) ---------- */
   #hud{
     width:min(94vw,640px);
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:10px 2px 6px;
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:10px 2px 8px;
   }
   .hud-btn{
     width:46px; height:46px; border-radius:14px; border:1px solid var(--line);
@@ -48,8 +48,9 @@
   .ic{width:25px; height:25px; flex:none; display:block;}
   .menu-btn .ic{width:24px; height:24px;}
   .dock-btn .ic{width:22px; height:22px;}
-  #statusCol{display:flex; flex-direction:column; align-items:flex-end; gap:5px; min-width:0;}
-  .status-row{display:flex; align-items:center; gap:7px;}
+  .hud-btn{justify-self:start;}
+  .hud-center{display:flex; align-items:center; gap:7px; justify-self:center;}
+  .hud-right{display:flex; align-items:center; gap:7px; justify-self:end; min-width:0;}
   .tag{
     background:var(--card); border:1px solid var(--line); border-radius:12px;
     padding:7px 13px; font-size:15px; font-weight:800; white-space:nowrap;
@@ -301,7 +302,7 @@
   }
   .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
   .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
-  #learnBanner.show .b-progress i{animation:bprog var(--bdur,8s) linear forwards;}
+  #learnBanner.show .b-progress i{animation:bprog var(--bdur,10s) linear forwards;}
   @keyframes bprog{ from{width:100%;} to{width:0;} }
 
   /* collection card (eerste keer) — z 级高于图鉴/结果,可直接关闭 */
@@ -379,15 +380,13 @@
 <div id="app">
   <header id="hud">
     <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
-    <div id="statusCol">
-      <div class="status-row">
-        <span class="tag" id="lvlTag">A1.1</span>
-        <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">🎯 0/4</span></span>
-      </div>
-      <div class="status-row">
-        <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
-        <span class="score-tag" id="scoreTag">⭐ 0</span>
-      </div>
+    <div class="hud-center">
+      <span class="tag" id="lvlTag">A2.1</span>
+      <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">🎯 0/4</span></span>
+    </div>
+    <div class="hud-right">
+      <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
+      <span class="score-tag" id="scoreTag">⭐ 0</span>
     </div>
   </header>
 
@@ -548,8 +547,8 @@ const VERBS=[
 ];
 // 手机优先:4×4 小盘 + 每关 3 个动词(9 种词形/16 格),格子更大、词更大更完整
 const LEVELS=[
-  {id:"A1.1", verbs:[0,1,2,3],   goal:4},
-  {id:"A1.2", verbs:[4,5,6,9],   goal:4},
+  {id:"A2.1", verbs:[0,1,2,3],   goal:4},
+  {id:"A2.2", verbs:[4,5,6,9],   goal:4},
   {id:"B1.1", verbs:[7,8,10,11], goal:4},
 ];
 const COLS=4, ROWS=9, SG=0, PL=1, PP=2;
@@ -1187,7 +1186,7 @@ function popScore(r,c,text,big=false){
 }
 
 /* ---- 教学横幅 + 朗读(普通关卡,不阻挡操作) ---- */
-const BANNER_MS=8000;
+const BANNER_MS=10000;
 let bannerTimer=null, bannerVerb=null;
 function hideBanner(){
   clearTimeout(bannerTimer); bannerTimer=null; bannerVerb=null;
