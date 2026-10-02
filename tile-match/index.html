@@ -347,6 +347,17 @@
     border-radius:8px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#5a6577;
   }
   .book-group{font-size:12px; color:#98a1b0; margin:14px 0 2px; font-weight:700;}
+  /* CEFR 档折叠头:列表内纵向目录行(全宽),折叠后也竖向堆叠,不横向并排 */
+  .book-group.book-toggle{
+    display:flex; align-items:center; gap:8px; width:100%; text-align:left;
+    padding:10px 12px; margin:12px 0 4px;
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    font-size:13.5px; color:var(--ink); cursor:pointer;
+  }
+  .book-group.book-toggle i{font-style:normal; font-size:11px; color:#98a1b0; width:12px; flex:none;}
+  .book-group.book-toggle:active{background:var(--line);}
+  .book-band-count{margin-left:auto; font-size:11px; font-weight:700; color:#98a1b0; flex:none;}
+  .book-sub{font-size:11px; color:#98a1b0; margin:8px 2px 2px; font-weight:700;}
   @media (max-width:520px){
     #bookDrawer{align-items:flex-end;}
     #bookDrawer .panel{
@@ -662,7 +673,7 @@ const IDLE_HINT_MS_DEFAULT=7000;
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
 const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, colorHint:true, shapeHint:true, dark:false}; // hintWait 默认=横幅 10s+2s
-let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, done:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
+let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, dailyDone:null, done:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){
@@ -676,7 +687,7 @@ function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 const I18N={
   nl:{
     "menu.new":"Nieuw spel","menu.continue":"Verder spelen","menu.levels":"Levels",
-    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Nieuwe puzzel elke dag","menu.endlessnew":"Punten jagen met jouw verzameling",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Nieuwe puzzel elke dag","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
     "menu.back":"Terug naar spel",
     "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
@@ -706,7 +717,7 @@ const I18N={
   },
   zh:{
     "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
-    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
     "menu.back":"回到当前游戏",
     "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
@@ -739,7 +750,7 @@ const I18N={
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
     "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock",
     "menu.back":"Back to game",
-    "menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection",
+    "menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
     "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait",
@@ -801,26 +812,29 @@ function initVoices(){
   pick();
   window.speechSynthesis.onvoiceschanged=pick;
 }
+let speechGen=0;   // 朗读代数令牌:每次新朗读/停止都 +1;cancel 会触发旧链的 onend,若不检查令牌,旧链会继续读下一个词,与新组混读
 function speakVerb(V){
+  const gen=++speechGen;
   return new Promise(res=>{
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
     try{
-      window.speechSynthesis.cancel();
+      window.speechSynthesis.cancel();      // 立刻打断上一组(旧链经令牌检查退出)
       const seq=[V.inf,V.sg,V.pl,V.pp];
       let i=0;
       const next=()=>{
-        if(i>=seq.length){ res(); return; }
+        if(gen!==speechGen || i>=seq.length){ res(); return; }
         const u=new SpeechSynthesisUtterance(seq[i++]);
         u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
         u.rate=0.82; u.volume=save.settings.ttsVolume/100;
         u.onend=next; u.onerror=next;
         window.speechSynthesis.speak(u);
       };
-      next();
+      // iOS Safari 的 cancel 异步生效:稍候一拍再开口,避免旧声未断新声已入队
+      setTimeout(()=>{ if(gen===speechGen) next(); },60);
     }catch(e){ res(); }
   });
 }
-function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
+function stopSpeech(){ speechGen++; if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
 
 /* ================= SVG 插画元素库 ================= */
 function ctxOf(style){
@@ -1451,6 +1465,7 @@ function startEndless(){
 }
 function startDaily(){
   if(save.unlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 每日限完成一次:今天已通关,拒绝再开
   abandonSession();
   mode='daily'; rng=dailySeed();
   level={id:"Dagelijks", verbs:sampleVerbs(collectedPool(),6,rng), goal:Infinity};
@@ -1773,16 +1788,15 @@ function endTimeUp(){
     const key=todayKey();
     const prev=save.dailyBest[key]||0;
     const rec=scoreRun>prev;
-    if(rec){ save.dailyBest[key]=scoreRun; persist(); }
+    save.dailyBest[key]=Math.max(prev,scoreRun);   // 0 分也记录:菜单要能显示今日已完成
+    save.dailyDone=key;                    // 计时结束=完成:今日名额用掉
+    persist();
     level=null;
     document.getElementById("resultTitle").textContent=t("result.timeup");
     document.getElementById("resultText").innerHTML=
       `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
     const btns=document.getElementById("resultBtns");
     btns.innerHTML="";
-    const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
-    b2.onclick=()=>{hideResult(); startDaily();};
-    btns.appendChild(b2);
     const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
     b3.onclick=()=>{hideResult(); openMenu();};
     btns.appendChild(b3);
@@ -1939,11 +1953,12 @@ function openMenu(){
   window.__continueId = nextLv ? nextLv.id : null;
   mc.style.display = (nextLv && !inSession) ? "" : "none";
   const unlockedModes=save.unlocked>=MODE_UNLOCK;
-  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes);
+  const dailyDone=save.dailyDone===todayKey();
+  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes||dailyDone);
   document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
   const dBest=save.dailyBest[todayKey()];
   document.getElementById("mDailySub").textContent=unlockedModes
-    ?(dBest?`${t("result.today")}: ${dBest}`:t("menu.newdaily"))
+    ?(dBest!=null?`${dailyDone?"✓ ":""}${t("result.today")}: ${dBest}`:t("menu.newdaily"))
     :t("menu.needlevel");
   const eBest=save.best["Oneindig"];
   document.getElementById("mEndlessSub").textContent=unlockedModes
@@ -2010,13 +2025,16 @@ function openBook(){
   const bands=[...new Set(LEVELS.map(l=>l.id.split(".")[0]))];   // A1 / A2 / B1
   for(const band of bands){
     const collapsed=!!bookCollapsed[band];
+    const lvls=LEVELS.filter(l=>l.id.split(".")[0]===band);
+    const idxs=lvls.flatMap(lv=>lv.verbs);
+    const gotN=idxs.filter(i=>save.collected.includes(VERBS[i].inf)).length;
     const head=document.createElement("button");
     head.className="book-group book-toggle";
-    head.innerHTML=`<i>${collapsed?"▸":"▾"}</i> ${band}`;
+    head.innerHTML=`<i>${collapsed?"▸":"▾"}</i> ${band}<span class="book-band-count">${gotN}/${idxs.length}</span>`;
     head.onclick=()=>toggleBookGroup(band);
     list.appendChild(head);
     if(collapsed) continue;
-    LEVELS.filter(l=>l.id.split(".")[0]===band).forEach(lv=>{
+    lvls.forEach(lv=>{
       const lvh=document.createElement("div");
       lvh.className="book-sub";
       lvh.textContent=lv.id;
@@ -2050,7 +2068,11 @@ document.getElementById("mContinue").onclick=()=>{
   startLevel(window.__continueId||LEVELS[0].id);
 };
 document.getElementById("mLevels").onclick=()=>showMenuView("levels");
-document.getElementById("mDaily").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startDaily(); };
+document.getElementById("mDaily").onclick=()=>{
+  if(save.unlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  document.getElementById("menuScreen").classList.remove("on"); startDaily();
+};
 document.getElementById("mEndless").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startEndless(); };
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");

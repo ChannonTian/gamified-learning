@@ -28,7 +28,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:localStorage key `nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, lastLevel, settings{...}}`;改结构要保持向后兼容(merge 默认值)。
+- **存档**:localStorage key `nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...}}`;改结构要保持向后兼容(merge 默认值)。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -51,6 +51,7 @@ gamified-learning/
 - ⚠️ **双产品同步维护点**:VERBS 词形/释义、插画元素库(person/PROP/SCENES)、i18n 框架在两个文件中是拷贝——改动需同步 tile-match/index.html 与 link-match/index.html。
 - v0.8 增量:73 词场景组合插画(姿态+道具表)、英语界面、图鉴 CEFR 折叠、全模式教学横幅、提示等待滑杆(默认 12s=横幅+2s)、继续游戏按完成记录。
 - v0.85 增量:菜单会话保活——打开菜单不销毁对局,顶部"回到当前游戏"按钮(Terug naar spel);"继续游戏"=下一未完成关;无尽/每日最佳分实时入库。
+- v0.87 增量:每日挑战限每日一次(save.dailyDone,完成后菜单灰显+✓,结算弹窗去掉"再来一次");朗读代数令牌(speechGen)——新横幅打断旧朗读链,朗读永远跟随最新教学横幅,iOS 上首词延迟 60ms 开口;图鉴 CEFR 折叠改纵向全宽手风琴目录+每档已收集计数。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)
@@ -63,3 +64,5 @@ gamified-learning/
 - 任何 UI 显示触发**不要用 requestAnimationFrame**(后台标签页不触发 → 卡死),用 `void el.offsetWidth` 强制重流。
 - 图鉴里打开的卡片 z-index(70)必须高于图鉴(50),否则关不掉。
 - 引擎是 COLS×ROWS 非方形网格,遍历边界别写死同一个常量。
+- **QA 钩子细节**:`NLM3.findMove()` 返回 `{a:[r,c], b:[r,c]}`(不是 r1/c1/r2/c2),bot 调 `swap(mv.a[0],mv.a[1],mv.b[0],mv.b[1])`;种子存档若未收集本关词,消除会弹首解锁卡并挂起 `await swap`(卡片等点击)——QA 种子直接全词收集最省事。
+- **隐藏标签页定时器节流**:Chrome 后台页 setTimeout 会被钳到 ~1s,朗读链/计时类自动化要放长等待或插桩看时间戳;系测试环境现象,与产品无关。
