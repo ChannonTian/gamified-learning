@@ -1088,8 +1088,8 @@ function findPathOcc(occ,ar,ac,br,bc){
     pts.push([r,c]);
     const p=par[r][c][d];
     if(!p) break;
-    cur=[p.cell[0],p.cell[1],p.dir===-1?0:p.dir];
-    if(p.dir===-1){ break; }
+    if(p.dir===-1){ pts.push([p.cell[0],p.cell[1]]); break; }
+    cur=[p.cell[0],p.cell[1],p.dir];
   }
   pts.reverse();
   return pts;   // 外圈坐标折线(含 A、B)
@@ -1201,7 +1201,7 @@ function findAnyPairNow(){
     const a=alive[i], b=alive[j];
     if(a.v!==b.v||a.k===b.k) continue;
     const o=occNow();
-    if(findPathOcc(o,a.r+1,a.c+1,b.r+1,b.c+1)) return [a,b];
+    if(findPathOcc(o,a.r,a.c,b.r,b.c)) return [a,b];
   }
   return null;
 }
@@ -1236,7 +1236,7 @@ async function attemptPair(a,b){
   // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
   const validPair = a && b && a!==b && a.v===b.v && a.k!==b.k;
   const o=occNow();
-  const path=validPair ? findPathOcc(o,a.r+1,a.c+1,b.r+1,b.c+1) : null;
+  const path=validPair ? findPathOcc(o,a.r,a.c,b.r,b.c) : null;
   if(!path){
     a.el.classList.add("shake"); b.el.classList.add("shake");
     blip(180,.08,"sine",.05);
