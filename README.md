@@ -17,6 +17,7 @@ Building a language learning game suite that really applies the latest learning 
 - [docs/DESIGN.md](docs/DESIGN.md) — 设计决策与依据
 - [docs/DEVLOG.md](docs/DEVLOG.md) — 迭代日志(最新在上)
 - [docs/ROADMAP.md](docs/ROADMAP.md) — 路线图
+- [docs/PLAYTEST.md](docs/PLAYTEST.md) — 试玩指引(给人类玩家)
 
 ## 本地运行
 

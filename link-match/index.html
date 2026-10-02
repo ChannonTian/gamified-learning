@@ -221,8 +221,10 @@
   .lv-btn{
     border:1px solid var(--line); background:var(--paper); border-radius:14px;
     padding:12px 6px; text-align:center; color:var(--ink); font-weight:800; font-size:13px;
+    position:relative;
   }
   .lv-btn small{display:block; color:#8b93a3; font-size:10px; font-weight:600; margin-top:3px;}
+  .lv-btn .lv-round{position:absolute; top:5px; right:8px; font-size:9px; font-weight:700; color:#98a1b0;}
   .lv-btn.locked{opacity:.4; pointer-events:none;}
   .lv-btn.done{border-color:#bcd9c8; background:#eef7f1;}
   body.dark .lv-btn.done{background:#243529; border-color:#2f4a3a;}
@@ -1623,8 +1625,9 @@ function renderLevelGrid(){
   LINK_LEVELS.forEach((lv,i)=>{
     const b=document.createElement("button");
     const locked=i>save.lUnlocked-1;
+    const within=i%6, round=Math.floor(within/3);   // 每档 6 关:0-2 第一轮,3-5 第二轮
     b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
-    b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`;
+    b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`+(round>0?`<span class="lv-round">${round+1}</span>`:"");
     b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
     g.appendChild(b);
   });
