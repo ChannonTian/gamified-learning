@@ -393,6 +393,13 @@
       </div>
     </div>
     <div class="set-row">
+      <label data-i18n="set.banner">Bannerduur</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setBanner" min="5" max="30" step="1">
+        <span id="bannerVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
+    </div>
+    <div class="set-row">
       <label data-i18n="set.dark">Donkere modus</label>
       <div class="seg" id="setDark"></div>
     </div>
@@ -437,6 +444,7 @@
     <p data-i18n="help.goal"></p>
     <p data-i18n="help.score"></p>
     <p data-i18n="help.rules"></p>
+    <p data-i18n="help.modes"></p>
     <p data-i18n="help.stuck"></p>
   </div>
 </div>
@@ -545,11 +553,13 @@ const TIERS=[
 const LINK_TYPES=["sg","pl","pp"];
 const LINK_LEVELS=[];
 TIERS.forEach((t,ti)=>{
-  LINK_TYPES.forEach((ty,ki)=>{
-    const verbs=[];
-    for(let k=0;k<7;k++) verbs.push(t.pool[(ki*7+k)%t.pool.length]);
-    LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, verbs});
-  });
+  for(let round=0;round<2;round++){          // 每档两轮:第二轮换一批词
+    LINK_TYPES.forEach((ty,ki)=>{
+      const verbs=[];
+      for(let k=0;k<7;k++) verbs.push(t.pool[((round*3+ki)*7+k)%t.pool.length]);
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, verbs});
+    });
+  }
 });
 const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
 const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
@@ -564,7 +574,7 @@ const I18N={
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
-    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur",
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
@@ -577,7 +587,8 @@ const I18N={
     "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
     "help.goal":"Doel: vind alle 14 paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
     "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een 🔥-combinatiebonus.",
-    "help.rules":"De vorm per level: A1.1/A2.1/B1.1 oefenen de verleden tijd enkelvoud, A1.2/A2.2/B1.2 de meervoud, A1.3/A2.3/B1.3 het voltooid deelwoord.",
+    "help.rules":"Elke band (A1/A2/B1) oefent drie vormen — enkelvoud, meervoud en voltooid deelwoord — daarna een tweede ronde met andere werkwoorden.",
+    "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig (puntjagen met jouw verzameling) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
     "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "card.tip":"Tik voor de betekenis",
   },
@@ -589,7 +600,7 @@ const I18N={
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
-    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长",
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
@@ -602,7 +613,8 @@ const I18N={
     "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
     "help.goal":"目标:找出全部 14 对配对。卡住时棋盘会自动重新洗牌。",
     "help.score":"计分:每对 +15 分;快速连续配对有 🔥 连击加成。",
-    "help.rules":"每关的形式:A1.1/A2.1/B1.1 练单数过去式,A1.2/A2.2/B1.2 练复数过去式,A1.3/A2.3/B1.3 练过去分词。",
+    "help.rules":"每档(A1/A2/B1)各练三种形式:单数、复数、过去分词;一轮之后再练一轮新词。",
+    "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)与每日挑战(180 秒,每天一次)。",
     "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "card.tip":"点击查看释义",
   },
@@ -614,7 +626,7 @@ const I18N={
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
-    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration",
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
@@ -627,7 +639,8 @@ const I18N={
     "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
     "help.goal":"Goal: find all 14 pairs before you get stuck. If you do get stuck, the board reshuffles.",
     "help.score":"Score: 15 points per pair. Quick consecutive pairs give a 🔥 combo bonus.",
-    "help.rules":"Form per level: A1.1/A2.1/B1.1 practise the singular past, A1.2/A2.2/B1.2 the plural, A1.3/A2.3/B1.3 the past participle.",
+    "help.rules":"Each band (A1/A2/B1) practises three forms — singular, plural and past participle — then a second round with different verbs.",
+    "help.modes":"Modes: after level 1 you unlock Endless (chase points with your collection) and the Daily Challenge (180 seconds, once per day).",
     "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
     "card.tip":"Tap for the meaning",
   },
@@ -638,7 +651,7 @@ function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.
 
 /* ================= 存档 ================= */
 const SAVE_KEY="linkmatch.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, dark:false};
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, bannerMs:10, dark:false};
 let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -959,7 +972,7 @@ function artSVG(vIdx,style){
 const COLS=4, ROWS=7;
 const RING=16;                       // 外圈连线带宽(px)
 const PAIR_POINTS=15, CLEAR_BONUS=100;
-const BANNER_MS=10000;               // 横幅=连击窗口
+const BANNER_DEFAULT_S=10;               // 横幅秒数默认值(=连击窗口,可在设置调 5-30s)
 const IDLE_HINT_MS_DEFAULT=12000;
 
 const boardEl=document.getElementById("grid");
@@ -1457,7 +1470,7 @@ function showLearnBanner(v,formWord){
   void bannerEl.offsetWidth;
   bannerEl.classList.add("show");
   bannerEl.onclick=hideBanner;
-  bannerTimer=setTimeout(hideBanner,BANNER_MS);
+  bannerTimer=setTimeout(hideBanner,(save.settings.bannerMs||BANNER_DEFAULT_S)*1000);
   speakPair(V,formWord);
 }
 function updateHUD(){
@@ -1641,6 +1654,8 @@ function renderSettings(){
   document.getElementById("setTts").value=S.ttsVolume;
   const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;
   document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
+  const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
+  document.getElementById("bannerVal").textContent=`${S.bannerMs||10} s`;
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
 
@@ -1738,6 +1753,10 @@ document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target
 document.getElementById("setHintWait").oninput=e=>{
   save.settings.hintWait=+e.target.value; persist();
   document.getElementById("hintWaitVal").textContent=save.settings.hintWait>0?`${save.settings.hintWait} s`:t("opt.off");
+};
+document.getElementById("setBanner").oninput=e=>{
+  save.settings.bannerMs=+e.target.value; persist();
+  document.getElementById("bannerVal").textContent=`${save.settings.bannerMs} s`;
 };
 document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
