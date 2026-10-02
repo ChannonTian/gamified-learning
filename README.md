@@ -8,8 +8,8 @@ Building a language learning game suite that really applies the latest learning 
 
 | 游戏 | 语言 | 内容 | 状态 |
 |---|---|---|---|
-| [tile-match](./tile-match/) | 荷兰语 | 强变化/不规则动词变位(过去式单复数 + 过去分词)三消 + 无尽/每日挑战 | 原型可玩,持续迭代 |
-| [link-match](./link-match/) | 荷兰语 | 原形 ↔ 变位形式连连看(每关专练一种形式) | 原型可玩,持续迭代 |
+| [link-match](./link-match/) | 荷兰语 | 原形 ↔ 变位形式连连看(每关专练一种形式) | **主线产品**,持续迭代 |
+| [tile-match](./tile-match/) | 荷兰语 | 强变化/不规则动词变位(过去式单复数 + 过去分词)三消 + 无尽/每日挑战 | 已上线,功能冻结(2026-10-02 起任务线集中到 link-match) |
 
 ## 文档
 
