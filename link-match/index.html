@@ -121,13 +121,18 @@
   .tile.k-pl .face{border-radius:6%;}
   .tile.k-pp .face{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
   .tile.k-inf .face::after{
-    content:""; position:absolute; left:14%; right:14%; bottom:8%;
-    height:3px; border-radius:2px; background:var(--accent);
+    content:""; position:absolute; left:8%; right:8%; bottom:6%;
+    height:4px; border-radius:2px; background:var(--accent);
+  }
+  .tile.k-inf .face::before{
+    content:""; position:absolute; top:6%; right:8%;
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
   }
   .tile.sel .face{
     scale:1.07;
     filter:drop-shadow(0 0 5px hsl(var(--h) 55% 45%));
   }
+  .tile.peer .face{ filter:drop-shadow(0 0 2.5px hsl(var(--h) 45% 55%)); }
   .tile.hint .face{animation:hintPulse 1.1s ease-in-out 3;}
   @keyframes hintPulse{
     0%,100%{filter:none; scale:1;}
@@ -559,7 +564,7 @@ const I18N={
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
     "result.title":"Koppelen gehaald! 🎉","result.done":"Alle 14 paren gevonden.",
-    "result.record":"nieuw record! 🏆","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu",
+    "result.record":"nieuw record! 🏆","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
     "toast.shuffle":"Geen combinaties meer — geschud!","toast.nopair":"Geen paar — geschud!",
     "book.title":"Verzameling","book.locked":"Nog niet gekoppeld",
     "book.lockedsub":"Koppel dit werkwoord om het te verzamelen.","book.view":"Tik om te bekijken",
@@ -582,7 +587,7 @@ const I18N={
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
     "result.title":"连连看过关! 🎉","result.done":"全部 14 对配对完成。",
-    "result.record":"新纪录! 🏆","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单",
+    "result.record":"新纪录! 🏆","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
     "toast.shuffle":"没有可连的了——重新洗牌!","toast.nopair":"无可连对——重新洗牌!",
     "book.title":"词典图鉴","book.locked":"尚未配对",
     "book.lockedsub":"配对这个动词来收集它。","book.view":"点击查看",
@@ -605,7 +610,7 @@ const I18N={
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
     "result.title":"Board cleared! 🎉","result.done":"All 14 pairs found.",
-    "result.record":"new record! 🏆","result.best":"best","btn.again":"Retry","btn.menu":"Menu",
+    "result.record":"new record! 🏆","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
     "toast.shuffle":"No combos left — shuffled!","toast.nopair":"No pairs — shuffled!",
     "book.title":"Collection","book.locked":"Not paired yet",
     "book.lockedsub":"Pair this verb to collect it.","book.view":"Tap to view",
@@ -1142,14 +1147,28 @@ function applyShuffle(g,list){
     positionTile(p.t);
   }
 }
+// 兜底:把剩余块按"原形+变位"成对放入行主序相邻格(经典路径下必然可连)
 function applyShuffleShallow(list){
-  const pos=[...list.map(p=>[p.r,p.c])];
-  for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
-  const vals=list.map(p=>p.t);
-  for(let i=0;i<list.length;i++){
-    const t=vals[i], [r,c]=pos[i];
-    board[r][c]=t; t.r=r; t.c=c; positionTile(t);
+  // 按动词分组:原形与形式各自排队,配成对
+  const infs=[], forms=[];
+  for(const p of list){ (p.t.k==="inf"?infs:forms).push(p.t); }
+  const pairs=[];
+  while(infs.length && forms.length){
+    const inf=infs.shift(), form=forms.find(f=>f.v===inf.v);
+    if(form){ forms.splice(forms.indexOf(form),1); pairs.push([inf,form]); }
+    else pairs.push([inf, forms.shift()]);   // 数量失衡的兜底(正常不会发生)
   }
+  while(infs.length) pairs.push([infs.shift(), infs.shift()]);
+  while(forms.length){ const a=forms.shift(); const b=forms.shift()||a; pairs.push([a,b]); }
+  // 行主序收集格子,成对放入相邻格
+  const pos=[...list.map(p=>[p.r,p.c])];
+  pos.sort((A,B)=> A[0]===B[0] ? A[1]-B[1] : A[0]-B[0]);
+  for(const p of list){ board[p.r][p.c]=null; }
+  pairs.forEach(([a,b],i)=>{
+    const [r1,c1]=pos[i*2], [r2,c2]=pos[i*2+1];
+    if(a){ a.r=r1; a.c=c1; board[r1][c1]=a; positionTile(a); }
+    if(b){ b.r=r2; b.c=c2; board[r2][c2]=b; positionTile(b); }
+  });
 }
 
 /* ---- 渲染 ---- */
@@ -1214,8 +1233,10 @@ let pairsLeft=PAIR_TOTAL;
 async function attemptPair(a,b){
   if(busy) return;
   busy=true;
+  // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
+  const validPair = a && b && a!==b && a.v===b.v && a.k!==b.k;
   const o=occNow();
-  const path=findPathOcc(o,a.r+1,a.c+1,b.r+1,b.c+1);
+  const path=validPair ? findPathOcc(o,a.r+1,a.c+1,b.r+1,b.c+1) : null;
   if(!path){
     a.el.classList.add("shake"); b.el.classList.add("shake");
     blip(180,.08,"sine",.05);
@@ -1265,7 +1286,8 @@ function drawPath(path){
   const svg=document.getElementById("pathSvg");
   svg.setAttribute("viewBox",`0 0 ${wrapEl.clientWidth} ${wrapEl.clientHeight}`);
   const pts=path.map(([r,c])=>cellCenter(r,c).map(n=>Math.round(n)).join(",")).join(" ");
-  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="${getComputedStyle(document.body).getPropertyValue('--accent')||'#e8734a'}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1200" stroke-dashoffset="1200"><animate attributeName="stroke-dashoffset" from="1200" to="0" dur="0.3s" fill="freeze"/></polyline>`;
+  const col=getComputedStyle(document.body).getPropertyValue("--accent").trim()||"#e8734a";
+  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
   setTimeout(()=>{ if(svg.firstChild) svg.removeChild(svg.firstChild); },450);
 }
 
@@ -1332,13 +1354,20 @@ boardEl.addEventListener("click",e=>{
   if(!el) return;
   const t=el._t;
   lastAction=Date.now();
-  if(!selected){ selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04); return; }
+  if(!selected){
+    selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04);
+    for(const x of tiles){ if(x.alive && x!==t && x.v===t.v) x.el.classList.add("peer"); }
+    return;
+  }
   if(selected===t){ clearSel(); return; }
   const a=selected, b=t;
   clearSel();
   attemptPair(a,b);
 });
-function clearSel(){ if(selected){ selected.el.classList.remove("sel"); selected=null; } }
+function clearSel(){
+  if(selected){ selected.el.classList.remove("sel"); selected=null; }
+  boardEl.querySelectorAll(".peer").forEach(el=>el.classList.remove("peer"));
+}
 </script>
 <script>
 "use strict";

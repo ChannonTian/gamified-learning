@@ -1477,7 +1477,7 @@ function forceTwoNearMiss(){
 
 let lastScoreShown=-1;
 function updateHUD(){
-  const isLevels=(mode==='levels');
+  const isLevels=(mode==='levels' && level);   // 过关后 level 已清空
   document.getElementById("goalTag").style.display=isLevels?"":"none";
   document.getElementById("timerTag").style.display=(mode==='daily')?"":"none";
   if(isLevels){
@@ -1500,7 +1500,31 @@ function updateHUD(){
 /* ---- 交换与消除 ---- */
 async function trySwap(r1,c1,r2,c2){
   if(busy) return false;
-  busy=true; clearSel();
+  busy=true;
+  try{
+    await doSwap(r1,c1,r2,c2);
+  }catch(err){
+    console.error(err);
+    window.__errors=window.__errors||[];
+    window.__errors.push(String(err&&err.stack||err));
+    toast("出错了,已自动恢复");
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+      if(!board[r][c]){
+        const t=pickRefillTile(null);
+        board[r][c]=t;
+        boardEl.appendChild(makeTileEl(t,r,c));
+        placeTile(t,r,c,true);
+      }
+    }
+  }finally{
+    busy=false;
+  }
+  if(pendingHint){ pendingHint=false; hint(); }
+  if(mode==='levels') checkEnd();
+  return true;
+}
+async function doSwap(r1,c1,r2,c2){
+  clearSel();
   lastAction=Date.now();
   const a=board[r1][c1], b=board[r2][c2];
   placeTile(a,r2,c2); placeTile(b,r1,c1);
@@ -1514,7 +1538,6 @@ async function trySwap(r1,c1,r2,c2){
     blip(180,.08,"sine",.05);
     if(streak>0){ streak=0; updateHUD(); }      // 无效交换打断连击
     await sleep(180);
-    busy=false;
     lastAction=Date.now();
     return false;
   }
@@ -1527,10 +1550,7 @@ async function trySwap(r1,c1,r2,c2){
     popScore(0.6, COLS/2-0.5, `🔥 combo +${bonus}`, true);
   }
   updateHUD();
-  busy=false;
-  if(pendingHint){ pendingHint=false; hint(); }
-  checkEnd();
-  return true;
+  lastAction=Date.now();
 }
 
 async function resolve(runs){
@@ -1538,10 +1558,16 @@ async function resolve(runs){
   while(runs.length){
     chain++;
     const verbSet=[...new Set(runs.flatMap(run=>run.cells.map(([r,c])=>board[r][c].v)))];
-    const cells=runs.flatMap(run=>run.cells);
+    // 行连段与列连段可能交叉共享同一块:必须去重,否则二次处理时 board[r][c] 已为 null → 崩溃冻结
+    const cellSet=new Set(), cells=[];
+    for(const run of runs) for(const [r,c] of run.cells){
+      const k=r*COLS+c;
+      if(!cellSet.has(k)){ cellSet.add(k); cells.push([r,c]); }
+    }
     blip(520+Math.min(cells.length,6)*40,.1,"triangle",.09);
     for(const [r,c] of cells){
       const t=board[r][c];
+      if(!t) continue;                      // 双重保险:交叉去重后不应出现
       t.el.classList.add("burst");
       board[r][c]=null;
     }
@@ -1645,6 +1671,16 @@ async function gravityRefill(){
       placeTile(t,r,c);
       above++;
       spawned.push(t);
+    }
+  }
+  // 自愈:任何残留空格直接补随机块(正常流程不会走到)
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if(!board[r][c]){
+      const t=pickRefillTile(null);
+      board[r][c]=t;
+      const el=makeTileEl(t,r,c);
+      boardEl.appendChild(el);
+      placeTile(t,r,c,true);
     }
   }
   if(spawned.length){
@@ -1772,11 +1808,12 @@ function checkEnd(){
 }
 function showResult(hasNext,newBest,oldBest){
   const finishedId=level && level.id;      // 按钮闭包用
+  const goalN=level ? level.goal : collectedRun.size;
   level=null;                              // 会话结束:菜单不再显示"回到当前游戏"
   document.getElementById("resultTitle").textContent=t("result.title");
   const bestTxt=newBest?` — ${t("result.record")}`:` (${t("result.best")}: ${oldBest})`;
   document.getElementById("resultText").innerHTML=
-    t("result.done").replace("{n}",level.goal)+"<br>"+
+    t("result.done").replace("{n}",goalN)+"<br>"+
     `⭐ <b>${scoreRun}</b>${bestTxt} · ${zettenRun} ${t("result.zetten")}`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
@@ -2036,6 +2073,14 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".o
 ["bookDrawer","helpModal","settingsModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
 });
+window.addEventListener("error",e=>{
+  window.__errors=window.__errors||[];
+  window.__errors.push(String(e.message)+" @"+e.lineno);
+});
+window.addEventListener("unhandledrejection",e=>{
+  window.__errors=window.__errors||[];
+  window.__errors.push("REJ: "+String(e.reason&&e.reason.stack||e.reason));
+});
 window.addEventListener("resize",()=>{
   syncWidths();
   if(!level) return;
@@ -2054,6 +2099,11 @@ window.NLM3={
   getLastAction:()=>lastAction,
   setLastAction:v=>lastAction=v,
   forceTimeUp:()=>{ dailyLeft=1; },
+  install(spec){ // 调试:按 [[r,c,verbIdx,form]] 覆写棋盘并重建 DOM
+    for(const [r,c,v,f] of spec){ if(board[r]&&board[r][c]){ board[r][c].v=v; board[r][c].f=f; } }
+    boardEl.innerHTML="";
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) boardEl.appendChild(makeTileEl(board[r][c],r,c));
+  },
   settings:()=>({...save.settings}),
   banner:()=>document.getElementById("learnBanner").className,
 };
