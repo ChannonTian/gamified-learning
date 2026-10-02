@@ -1,5 +1,13 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-01 · v0.86 修复「消除后卡死」(tile-match,用户手机复现两次)
+
+- 根因:行连段与列连段**交叉共享同一块**(L/T 形)时,消除列表含重复项;第二次处理该格时 board 已置 null → t.el 抛 TypeError → resolve 中断 → busy 永久 true(重力未执行:悬空块不落、全盘不可点)。与设备无关,概率触发。
+- 修复:消除格子按格去重;burst 循环加空引用防御;重力后自愈填充残留空格;trySwap 包 try/catch/finally(busy 必复位+棋盘自愈+报错提示);全局 error/unhandledrejection 捕获进 window.__errors。
+- 顺修:showResult 先置 level=null 再读 level.goal(过关结算弹窗从不显示)、updateHUD 在 level 置空后读 level.goal(横幅超时报错一次)。
+- 回归:NLM3.install() 构造交叉布局,消除后无冻结无空洞;bot 通关后横幅超时窗内零错误。
+
+
 > 每次迭代追加一节:日期、内容、用户反馈来源、修掉的 bug。最新在最上。
 
 ## 2026-10-02 · v1.1(link-match)试玩反馈五连修

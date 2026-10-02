@@ -55,6 +55,9 @@ gamified-learning/
 
 ## 已踩过的坑(别再踩)
 
+- **交叉消除去重**:行/列连段交叉共享同一块时,消除列表必须按格去重,否则二次置 null 后 t.el 崩、busy 卡死(tile-match v0.86 修复)。
+- **异步链路异常会卡死 busy**:await 链外层 try/finally 复位 busy,全局错误捕获(window.__errors)留痕;showResult/updateHUD 等「先置空后使用」的次序错误用 NLM3.errors() 排查。
+
 - 补牌生成的 tile 必须 `boardEl.appendChild`(曾导致棋盘隐形减员)。
 - 首次解锁判断用全局 `save.collected`,不是本局 `collectedRun`。
 - 任何 UI 显示触发**不要用 requestAnimationFrame**(后台标签页不触发 → 卡死),用 `void el.offsetWidth` 强制重流。
