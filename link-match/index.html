@@ -309,6 +309,7 @@
     <div class="hud-center">
       <span class="tag" id="lvlTag">A1</span>
       <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/14</span></span>
+      <span class="tag" id="timerTag" style="display:none;">⏱ 3:00</span>
     </div>
     <div class="hud-right">
       <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
@@ -344,6 +345,8 @@
       <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
       <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
+      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
+      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
@@ -555,6 +558,8 @@ const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
 const I18N={
   nl:{
     "menu.back":"Terug naar spel","menu.continue":"Verder spelen","menu.levels":"Levels",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
+    "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
@@ -578,6 +583,8 @@ const I18N={
   },
   zh:{
     "menu.back":"回到当前游戏","menu.continue":"继续游戏","menu.levels":"关卡选择",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
+    "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
@@ -601,6 +608,8 @@ const I18N={
   },
   en:{
     "menu.back":"Back to game","menu.continue":"Continue","menu.levels":"Levels",
+    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
+    "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
@@ -630,7 +639,7 @@ function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.
 /* ================= 存档 ================= */
 const SAVE_KEY="linkmatch.v1";
 const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, dark:false};
-let save={lUnlocked:1, done:{}, best:{}, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
+let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
@@ -967,7 +976,7 @@ let layout={ring:RING, tw:80, th:60};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
-const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][curLevel.type];
+const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
@@ -984,13 +993,14 @@ function syncSize(){
   wrapEl.style.height=(gridH+RING*2)+"px";
   document.getElementById("hud").style.width=(gridW+RING*2)+"px";
   document.getElementById("dock").style.width=(gridW+RING*2)+"px";
-  // 字号:canvas 实测最长词(原形+形式)
+  // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块
   const ctx=measureCanvas.getContext("2d");
   ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
   let maxW=1;
-  if(curLevel) for(const vi of curLevel.verbs){
-    const V=VERBS[vi];
-    for(const w of [V.inf, V[curLevel.type]]) maxW=Math.max(maxW, ctx.measureText(w).width);
+  const src=tiles.length?tiles:(curLevel&&curLevel.verbs?curLevel.verbs.map(vi=>({v:vi,f:curLevel.type,k:"inf"})):[]);
+  for(const t of src){
+    const V=VERBS[t.v];
+    maxW=Math.max(maxW, ctx.measureText(V.inf).width, ctx.measureText(V[t.f]||V.sg).width);
   }
   levelFont=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/maxW));
   for(const t of tiles){ if(t.el){ t.el.firstChild.style.fontSize=levelFont+"px"; positionTile(t); } }
@@ -1011,12 +1021,12 @@ function cellCenter(r,c){   // 外圈坐标(含 0 与 ROWS+1/COLS+1 的环)
 }
 
 /* ---- 布点:14 对 + 可解性模拟 ---- */
-function buildPairs(){
+function buildPairsFrom(picks){   // picks = [{v, f}]:每词原形×2 + 变位×2(变位形式由 f 决定)
   const cells=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) cells.push([r,c]);
   const tiles=[];
-  for(const vi of curLevel.verbs){
-    tiles.push({v:vi,k:"inf"},{v:vi,k:"form"},{v:vi,k:"inf"},{v:vi,k:"form"});
+  for(const p of picks){
+    tiles.push({v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f},{v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f});
   }
   // 洗牌(词块与位置都随机)
   for(let tries=0;tries<60;tries++){
@@ -1031,16 +1041,17 @@ function buildPairs(){
   // 兜底:相邻成对放置(必然可解)
   const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
   let n=0;
-  for(const vi of curLevel.verbs){
+  for(const p of picks){
     for(let k=0;k<2;k++){
       const r=Math.floor(n/COLS), c=n%COLS;
-      g[r][c]={v:vi,k:"inf"}; n++;
+      g[r][c]={v:p.v,k:"inf",f:p.f}; n++;
       const r2=Math.floor(n/COLS), c2=n%COLS;
-      g[r2][c2]={v:vi,k:"form"}; n++;
+      g[r2][c2]={v:p.v,k:"form",f:p.f}; n++;
     }
   }
   return g;
 }
+function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type}))); }
 function occFrom(g){
   const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) o[r+1][c+1]=true;
@@ -1178,11 +1189,11 @@ function buildBoardDOM(){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     const t=board[r][c];
     const el=document.createElement("div");
-    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+curLevel.type);
+    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+t.f);
     el.style.setProperty("--h",VERBS[t.v].hue);
     const face=document.createElement("div");
     face.className="face";
-    face.textContent=t.k==="inf"?VERBS[t.v].inf:VERBS[t.v][curLevel.type];
+    face.textContent=t.k==="inf"?VERBS[t.v].inf:VERBS[t.v][t.f];
     face.style.fontSize=levelFont+"px";
     el.appendChild(face);
     el._t=t; t.el=el;
@@ -1211,6 +1222,9 @@ async function startLink(idx){
   const lv=LINK_LEVELS[idx];
   if(!lv) return;
   abandonSession();
+  mode="levels";
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
   curLevel=lv;
   selected=null; pendingHint=false;
   scoreRun=0; streak=0; lastScoreShown=-1;
@@ -1229,6 +1243,131 @@ async function startLink(idx){
 function displayId(lv){ return `${lv.band} · ${t(SHORT_KEY[lv.type])}`; }
 const PAIR_TOTAL=ROWS*COLS/2;
 let pairsLeft=PAIR_TOTAL;
+
+/* ---- 模式:无尽 / 每日挑战(过第 1 关解锁;只用已收集动词) ---- */
+const MODE_UNLOCK=2, DAILY_SECONDS=180;
+let mode="levels";           // "levels" | "endless" | "daily"
+let modeRng=Math.random;     // 每日:当日种子;无尽:真随机
+const MODE_FORMS=["sg","pl","pp"];
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function dailySeed(){        // 日期字符串 → 确定性 rng(全玩家同日同盘)
+  const key=todayKey();
+  let h=1779033703 ^ key.length;
+  for(const ch of key){ h=Math.imul(h^ch.charCodeAt(0),3432918353); h=((h<<13)|(h>>>19))>>>0; }
+  return ()=>{ h=Math.imul(h^(h>>>16),2246822507); h=Math.imul(h^(h>>>13),3266489909); h^=h>>>16; return (h>>>0)/4294967296; };
+}
+function shuffleWith(arr,r){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function collectedPool(){
+  const all=new Set(); TIERS.forEach(tr=>tr.pool.forEach(vi=>all.add(vi)));
+  const got=[...all].filter(vi=>(save.counts[VERBS[vi].inf]||0)>0);
+  return got.length?got:[0,1,2,3,4,5,6];
+}
+function sampleModeVerbs(pool,n,r){   // 取 n 个 {v,f}:同一盘内变位词串不重复(同动词可换形式再入)
+  const picks=[], seenStr=new Set(), seenPair=new Set();
+  const tryPush=(vi)=>{
+    if(picks.length>=n) return;
+    for(const f of shuffleWith(MODE_FORMS,r)){
+      const s=VERBS[vi][f];
+      if(seenStr.has(s)||seenPair.has(vi+"/"+f)) continue;
+      seenStr.add(s); seenPair.add(vi+"/"+f); picks.push({v:vi,f}); return;
+    }
+  };
+  shuffleWith(pool,r).forEach(tryPush);
+  let guard=0;
+  while(picks.length<n && guard++<300){ tryPush(pool[Math.floor(r()*pool.length)]); }
+  while(picks.length<n){ const vi=pool[guard++%pool.length]; picks.push({v:vi,f:MODE_FORMS[guard%3]}); }  // 极端兜底(收词过少)
+  return picks;
+}
+function dealModeBoard(){
+  const picks=sampleModeVerbs(collectedPool(),7,mode==="daily"?modeRng:Math.random);
+  clearSel(); clearHint();
+  board=buildPairsFrom(picks);
+  tiles=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
+  buildBoardDOM();
+  syncSize();   // 按新盘词长校字号
+  pairsLeft=PAIR_TOTAL;
+  updateHUD();
+}
+function startEndless(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  abandonSession();
+  mode="endless"; modeRng=Math.random;
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
+  curLevel={id:"Oneindig"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.endless");
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+}
+function startDaily(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 每日限一次:今天已完成,拒绝再开
+  abandonSession();
+  mode="daily"; modeRng=dailySeed();
+  curLevel={id:"Dagelijks"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.daily");
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+  startDailyTimer();
+}
+
+/* ---- 每日挑战计时(180s,时间到=当日完成) ---- */
+let dailyLeft=0, dailyIv=null;
+function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } }
+function updateTimerTag(){
+  const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
+  const el=document.getElementById("timerTag");
+  el.style.display=""; el.textContent=`⏱ ${m}:${s}`;
+}
+function startDailyTimer(){
+  dailyLeft=DAILY_SECONDS;
+  updateTimerTag();
+  stopDailyTimer();
+  dailyIv=setInterval(()=>{
+    if(mode!=="daily"||!curLevel){ stopDailyTimer(); return; }
+    dailyLeft--; updateTimerTag();
+    if(dailyLeft<=0){ stopDailyTimer(); endTimeUp(); }
+  },1000);
+}
+function endTimeUp(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const key=todayKey();
+    const prev=save.dailyBest[key]||0;
+    const rec=scoreRun>prev;
+    save.dailyBest[key]=Math.max(prev,scoreRun);   // 0 分也记录:菜单完成态要能显示
+    save.dailyDone=key;
+    persist();
+    curLevel=null;
+    updateHUD();   // curLevel 已空:隐藏计时器
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
+    b.onclick=()=>{ hideResult(); openMenu(); };
+    btns.appendChild(b);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
 
 async function attemptPair(a,b){
   if(busy) return;
@@ -1274,8 +1413,14 @@ async function attemptPair(a,b){
   if(pairsLeft<=0){
     scoreRun+=CLEAR_BONUS;
     updateHUD();
-    await sleep(400);
-    finishLevel();
+    await sleep(450);
+    if(mode==="levels"){
+      finishLevel();
+    }else{
+      blip(660,.1,"triangle",.07);   // 无尽/每日:清盘→发下一盘,连击窗口延续
+      dealModeBoard();
+      busy=false;
+    }
   }else if(!findAnyPairNow()){
     toast(t("toast.nopair"));
     await sleep(400);
@@ -1318,9 +1463,15 @@ function showLearnBanner(v,formWord){
 function updateHUD(){
   document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
   document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
+  document.getElementById("timerTag").style.display=(mode==="daily"&&curLevel)?"":"none";
   const st=document.getElementById("scoreTag");
   st.textContent=`⭐ ${scoreRun}`;
-  if(scoreRun!==lastScoreShown){ st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun; }
+  if(scoreRun!==lastScoreShown){
+    st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun;
+    // 无尽/每日:最佳分实时入库(中途离开/刷新不丢)
+    if(mode==="endless" && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
+    if(mode==="daily"){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
+  }
   const ct=document.getElementById("comboTag");
   if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
   else ct.style.display="none";
@@ -1429,6 +1580,19 @@ function openMenu(){
   const mc=document.getElementById("mContinue");
   const nextIdx=LEVELS_done();
   mc.style.display=nextIdx<LINK_LEVELS.length?"":"none";
+  // 无尽/每日按钮:解锁态 + 今日完成态 + 副标题
+  const unlockedModes=save.lUnlocked>=MODE_UNLOCK;
+  const dailyDone=save.dailyDone===todayKey();
+  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes||dailyDone);
+  document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
+  const dBest=save.dailyBest[todayKey()];
+  document.getElementById("mDailySub").textContent=unlockedModes
+    ?(dBest!=null?`${dailyDone?"✓ ":""}${t("result.today")}: ${dBest}`:t("menu.newdaily"))
+    :t("menu.needlevel");
+  const eBest=save.best["Oneindig"];
+  document.getElementById("mEndlessSub").textContent=unlockedModes
+    ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
+    :t("menu.needlevel");
   document.getElementById("menuScreen").classList.add("on");
 }
 function LEVELS_done(){
@@ -1550,6 +1714,17 @@ setInterval(()=>{
 document.getElementById("btnMenu").onclick=openMenu;
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
+document.getElementById("mDaily").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  document.getElementById("menuScreen").classList.remove("on");
+  startDaily();
+};
+document.getElementById("mEndless").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  document.getElementById("menuScreen").classList.remove("on");
+  startEndless();
+};
 document.getElementById("mContinue").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
   startLink(LEVELS_done());
@@ -1582,12 +1757,14 @@ setInterval(()=>{ if(window.innerWidth!==lastVW || window.innerHeight!==lastVH){
 
 /* ================= 调试钩子 ================= */
 window.NLM3={
-  state:()=>({level:curLevel&&curLevel.id, pairs:pairsLeft, score:scoreRun, streak, busy,
+  state:()=>({level:curLevel&&curLevel.id, mode, dailyLeft, pairs:pairsLeft, score:scoreRun, streak, busy,
     board:board.map(row=>row.map(t=>t?[t.v,t.k]:null))}),
   verbs:VERBS, levels:LINK_LEVELS,
   findPair:()=>{ const p=findAnyPairNow(); return p?[p[0].r,p[0].c,p[1].r,p[1].c]:null; },
   connect:(r1,c1,r2,c2)=>attemptPair(board[r1][c1],board[r2][c2]),
   settings:()=>({...save.settings}),
+  forceTimeUp:()=>{ dailyLeft=1; },
+  save:()=>save,
 };
 
 /* ================= 启动 ================= */

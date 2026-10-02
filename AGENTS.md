@@ -32,7 +32,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:localStorage key `nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...}}`;改结构要保持向后兼容(merge 默认值)。
+- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig), dailyBest{日期:分}, dailyDone, counts{}, style, settings{...}}`;改结构要保持向后兼容(merge 默认值)。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -57,6 +57,7 @@ gamified-learning/
 - v0.85 增量:菜单会话保活——打开菜单不销毁对局,顶部"回到当前游戏"按钮(Terug naar spel);"继续游戏"=下一未完成关;无尽/每日最佳分实时入库。
 - v0.87 增量:每日挑战限每日一次(save.dailyDone,完成后菜单灰显+✓,结算弹窗去掉"再来一次");朗读代数令牌(speechGen)——新横幅打断旧朗读链,朗读永远跟随最新教学横幅,iOS 上首词延迟 60ms 开口;图鉴 CEFR 折叠改纵向全宽手风琴目录+每档已收集计数。
 - **link-match v1.2(2026-10-02)**:修复路径判定坐标系双重偏移(有路被阻/假提示/连线画偏)与折线丢失起点;回归测试固化于 link-match/test/。同窗口补发了曾滞留工作区的 tile-match v0.87 代码(42e1d9c)。
+- **link-match v1.3(2026-10-02)**:无尽(清盘连发、连击跨盘、最佳实时入库)+ 每日挑战(180s、日期种子、每日一次带 ✓);词形挂到每块(t.f),`syncSize` 按盘面量字号;QA 钩子增 `mode/dailyLeft/save()/forceTimeUp()`。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)
