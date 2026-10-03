@@ -4,10 +4,11 @@
 
 ## 项目是什么
 
-用游戏机制**真正承载学习内容**的语言学习游戏合集(拒绝"消消乐+飘单词"式贴皮)。两个游戏(**2026-10-02 起任务线只做 link-match**,tile-match 冻结):
+用游戏机制**真正承载学习内容**的语言学习游戏合集(拒绝"消消乐+贴皮")。三个产品(**2026-10-02 起任务线主线在 link-match**,tile-match 冻结;2026-10-03 加四消原型):
 
 - **link-match(主线)**:动词原形↔变位连连看——匹配判定=把原形和它的变位连到一起,检索练习即玩法。
 - **tile-match(冻结于 v0.87)**:荷兰语强变化动词三消。匹配判定=同一动词的"单数过去式+复数过去式+过去分词"三种形式各≥1、3+ 个连成一线。
+- **four-match(原型 v0.1)**:四消对照分支——原形+三变位**四形同消**,A1 起、每关 3 词、6×6;独立单文件,待试玩定夺。
 
 ## 结构与约定
 
@@ -27,12 +28,15 @@ gamified-learning/
 │   ├── README.md       ← 游戏说明
 │   └── test/
 │       └── path-engine.test.mjs ← 路径引擎回归(零依赖,node 直跑;改引擎必跑)
+├── four-match/
+│   ├── index.html      ← 第三个产品:四消原型(原形+三变位同消;存档 nlm4.*、钩子 NLM4)
+│   └── README.md       ← 游戏说明
 └── LICENSE             ← PolyForm Noncommercial 1.0.0(公开但非商业)
 ```
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig), dailyBest{日期:分}, dailyDone, counts{}, style, settings{...}}`;改结构要保持向后兼容(merge 默认值)。
+- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig), dailyBest{日期:分}, dailyDone, counts{}, style, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值)。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -59,6 +63,7 @@ gamified-learning/
 - **link-match v1.2(2026-10-02)**:修复路径判定坐标系双重偏移(有路被阻/假提示/连线画偏)与折线丢失起点;回归测试固化于 link-match/test/。同窗口补发了曾滞留工作区的 tile-match v0.87 代码(42e1d9c)。
 - **link-match v1.3(2026-10-02)**:无尽(清盘连发、连击跨盘、最佳实时入库)+ 每日挑战(180s、日期种子、每日一次带 ✓);词形挂到每块(t.f),`syncSize` 按盘面量字号;QA 钩子增 `mode/dailyLeft/save()/forceTimeUp()`。
 - **link-match v1.4(2026-10-02)**:关卡 9→18(每档两轮,第二轮换词);横幅时长进设置(5-30s,默认 10,兼连击窗口)。
+- **four-match v0.1(2026-10-03)**:四消独立原型上线 https://channontian.github.io/gamified-learning/four-match/ ——四形同消、A1 3 关、每关 3 词、6×6、12 类型;玩法观察(偏松、字号偏小)记 DEVLOG,待试玩定夺后再决定是否继续投入。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)
@@ -72,5 +77,5 @@ gamified-learning/
 - 任何 UI 显示触发**不要用 requestAnimationFrame**(后台标签页不触发 → 卡死),用 `void el.offsetWidth` 强制重流。
 - 图鉴里打开的卡片 z-index(70)必须高于图鉴(50),否则关不掉。
 - 引擎是 COLS×ROWS 非方形网格,遍历边界别写死同一个常量。
-- **QA 钩子细节**:`NLM3.findMove()` 返回 `{a:[r,c], b:[r,c]}`(不是 r1/c1/r2/c2),bot 调 `swap(mv.a[0],mv.a[1],mv.b[0],mv.b[1])`;种子存档若未收集本关词,消除会弹首解锁卡并挂起 `await swap`(卡片等点击)——QA 种子直接全词收集最省事。
+- **QA 钩子细节**:`NLM3/NLM4.findMove()` 返回 `{a:[r,c], b:[r,c]}`(不是 r1/c1/r2/c2),bot 调 `swap(mv.a[0],mv.a[1],mv.b[0],mv.b[1])`;种子存档若未收集本关词,消除会弹首解锁卡并挂起 `await swap`(卡片等点击)——QA 种子直接全词收集最省事。
 - **隐藏标签页定时器节流**:Chrome 后台页 setTimeout 会被钳到 ~1s,朗读链/计时类自动化要放长等待或插桩看时间戳;系测试环境现象,与产品无关。
