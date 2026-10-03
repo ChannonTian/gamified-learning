@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Koppelen · UI test</title>
+<style>
+  :root{
+    --ink:#33415c;
+    --paper:#f7f5f0;
+    --card:#ffffff;
+    --line:#e4dfd4;
+    --accent:#e8734a;
+    --dim:rgba(51,65,92,.42);
+    --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
+  }
+  body.dark{
+    --ink:#dfe5f0;
+    --paper:#222834;
+    --card:#2b3342;
+    --line:#3d4757;
+    --dim:rgba(10,14,22,.55);
+    --tile-s:30%; --tile-l:26%; --tile-ink:84%; --tile-edge:15%;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    background:var(--paper); color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    user-select:none; -webkit-user-select:none;
+    overflow:hidden;
+  }
+  button{font-family:inherit; cursor:pointer;}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:10px 2px 8px;
+  }
+  .hud-btn{justify-self:start;}
+  .hud-btn{
+    width:46px; height:46px; border-radius:14px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hud-btn:active{transform:scale(.94);}
+  .ic{width:25px; height:25px; flex:none; display:block;}
+  .menu-btn .ic{width:24px; height:24px;}
+  .dock-btn .ic{width:22px; height:22px;}
+  .hud-center{display:flex; align-items:center; gap:7px; justify-self:center;}
+  .hud-right{display:flex; align-items:center; gap:7px; justify-self:end; min-width:0;}
+  .tag{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:7px 13px; font-size:15px; font-weight:800; white-space:nowrap;
+  }
+  .goal-pill{
+    position:relative; overflow:hidden; min-width:96px;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; font-size:14px; font-weight:800; text-align:center;
+  }
+  .goal-pill i{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, hsl(150 55% 65% / .5), hsl(150 60% 48% / .8));
+    transition:width .45s cubic-bezier(.3,1.2,.5,1);
+  }
+  .goal-pill span{position:relative;}
+  .score-tag{
+    font-size:20px; font-weight:800; letter-spacing:.3px; line-height:1;
+    padding:3px 6px;
+    background:linear-gradient(135deg,#f5b942,#e8734a);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .score-tag.bump{animation:scoreBump .32s ease;}
+  @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
+  .combo-tag{
+    background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
+    padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
+    animation:comboPop .25s ease, comboGlow 1.6s ease-in-out infinite;
+  }
+  @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
+  @keyframes comboGlow{ 0%,100%{box-shadow:0 0 8px rgba(232,85,74,.35);} 50%{box-shadow:0 0 18px rgba(232,85,74,.6);} }
+  @media (max-width:430px){
+    .hud-btn{width:40px; height:40px;}
+    .ic{width:22px; height:22px;}
+    .tag{padding:6px 10px; font-size:13.5px;}
+    .goal-pill{padding:6px 10px; font-size:13px; min-width:84px;}
+    .score-tag{font-size:17px;}
+    .combo-tag{padding:5px 11px; font-size:13px;}
+    #hud{padding-top:8px; gap:6px;}
+  }
+
+  /* ---------- Board:4×7 网格 + 外圈连线带 ---------- */
+  #boardWrap{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    margin:2px 0 10px;
+    box-shadow:0 6px 24px rgba(51,65,92,.06);
+  }
+  #grid{ position:absolute; }
+  #pathSvg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6; }
+  .tile{
+    position:absolute; left:0; top:0;
+    transition:transform .18s ease, opacity .25s;
+    will-change:transform;
+  }
+  .face{
+    width:90%; height:90%; margin:5%;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:hsl(var(--h) var(--tile-s) var(--tile-l));
+    color:hsl(var(--h) 45% var(--tile-ink));
+    box-shadow:inset 0 -3px 0 hsl(var(--h) var(--tile-s) var(--tile-edge));
+    font-weight:700; line-height:1.05; text-align:center;
+    overflow:hidden; padding:0 2px;
+    border-radius:18%;
+    transition:filter .15s, scale .15s;
+  }
+  .tile.k-pl .face{border-radius:6%;}
+  .tile.k-pp .face{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+  .tile.k-inf .face::after{
+    content:""; position:absolute; left:8%; right:8%; bottom:6%;
+    height:4px; border-radius:2px; background:var(--accent);
+  }
+  .tile.k-inf .face::before{
+    content:""; position:absolute; top:6%; right:8%;
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
+  }
+  .tile.sel .face{
+    scale:1.07;
+    filter:drop-shadow(0 0 5px hsl(var(--h) 55% 45%));
+  }
+  .tile.peer .face{ filter:drop-shadow(0 0 2.5px hsl(var(--h) 45% 55%)); }
+  .tile.hint .face{animation:hintPulse 1.1s ease-in-out 3;}
+  @keyframes hintPulse{
+    0%,100%{filter:none; scale:1;}
+    50%{filter:drop-shadow(0 0 7px hsl(var(--h) 60% 50%)); scale:1.08;}
+  }
+  .tile.gone{z-index:5;}
+  .tile.gone .face{animation:goneAnim .28s ease forwards;}
+  @keyframes goneAnim{ to{ scale:1.35; opacity:0; } }
+  .tile.shake .face{animation:shakeX .3s ease;}
+  @keyframes shakeX{ 0%,100%{translate:0;} 25%{translate:-4px 0;} 75%{translate:4px 0;} }
+
+  /* ---------- 底部操作坞 + 教学横幅 ---------- */
+  #dock{
+    position:relative;
+    display:flex; gap:12px; justify-content:center;
+    margin-top:10px;
+    padding:2px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+  .dock-btn{
+    display:flex; align-items:center; gap:8px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:14px; padding:12px 20px; font-size:15px; font-weight:700;
+    box-shadow:0 2px 8px rgba(51,65,92,.06);
+  }
+  .dock-btn:active{transform:scale(.95);}
+  #learnBanner{
+    position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px rgba(20,30,50,.28);
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; cursor:pointer; overflow:hidden;
+    opacity:0; visibility:hidden; transform:translateY(16px);
+    transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s;
+  }
+  #learnBanner.show{opacity:1; visibility:visible; transform:none;}
+  #bannerArt{width:46px; height:46px; flex:none;}
+  .b-main{flex:1; min-width:0;}
+  .b-main b{font-size:23px; font-weight:800; line-height:1.1;}
+  #bannerForm{font-size:18px; font-weight:700; color:hsl(var(--h) 45% 40%); margin-top:2px;}
+  #bannerGloss{
+    margin-left:auto; flex:none; max-width:34%;
+    font-size:12.5px; line-height:1.35; text-align:right;
+    color:var(--ink); opacity:.6;
+  }
+  .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
+  .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
+  #learnBanner.show .b-progress i{animation:bprog var(--bdur,10s) linear forwards;}
+  @keyframes bprog{ from{width:100%;} to{width:0;} }
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:50;
+    background:var(--dim);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .22s;
+  }
+  .overlay.on{opacity:1; pointer-events:auto;}
+  .panel{
+    background:var(--card); border-radius:20px;
+    padding:22px 22px 20px; width:min(88vw,380px);
+    box-shadow:0 18px 50px rgba(20,30,50,.25);
+    position:relative; max-height:86vh; overflow:auto;
+  }
+  .panel h1{margin:0 0 4px; font-size:22px;}
+  .panel h2{margin:0 0 10px; font-size:17px;}
+  .panel p{font-size:13px; line-height:1.65; color:#5a6577; margin:8px 0;}
+  body.dark .panel p{color:#a8b2c4;}
+  .close-x{
+    position:absolute; top:10px; right:10px; width:30px; height:30px;
+    border:none; background:none; font-size:18px; color:#98a1b0;
+  }
+  .menu-btn{
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:13px 16px; margin:9px 0;
+    border-radius:14px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
+    font-size:15.5px; font-weight:700; text-align:left;
+  }
+  .menu-btn:active{transform:scale(.97);}
+  .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .menu-btn.ghost{background:var(--paper);}
+  .menu-btn .m-label{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .menu-btn small{font-size:10.5px; font-weight:600; color:#8b93a3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .menu-btn.locked{opacity:.5;}
+  .lv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:14px 0 6px;}
+  .lv-btn{
+    border:1px solid var(--line); background:var(--paper); border-radius:14px;
+    padding:12px 6px; text-align:center; color:var(--ink); font-weight:800; font-size:13px;
+    position:relative;
+  }
+  .lv-btn small{display:block; color:#8b93a3; font-size:10px; font-weight:600; margin-top:3px;}
+  .lv-btn .lv-round{position:absolute; top:5px; right:8px; font-size:9px; font-weight:700; color:#98a1b0;}
+  .lv-btn.locked{opacity:.4; pointer-events:none;}
+  .lv-btn.done{border-color:#bcd9c8; background:#eef7f1;}
+  body.dark .lv-btn.done{background:#243529; border-color:#2f4a3a;}
+  #cardModal{z-index:70;}
+  #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
+  #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
+  #cardInf{font-size:32px; font-weight:800;}
+  #cardForms{font-size:13px; color:#8b93a3; margin-top:6px;}
+  #cardGloss{
+    margin-top:12px; padding:10px 12px; border-radius:12px;
+    background:var(--paper); font-size:14px; color:var(--ink); display:none;
+  }
+  #cardModal.gloss-open #cardGloss{display:block;}
+  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
+  #resultModal .panel{text-align:center;}
+  .btn{
+    display:inline-block; border:none; border-radius:12px;
+    padding:11px 20px; font-size:14px; font-weight:700; margin:6px 4px 0;
+    background:var(--accent); color:#fff;
+  }
+  .btn.ghost{background:var(--paper); color:var(--ink); border:1px solid var(--line);}
+  .btn:active{transform:scale(.96);}
+  .set-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0; border-bottom:1px dashed var(--line); font-size:13.5px;
+  }
+  .set-row:last-child{border-bottom:none;}
+  .set-row>label{font-weight:700;}
+  .seg{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+  .seg button{
+    padding:7px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;
+  }
+  .seg button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .set-row input[type=range]{width:140px; accent-color:var(--accent);}
+  .book-group{
+    display:flex; align-items:center; width:100%; text-align:left;
+    background:none; border:none; color:var(--ink);
+    font-size:13px; font-weight:800; margin:14px 0 2px; padding:4px 2px;
+  }
+  .book-group i{font-style:normal; margin-right:6px; color:#98a1b0;}
+  .book-sub{font-size:11px; color:#98a1b0; margin:8px 0 2px; font-weight:700;}
+  .book-row{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 6px; border-bottom:1px dashed var(--line);
+  }
+  .book-row.viewable{cursor:pointer; border-radius:10px;}
+  .book-row.viewable:active{background:var(--paper);}
+  .book-art{width:44px; height:44px; flex:none;}
+  .book-art.empty{
+    border-radius:12px; background:var(--paper); border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; color:#b6bdc9; font-size:16px;
+  }
+  .book-main b{font-size:15px;}
+  .book-main small{display:block; color:#8b93a3; font-size:11.5px; margin-top:2px;}
+  .book-tag{margin-left:auto; font-size:11px; color:#8b93a3; flex:none; text-align:right; line-height:1.5;}
+  .book-count{
+    display:inline-block; background:var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#5a6577;
+  }
+  #toast{
+    position:fixed; left:50%; bottom:9vh; transform:translateX(-50%) translateY(8px);
+    background:rgba(51,65,92,.88); color:#fff; font-size:13px;
+    padding:8px 16px; border-radius:20px; opacity:0; transition:.25s; z-index:80;
+    pointer-events:none; white-space:nowrap; max-width:92vw;
+  }
+  #toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
+  .rule-legend{display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;}
+  .rule-legend .leg{color:#5a6577; font-size:12px; display:flex; align-items:center; gap:5px;}
+  .rule-legend .leg i{
+    width:15px; height:12px; display:inline-block; background:#dfe6f2;
+    box-shadow:inset 0 -2px 0 #c3cfe4; border-radius:18%;
+  }
+  body.dark .rule-legend .leg i{background:#3a465a; box-shadow:inset 0 -2px 0 #2c3648;}
+  .rule-legend .leg i.s-pl{border-radius:6%;}
+  .rule-legend .leg i.s-pp{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+
+  /* =====================================================================
+     UI TEST · 皮肤系统(body.skin-*)+ 反馈层 + 响应式
+     皮肤 = 一套 token + 局部覆盖;荷兰语限定 = skin-delft(代尔夫特蓝陶),
+     将来别的语言加 skin-xxx 即可,引擎/DOM 不变。
+     ===================================================================== */
+  body{ --tile-font:-apple-system,"Segoe UI",system-ui,sans-serif; }
+  body.skin-delft{
+    --ink:#1e3768;
+    --paper:#edf1f7;
+    --card:#fbfcfe;
+    --line:#cbd6e8;
+    --accent:#2a56a8;
+    --accent-2:#d9533f;            /* 郁金香红:连击/奖励 */
+    --gold:#c99a2e;
+    --dim:rgba(16,30,62,.46);
+    --water:#d3e2f3; --water-2:#bcd2ec;
+    --grout:#e3e9f2; --grout-line:#d2dbe8;
+    --glaze-l:94%; --glaze-s:52%;
+    --frame-l:66%; --frame-s:42%;
+    --tile-ink:#1b3367; --tile-side:#b7c4da;
+    --orn:#3560b0;
+    --wall-line:rgba(42,86,168,.07); --wall-dot:rgba(42,86,168,.10);
+    --tile-font:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(circle at 50% 50%, var(--wall-dot) 0 2.2px, transparent 2.8px),
+      linear-gradient(var(--wall-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--wall-line) 1px, transparent 1px);
+    background-size:64px 64px, 64px 64px, 64px 64px;
+    background-position:32px 32px, 0 0, 0 0;
+  }
+  body.skin-delft.dark{
+    --ink:#dbe5f8;
+    --paper:#0e1627;
+    --card:#16213a;
+    --line:#2a3a5d;
+    --accent:#7ea4f5;
+    --accent-2:#f07a62;
+    --gold:#e3b852;
+    --dim:rgba(3,8,18,.62);
+    --water:#12233f; --water-2:#183056;
+    --grout:#0f1a2f; --grout-line:#1a2945;
+    --glaze-l:19%; --glaze-s:24%;
+    --frame-l:60%; --frame-s:38%;
+    --tile-ink:#e6eeff; --tile-side:#070d1a;
+    --orn:#8fb0f5;
+    --wall-line:rgba(126,164,245,.05); --wall-dot:rgba(126,164,245,.08);
+  }
+  body.skin-delft h1, body.skin-delft h2{ font-family:var(--tile-font); letter-spacing:.2px; }
+
+  /* ---------- Delft:HUD ---------- */
+  .skin-delft .hud-btn, .skin-delft .tag, .skin-delft .goal-pill, .skin-delft .dock-btn{
+    background:var(--card); border:1.5px solid var(--line);
+    box-shadow:0 2px 0 var(--line);
+  }
+  .skin-delft .goal-pill i{ background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 42%, transparent)); }
+  .score-tag{ display:flex; align-items:center; gap:4px; }
+  .score-tag svg{ width:20px; height:20px; flex:none; }
+  .skin-delft .score-tag{ background:none; color:var(--gold); -webkit-background-clip:initial; background-clip:initial; font-family:var(--tile-font); font-size:22px; }
+  .combo-tag{ display:inline-flex; align-items:center; gap:3px; }
+  .hud-right{ position:relative; }
+  #comboTag{ position:absolute; right:-4px; top:calc(100% + 4px); z-index:8; white-space:nowrap; }
+  body.wide #comboTag{ position:static; }
+  .combo-tag svg{ width:18px; height:18px; flex:none; }
+  .skin-delft .combo-tag{ background:var(--accent-2); font-family:var(--tile-font); font-size:15px; }
+  .combo-tag.t2{ background:linear-gradient(135deg,#ff8a3d,#e0453a); }
+  .combo-tag.t3{ background:linear-gradient(135deg,#ff5a5a,#c2187a); scale:1.08; }
+  .combo-tag.t4{ background:linear-gradient(135deg,#ffcf4a,#ff5a2e 45%,#b1157c); scale:1.16; }
+  .tag .var-ic{ width:14px; height:14px; display:inline-block; vertical-align:-2px; margin-left:4px; opacity:.7; }
+
+  /* ---------- Delft:棋盘 = 运河环绕的瓷砖面板 ---------- */
+  .skin-delft #boardWrap{
+    background-color:var(--water);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='16' viewBox='0 0 48 16'%3E%3Cpath d='M0 9 q6 -5 12 0 t12 0 t12 0 t12 0' fill='none' stroke='%232a56a8' stroke-opacity='.13' stroke-width='1.6'/%3E%3C/svg%3E");
+    border:2px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+    border-radius:16px;
+    box-shadow:0 0 0 5px var(--card), 0 0 0 6.5px var(--line), 0 14px 34px rgba(20,40,90,.16);
+  }
+  .skin-delft.dark #boardWrap{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='16' viewBox='0 0 48 16'%3E%3Cpath d='M0 9 q6 -5 12 0 t12 0 t12 0 t12 0' fill='none' stroke='%237ea4f5' stroke-opacity='.14' stroke-width='1.6'/%3E%3C/svg%3E"); box-shadow:0 0 0 5px var(--card), 0 0 0 6.5px var(--line), 0 14px 40px rgba(0,0,0,.45); }
+  .skin-delft #grid{
+    background-color:var(--grout);
+    background-image:
+      linear-gradient(to right, var(--grout-line) 1.5px, transparent 1.5px),
+      linear-gradient(to bottom, var(--grout-line) 1.5px, transparent 1.5px);
+    background-size:25% calc(100% / 7);
+    border-radius:4px;
+    box-shadow:inset 0 1px 3px rgba(20,40,90,.12);
+  }
+  .tile{ transition:transform .18s ease, opacity .25s, left .32s cubic-bezier(.3,1.25,.5,1), top .32s cubic-bezier(.3,1.25,.5,1); }
+  .face .w{ position:relative; z-index:1; }
+  .skin-delft .face{
+    width:92%; height:90%; margin:4% 4% 6%;
+    --glaze:hsl(var(--h) var(--glaze-s) var(--glaze-l));
+    --frame:hsl(var(--h) var(--frame-s) var(--frame-l));
+    background:
+      radial-gradient(120% 85% at 22% 12%, rgba(255,255,255,.9), rgba(255,255,255,0) 52%),
+      var(--glaze);
+    color:var(--tile-ink);
+    font-family:var(--tile-font); font-weight:700; letter-spacing:.1px;
+    border-radius:11%;
+    box-shadow:
+      inset 0 0 0 1.5px var(--frame),
+      inset 0 0 0 4px var(--glaze),
+      inset 0 0 0 5px color-mix(in srgb, var(--frame) 55%, transparent),
+      0 3px 0 var(--tile-side),
+      0 6px 10px rgba(20,40,90,.16);
+    transition:filter .15s, scale .15s, translate .15s;
+  }
+  .skin-delft.dark .face{
+    background:radial-gradient(120% 85% at 22% 12%, rgba(255,255,255,.10), rgba(255,255,255,0) 55%), var(--glaze);
+  }
+  body.nohue .face{ --glaze:hsl(215 40% var(--glaze-l)); --frame:hsl(218 35% var(--frame-l)); }
+  body.nohue:not(.skin-delft) .face{ background:hsl(215 25% var(--tile-l)); color:hsl(215 40% var(--tile-ink)); box-shadow:inset 0 -3px 0 hsl(215 25% var(--tile-edge)); }
+  /* 原形 = 四角"牛头角花"(代尔夫特砖经典角饰),形状差而非颜色差 */
+  .skin-delft .tile.k-inf .face::after{ display:none; }
+  .skin-delft .tile.k-inf .face::before{
+    content:""; position:absolute; inset:0; width:auto; height:auto; border-radius:inherit; background:
+      radial-gradient(circle at 0 0, var(--orn) 0 8px, transparent 8.6px),
+      radial-gradient(circle at 100% 0, var(--orn) 0 8px, transparent 8.6px),
+      radial-gradient(circle at 100% 100%, var(--orn) 0 8px, transparent 8.6px),
+      radial-gradient(circle at 0 100%, var(--orn) 0 8px, transparent 8.6px),
+      radial-gradient(circle at 13px 13px, var(--orn) 0 1.8px, transparent 2.3px),
+      radial-gradient(circle at calc(100% - 13px) 13px, var(--orn) 0 1.8px, transparent 2.3px),
+      radial-gradient(circle at calc(100% - 13px) calc(100% - 13px), var(--orn) 0 1.8px, transparent 2.3px),
+      radial-gradient(circle at 13px calc(100% - 13px), var(--orn) 0 1.8px, transparent 2.3px);
+    opacity:.85; top:0; right:0;
+  }
+  .skin-delft .tile.k-pl .face{ border-radius:4%; }
+  .skin-delft .tile.sel .face{ scale:1.06; translate:0 -3px; filter:none; outline:3px solid var(--accent); outline-offset:1px; }
+  .skin-delft .tile.peer .face{ filter:none; outline:2px dashed color-mix(in srgb, var(--frame) 80%, transparent); outline-offset:1px; }
+  .skin-delft .tile.hint .face{ animation:hintPulseD 1.1s ease-in-out 3; }
+  @keyframes hintPulseD{ 0%,100%{scale:1; outline:0 solid transparent;} 50%{scale:1.07; outline:3px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:2px;} }
+  .tile.pop .face{ animation:tilePop .2s ease-out forwards; }
+  @keyframes tilePop{ to{ scale:1.14; } }
+  .tile.vanish{ opacity:0; transition:opacity .12s; }
+
+  /* ---------- 连线:流动墨线 + 光点 ---------- */
+  #pathSvg .ln{ fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; animation:lnDraw var(--pd,.22s) cubic-bezier(.4,0,.2,1) forwards; }
+  #pathSvg .glow{ opacity:.35; filter:blur(3px); }
+  #pathSvg g.fade{ animation:lnFade .35s ease forwards; }
+  @keyframes lnDraw{ to{ stroke-dashoffset:0; } }
+  @keyframes lnFade{ to{ opacity:0; } }
+
+  /* ---------- 反馈层(覆盖全屏,不拦截点击) ---------- */
+  #fx{ position:fixed; inset:0; pointer-events:none; z-index:40; overflow:hidden; }
+  .fx-p{ position:absolute; left:0; top:0; width:9px; height:9px; border-radius:2px; }
+  .fx-score{ position:absolute; font-weight:800; font-size:20px; color:var(--gold); text-shadow:0 2px 0 var(--card), 0 0 6px var(--card); font-family:var(--tile-font); white-space:nowrap; }
+  .fx-card{
+    position:absolute; left:0; top:0; border-radius:12px; overflow:hidden;
+    background:var(--card); box-shadow:0 8px 20px rgba(20,40,90,.25), inset 0 0 0 2px var(--accent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fx-card svg{ width:86%; height:86%; }
+  .fx-praise{
+    position:absolute; left:50%; top:42%; translate:-50% -50%;
+    font-family:var(--tile-font); font-weight:800; font-size:clamp(30px, 9vw, 54px);
+    color:var(--accent-2,#e8734a); letter-spacing:.5px; white-space:nowrap;
+    text-shadow:0 3px 0 var(--card), 0 0 18px var(--card);
+  }
+  .dock-btn.bump{ animation:bookBump .35s ease; }
+  @keyframes bookBump{ 40%{ scale:1.12; } }
+
+  /* ---------- 终盘冲刺 ---------- */
+  #boardWrap.finale{ animation:finaleGlow 1.2s ease-in-out infinite; }
+  @keyframes finaleGlow{
+    0%,100%{ box-shadow:0 0 0 5px var(--card), 0 0 0 6.5px var(--line), 0 0 0 0 color-mix(in srgb, var(--accent-2,#e8734a) 0%, transparent); }
+    50%{ box-shadow:0 0 0 5px var(--card), 0 0 0 6.5px var(--accent-2,#e8734a), 0 0 26px 4px color-mix(in srgb, var(--accent-2,#e8734a) 35%, transparent); }
+  }
+  #boardWrap.finale .tile .face{ animation:bob 1.2s ease-in-out infinite; }
+  #boardWrap.finale .tile:nth-child(2n) .face{ animation-delay:-.6s; }
+  @keyframes bob{ 50%{ translate:0 -3px; } }
+
+  /* ---------- 横幅:跟读高亮 ---------- */
+  .skin-delft #learnBanner{ border:1.5px solid var(--line); box-shadow:0 10px 30px rgba(20,40,90,.22); }
+  .skin-delft .b-main b, .skin-delft #bannerForm{ font-family:var(--tile-font); }
+  #bannerInf, #bannerForm{ transition:color .15s, scale .15s; transform-origin:left center; display:inline-block; }
+  body.dark #bannerForm{ color:hsl(var(--h) 55% 72%); }
+  #bannerInf.say, #bannerForm.say{ color:var(--accent); scale:1.08; }
+  .b-main{ display:flex; flex-direction:column; align-items:flex-start; }
+  .b-say{ position:absolute; right:10px; top:8px; width:18px; height:18px; opacity:.45; }
+
+  /* ---------- 菜单 / 关卡 / 结算 ---------- */
+  .menu-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .menu-head h1{ margin:0; }
+  .menu-head small{ display:block; font-size:12px; color:#8b93a3; font-weight:600; margin-top:2px; }
+  .emblem{ width:54px; height:54px; flex:none; }
+  .emblem .blades{ transform-origin:30px 25px; animation:spin 9s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .skin-delft .panel{ border:1.5px solid var(--line); }
+  .skin-delft .menu-btn{ border-width:1.5px; box-shadow:0 2px 0 var(--line); }
+  .skin-delft .menu-btn.primary{ box-shadow:0 2px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+  .skin-delft .lv-btn{
+    background:radial-gradient(120% 85% at 22% 12%, rgba(255,255,255,.85), rgba(255,255,255,0) 52%), var(--card);
+    border:1.5px solid var(--line); box-shadow:0 2px 0 var(--line); font-family:var(--tile-font); font-size:15px;
+  }
+  .skin-delft.dark .lv-btn{ background:var(--card); }
+  .skin-delft .lv-btn.done{ border-color:color-mix(in srgb, var(--accent) 50%, var(--line)); background:color-mix(in srgb, var(--accent) 8%, var(--card)); }
+  .lv-btn .lv-check{ position:absolute; top:4px; left:7px; width:13px; height:13px; color:var(--accent); }
+  .recap{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:12px 0 4px; }
+  .recap button{
+    border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+    border-radius:10px; padding:6px 10px; font-size:13.5px; font-weight:700; font-family:var(--tile-font);
+  }
+  .recap button i{ font-style:normal; color:var(--accent); }
+  .recap button:active{ scale:.95; }
+
+  /* ---------- 响应式:手机竖屏优先;宽屏 = 棋盘 + 右侧学习栏 ---------- */
+  #app{ display:flex; flex-direction:column; align-items:center; }
+  body.wide #app{
+    display:grid; grid-template-columns:auto 300px; column-gap:28px;
+    grid-template-areas:"hud hud" "board side"; align-items:start;
+  }
+  body.wide #hud{ grid-area:hud; }
+  body.wide #boardWrap{ grid-area:board; }
+  body.wide #dock{
+    grid-area:side; flex-direction:column; justify-content:flex-start; align-items:stretch;
+    margin-top:2px; padding:0; gap:12px; width:300px !important;
+  }
+  body.wide #learnBanner{
+    position:relative; order:-1; inset:auto; min-height:300px;
+    flex-direction:column; justify-content:center; text-align:center; gap:6px; padding:18px 16px 22px;
+  }
+  body.wide #bannerArt{ width:150px; height:150px; }
+  body.wide .b-main{ align-items:center; flex:none; }
+  body.wide .b-main b{ font-size:34px; }
+  body.wide #bannerForm{ font-size:26px; transform-origin:center; }
+  body.wide #bannerInf{ transform-origin:center; }
+  body.wide #bannerGloss{ margin:4px 0 0; max-width:none; text-align:center; font-size:14px; }
+  body.wide #learnBanner:not(.show){ opacity:.55; visibility:visible; transform:none; }
+  body.wide .dock-btn{ justify-content:center; padding:14px 18px; }
+</style>
+</head>
+<body class="skin-delft">
+
+<div id="app">
+  <header id="hud">
+    <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
+    <div class="hud-center">
+      <span class="tag" id="lvlTag">A1</span>
+      <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/14</span></span>
+      <span class="tag" id="timerTag" style="display:none;">⏱ 3:00</span>
+    </div>
+    <div class="hud-right">
+      <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
+      <span class="score-tag" id="scoreTag">⭐ 0</span>
+    </div>
+  </header>
+
+  <div id="boardWrap">
+    <div id="grid"></div>
+    <svg id="pathSvg"></svg>
+  </div>
+
+  <div id="dock">
+    <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
+    <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
+    <div id="learnBanner">
+      <svg id="bannerArt" viewBox="0 0 120 120"></svg>
+      <div class="b-main">
+        <b id="bannerInf"></b>
+        <div id="bannerForm"></div>
+      </div>
+      <div id="bannerGloss"></div>
+      <svg class="b-say" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <div class="b-progress"><i></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Hoofdmenu -->
+<div class="overlay on" id="menuScreen">
+  <div class="panel">
+    <div id="menuMain">
+      <div class="menu-head"><svg class="emblem" viewBox="0 0 60 60"><rect x="2" y="2" width="56" height="56" rx="9" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/><rect x="6.5" y="6.5" width="47" height="47" rx="6" fill="none" stroke="var(--accent)" stroke-opacity=".35"/><g fill="var(--accent)" fill-opacity=".75"><circle cx="10" cy="10" r="2.4"/><circle cx="50" cy="10" r="2.4"/><circle cx="50" cy="50" r="2.4"/><circle cx="10" cy="50" r="2.4"/></g><path d="M10 51 q5 -3 10 0 t10 0 t10 0 t10 0" fill="none" stroke="var(--accent)" stroke-opacity=".5" stroke-width="1.6"/><path d="M25.5 49 L27.6 26 L32.4 26 L34.5 49 Z" fill="var(--accent)"/><path d="M26 27 L30 21.5 L34 27 Z" fill="var(--accent)"/><rect x="28.6" y="40" width="2.8" height="9" rx="1.2" fill="var(--card)"/><g class="blades"><g><rect x="29" y="6" width="2" height="19" rx="1" fill="var(--accent)"/><rect x="31" y="8" width="5" height="13" rx="1" fill="var(--accent)" fill-opacity=".35" stroke="var(--accent)" stroke-width="1"/></g><g transform="rotate(90 30 25)"><g><rect x="29" y="6" width="2" height="19" rx="1" fill="var(--accent)"/><rect x="31" y="8" width="5" height="13" rx="1" fill="var(--accent)" fill-opacity=".35" stroke="var(--accent)" stroke-width="1"/></g></g><g transform="rotate(180 30 25)"><g><rect x="29" y="6" width="2" height="19" rx="1" fill="var(--accent)"/><rect x="31" y="8" width="5" height="13" rx="1" fill="var(--accent)" fill-opacity=".35" stroke="var(--accent)" stroke-width="1"/></g></g><g transform="rotate(270 30 25)"><g><rect x="29" y="6" width="2" height="19" rx="1" fill="var(--accent)"/><rect x="31" y="8" width="5" height="13" rx="1" fill="var(--accent)" fill-opacity=".35" stroke="var(--accent)" stroke-width="1"/></g></g></g><circle cx="30" cy="25" r="2.2" fill="var(--card)" stroke="var(--accent)" stroke-width="1.4"/></svg><div><h1>Koppelen</h1><small>sterke werkwoorden</small></div></div>
+      <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
+      <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
+      <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
+      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
+      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
+      <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
+      <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
+    </div>
+    <div id="menuLevels" style="display:none;">
+      <h2><button class="back-btn" id="mBack" style="border:none;background:none;color:var(--ink);font-size:20px;margin-left:-8px;cursor:pointer;">←</button><span data-i18n="menu.levels">Levels</span></h2>
+      <div class="lv-grid" id="lvGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Instellingen -->
+<div class="overlay" id="settingsModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="set.title">Instellingen</h2>
+    <div class="set-row">
+      <label data-i18n="set.skin">Thema</label>
+      <div class="seg" id="setSkin"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.hue">Kleurhint</label>
+      <div class="seg" id="setHue"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.tap">Uitspraak bij tikken</label>
+      <div class="seg" id="setTap"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.style">Illustratiestijl</label>
+      <div class="seg" id="setStyle"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.lang">Taal</label>
+      <div class="seg" id="setLang"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.sound">Geluid</label>
+      <input type="range" id="setVolume" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.tts">Voorlezen</label>
+      <input type="range" id="setTts" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.voice">Stem</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="voiceName" style="font-size:11.5px; color:#8b93a3; max-width:150px; text-align:right; line-height:1.35;"></span>
+        <button id="btnVoiceTest" style="display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;"><svg class="ic" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span data-i18n="set.voicetest">Probeer</span></button>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.hintwait">Hint wachttijd</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setHintWait" min="0" max="30" step="1">
+        <span id="hintWaitVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.banner">Bannerduur</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setBanner" min="5" max="30" step="1">
+        <span id="bannerVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.dark">Donkere modus</label>
+      <div class="seg" id="setDark"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Koppelkaart -->
+<div class="overlay" id="cardModal">
+  <div class="panel" id="cardPanel">
+    <button class="close-x" id="cardClose">✕</button>
+    <svg id="cardArt" viewBox="0 0 120 120"></svg>
+    <div id="cardInf"></div>
+    <div id="cardForms"></div>
+    <div id="cardGloss"></div>
+    <div id="cardTip"></div>
+  </div>
+</div>
+
+<!-- Resultaat -->
+<div class="overlay" id="resultModal">
+  <div class="panel">
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+    <div id="resultBtns"></div>
+  </div>
+</div>
+
+<!-- Verzameling -->
+<div class="overlay" id="bookDrawer">
+  <div class="panel">
+    <h2 data-i18n="book.title">Verzameling</h2>
+    <div id="bookList"></div>
+  </div>
+</div>
+
+<!-- Speluitleg -->
+<div class="overlay" id="helpModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="help.title">Speluitleg</h2>
+    <p data-i18n="help.p1"></p>
+    <p data-i18n="help.goal"></p>
+    <p data-i18n="help.score"></p>
+    <p data-i18n="help.rules"></p>
+    <p data-i18n="help.modes"></p>
+    <p data-i18n="help.stuck"></p>
+  </div>
+</div>
+
+<div id="fx"></div>
+<div id="toast"></div>
+
+<script>
+window.__errs=[]; window.addEventListener("error",e=>{(window.__errs=window.__errs||[]).push(e.message+" @"+e.lineno);});
+"use strict";
+/* ================= 数据:85 词(与 tile-match 同源,改动需两边同步) ================= */
+const VERBS=[
+  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215},
+  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12},
+  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275},
+  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65},
+  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356},
+  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250},
+  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300},
+  {inf:"drinken",  sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝"},
+  {inf:"zitten",   sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐"},
+  {inf:"liggen",   sg:"lag",     pl:"lagen",    pp:"gelegen",    en:"to lie",   zh:"躺"},
+  {inf:"staan",    sg:"stond",   pl:"stonden",  pp:"gestaan",    en:"to stand", zh:"站"},
+  {inf:"lezen",    sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读"},
+  {inf:"spreken",  sg:"sprak",   pl:"spraken",  pp:"gesproken",  en:"to speak", zh:"说"},
+  {inf:"doen",     sg:"deed",    pl:"deden",    pp:"gedaan",     en:"to do",    zh:"做"},
+  {inf:"weten",    sg:"wist",    pl:"wisten",   pp:"geweten",    en:"to know",  zh:"知道"},
+  {inf:"zeggen",   sg:"zei",     pl:"zeiden",   pp:"gezegd",     en:"to say",   zh:"说(话)"},
+  {inf:"houden",   sg:"hield",   pl:"hielden",  pp:"gehouden",   en:"to hold",  zh:"拿住"},
+  {inf:"kiezen",   sg:"koos",    pl:"kozen",    pp:"gekozen",    en:"to choose",zh:"选择"},
+  {inf:"beginnen", sg:"begon",   pl:"begonnen", pp:"begonnen",   en:"to begin", zh:"开始"},
+  {inf:"begrijpen",sg:"begreep", pl:"begrepen", pp:"begrepen",   en:"to understand", zh:"理解"},
+  {inf:"brengen",  sg:"bracht",  pl:"brachten", pp:"gebracht",   en:"to bring", zh:"带来"},
+  {inf:"denken",   sg:"dacht",   pl:"dachten",  pp:"gedacht",    en:"to think", zh:"想"},
+  {inf:"vinden",   sg:"vond",    pl:"vonden",   pp:"gevonden",   en:"to find",  zh:"找到"},
+  {inf:"helpen",   sg:"hielp",   pl:"hielpen",  pp:"geholpen",   en:"to help",  zh:"帮助"},
+  {inf:"kopen",    sg:"kocht",   pl:"kochten",  pp:"gekocht",    en:"to buy",   zh:"买"},
+  {inf:"krijgen",  sg:"kreeg",   pl:"kregen",   pp:"gekregen",   en:"to get",   zh:"得到"},
+  {inf:"vragen",   sg:"vroeg",   pl:"vroegen",  pp:"gevraagd",   en:"to ask",   zh:"问"},
+  {inf:"wassen",   sg:"waste",   pl:"wasten",   pp:"gewassen",   en:"to wash",  zh:"洗"},
+  {inf:"dragen",   sg:"droeg",   pl:"droegen",  pp:"gedragen",   en:"to carry", zh:"携带"},
+  {inf:"verliezen",sg:"verloor", pl:"verloren", pp:"verloren",   en:"to lose",  zh:"失去"},
+  {inf:"winnen",   sg:"won",     pl:"wonnen",   pp:"gewonnen",   en:"to win",   zh:"赢得"},
+  {inf:"hangen",   sg:"hing",    pl:"hingen",   pp:"gehangen",   en:"to hang",  zh:"挂"},
+  {inf:"sterven",  sg:"stierf",  pl:"stierven", pp:"gestorven",  en:"to die",   zh:"死亡"},
+  {inf:"vergeten", sg:"vergat",  pl:"vergaten", pp:"vergeten",   en:"to forget",zh:"忘记"},
+  {inf:"bieden",   sg:"bood",    pl:"boden",    pp:"geboden",    en:"to offer", zh:"提供"},
+  {inf:"trekken",  sg:"trok",    pl:"trokken",  pp:"getrokken",  en:"to pull",  zh:"拉"},
+  {inf:"zingen",   sg:"zong",    pl:"zongen",   pp:"gezongen",   en:"to sing",  zh:"唱"},
+  {inf:"vallen",   sg:"viel",    pl:"vielen",   pp:"gevallen",   en:"to fall",  zh:"落下"},
+  {inf:"sluiten",  sg:"sloot",   pl:"sloten",   pp:"gesloten",   en:"to close", zh:"关闭"},
+  {inf:"rijden",   sg:"reed",    pl:"reden",    pp:"gereden",    en:"to ride",  zh:"骑/开"},
+  {inf:"zwijgen",  sg:"zweg",    pl:"zwegen",   pp:"gezwegen",   en:"to keep silent", zh:"沉默"},
+  {inf:"wijzen",   sg:"wees",    pl:"wezen",    pp:"gewezen",    en:"to point", zh:"指"},
+  {inf:"werpen",   sg:"wierp",   pl:"wierpen",  pp:"geworpen",   en:"to throw", zh:"投掷"},
+  {inf:"gelden",   sg:"gold",    pl:"golden",   pp:"gegolden",   en:"to be valid", zh:"有效"},
+  {inf:"smelten",  sg:"smolt",   pl:"smolten",  pp:"gesmolten",  en:"to melt",  zh:"融化"},
+  {inf:"zwellen",  sg:"zwol",    pl:"zwollen",  pp:"gezwollen",  en:"to swell", zh:"膨胀"},
+  {inf:"binden",   sg:"bond",    pl:"bonden",   pp:"gebonden",   en:"to bind",  zh:"绑"},
+  {inf:"zenden",   sg:"zond",    pl:"zonden",   pp:"gezonden",   en:"to send",  zh:"发送"},
+  {inf:"bijten",   sg:"beet",    pl:"beten",    pp:"gebeten",    en:"to bite",  zh:"咬"},
+  {inf:"gieten",   sg:"goot",    pl:"goten",    pp:"gegoten",    en:"to pour",  zh:"倒"},
+  {inf:"wringen",  sg:"wrong",   pl:"wrongen",  pp:"gewrongen",  en:"to wring", zh:"拧"},
+  {inf:"zuigen",   sg:"zoog",    pl:"zogen",    pp:"gezogen",    en:"to suck",  zh:"吸"},
+  {inf:"krimpen",  sg:"kromp",   pl:"krompen",  pp:"gekrompen",  en:"to shrink",zh:"收缩"},
+  {inf:"springen", sg:"sprong",  pl:"sprongen", pp:"gesprongen", en:"to jump",  zh:"跳"},
+  {inf:"klinken",  sg:"klonk",   pl:"klonken",  pp:"geklonken",  en:"to sound", zh:"响"},
+  {inf:"zinken",   sg:"zonk",    pl:"zonken",   pp:"gezonken",   en:"to sink",  zh:"下沉"},
+  {inf:"lijden",   sg:"leed",    pl:"leden",    pp:"geleden",    en:"to suffer",zh:"遭受"},
+  {inf:"scheppen", sg:"schiep",  pl:"schiepen", pp:"geschapen",  en:"to create",zh:"创造"},
+  {inf:"heffen",   sg:"hief",    pl:"hieven",   pp:"geheven",    en:"to lift",  zh:"举起"},
+  {inf:"vriezen",  sg:"vroor",   pl:"vroren",   pp:"gevroren",   en:"to freeze",zh:"结冰"},
+  {inf:"schrikken",sg:"schrok",  pl:"schrokken",pp:"geschrokken",en:"to startle",zh:"受惊"},
+  {inf:"vechten",  sg:"vocht",   pl:"vochten",  pp:"gevochten",  en:"to fight", zh:"战斗"},
+  {inf:"prijzen",  sg:"prees",   pl:"prezen",   pp:"geprezen",   en:"to praise",zh:"称赞"},
+  {inf:"genezen",  sg:"genas",   pl:"genazen",  pp:"genezen",    en:"to heal",  zh:"治愈"},
+  {inf:"wegen",    sg:"woog",    pl:"wogen",    pp:"gewogen",    en:"to weigh", zh:"称重"},
+  {inf:"treden",   sg:"trad",    pl:"traden",   pp:"getreden",   en:"to step",  zh:"踏"},
+  {inf:"schenden", sg:"schond",  pl:"schonden", pp:"geschonden", en:"to violate",zh:"侵犯"},
+  {inf:"besluiten",sg:"besloot", pl:"besloten", pp:"besloten",   en:"to decide",zh:"决定"},
+  {inf:"bedriegen",sg:"bedroog", pl:"bedrogen", pp:"bedrogen",   en:"to deceive",zh:"欺骗"},
+  {inf:"bederven", sg:"bedierf", pl:"bedierven",pp:"bedorven",   en:"to spoil", zh:"损坏"},
+  {inf:"ontbreken",sg:"ontbrak", pl:"ontbraken",pp:"ontbroken",  en:"to be missing",zh:"缺少"},
+  {inf:"beschrijven",sg:"beschreef",pl:"beschreven",pp:"beschreven",en:"to describe",zh:"描写"},
+  {inf:"vermijden",sg:"vermeed", pl:"vermeden", pp:"vermeden",   en:"to avoid", zh:"避免"},
+  {inf:"wijken",   sg:"week",    pl:"weken",    pp:"geweken",    en:"to give way",zh:"退让"},
+  {inf:"schuiven", sg:"schoof",  pl:"schoven",  pp:"geschoven",  en:"to shift", zh:"推"},
+  {inf:"klimmen",  sg:"klom",    pl:"klommen",  pp:"geklommen",  en:"to climb", zh:"爬"},
+  {inf:"dringen",  sg:"drong",   pl:"drongen",  pp:"gedrongen",  en:"to push",  zh:"挤"},
+  {inf:"verbieden",sg:"verbood", pl:"verboden", pp:"verboden",   en:"to forbid",zh:"禁止"},
+  {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen",   en:"to proceed",zh:"进行"},
+  {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen",  en:"to meet",  zh:"遇到"},
+];
+VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
+
+/* 每关 7 词;A1/A2/B1 各三关(sg→pl→pp),词池轮转覆盖 */
+const TIERS=[
+  {band:"A1", pool:[0,1,2,3,4,5,6,8,9,12,13,14,15,16,17]},
+  {band:"A2", pool:[7,10,11,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]},
+  {band:"B1", pool:[45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84]},
+];
+const LINK_TYPES=["sg","pl","pp"];
+const LINK_LEVELS=[];
+TIERS.forEach((t,ti)=>{
+  for(let round=0;round<2;round++){          // 每档两轮:第二轮换一批词
+    LINK_TYPES.forEach((ty,ki)=>{
+      const verbs=[];
+      for(let k=0;k<7;k++) verbs.push(t.pool[((round*3+ki)*7+k)%t.pool.length]);
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, verbs, variant:round===1?"down":null});
+    });
+  }
+});
+const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
+const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
+
+/* ================= i18n ================= */
+const I18N={
+  nl:{
+    "menu.back":"Terug naar spel","menu.continue":"Verder spelen","menu.levels":"Levels",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
+    "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
+    "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
+    "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
+    "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
+    "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur",
+    "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
+    "set.voice":"Stem","set.voicetest":"Probeer",
+    "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
+    "result.title":"Koppelen gehaald! 🎉","result.done":"Alle 14 paren gevonden.",
+    "result.record":"nieuw record! 🏆","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
+    "toast.shuffle":"Geen combinaties meer — geschud!","toast.nopair":"Geen paar — geschud!",
+    "book.title":"Verzameling","book.locked":"Nog niet gekoppeld",
+    "book.lockedsub":"Koppel dit werkwoord om het te verzamelen.","book.view":"Tik om te bekijken",
+    "help.title":"Speluitleg",
+    "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
+    "help.goal":"Doel: vind alle 14 paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
+    "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een 🔥-combinatiebonus.",
+    "help.rules":"Elke band (A1/A2/B1) oefent drie vormen — enkelvoud, meervoud en voltooid deelwoord — daarna een tweede ronde met andere werkwoorden.",
+    "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig (puntjagen met jouw verzameling) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
+    "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
+    "card.tip":"Tik voor de betekenis",
+    "set.skin":"Thema","set.hue":"Kleurhint","set.tap":"Uitspraak bij tikken","opt.auto":"Auto",
+    "skin.delft":"Delfts blauw","skin.classic":"Klassiek",
+    "toast.gravity":"Variant: tegels zakken naar beneden","banner.empty":"Koppel een paar — je hoort en ziet het hier.",
+    "result.recap":"Tik om nog eens te horen",
+  },
+  zh:{
+    "menu.back":"回到当前游戏","menu.continue":"继续游戏","menu.levels":"关卡选择",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
+    "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
+    "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
+    "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
+    "short.sg":"单数","short.pl":"复数","short.pp":"分词",
+    "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长",
+    "set.dark":"深色模式","opt.off":"关","opt.on":"开",
+    "set.voice":"朗读语音","set.voicetest":"试听",
+    "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
+    "result.title":"连连看过关! 🎉","result.done":"全部 14 对配对完成。",
+    "result.record":"新纪录! 🏆","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
+    "toast.shuffle":"没有可连的了——重新洗牌!","toast.nopair":"无可连对——重新洗牌!",
+    "book.title":"词典图鉴","book.locked":"尚未配对",
+    "book.lockedsub":"配对这个动词来收集它。","book.view":"点击查看",
+    "help.title":"玩法介绍",
+    "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
+    "help.goal":"目标:找出全部 14 对配对。卡住时棋盘会自动重新洗牌。",
+    "help.score":"计分:每对 +15 分;快速连续配对有 🔥 连击加成。",
+    "help.rules":"每档(A1/A2/B1)各练三种形式:单数、复数、过去分词;一轮之后再练一轮新词。",
+    "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)与每日挑战(180 秒,每天一次)。",
+    "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
+    "card.tip":"点击查看释义",
+    "set.skin":"主题","set.hue":"颜色提示","set.tap":"点选时朗读","opt.auto":"跟随系统",
+    "skin.delft":"代尔夫特蓝","skin.classic":"经典",
+    "toast.gravity":"变体:消除后方块下落","banner.empty":"连成一对——这里会显示并朗读。",
+    "result.recap":"点击再听一遍",
+  },
+  en:{
+    "menu.back":"Back to game","menu.continue":"Continue","menu.levels":"Levels",
+    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
+    "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
+    "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
+    "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
+    "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
+    "set.title":"Settings","set.style":"Art style","set.lang":"Language",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration",
+    "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
+    "set.voice":"Voice","set.voicetest":"Test",
+    "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
+    "result.title":"Board cleared! 🎉","result.done":"All 14 pairs found.",
+    "result.record":"new record! 🏆","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
+    "toast.shuffle":"No combos left — shuffled!","toast.nopair":"No pairs — shuffled!",
+    "book.title":"Collection","book.locked":"Not paired yet",
+    "book.lockedsub":"Pair this verb to collect it.","book.view":"Tap to view",
+    "help.title":"How to play",
+    "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
+    "help.goal":"Goal: find all 14 pairs before you get stuck. If you do get stuck, the board reshuffles.",
+    "help.score":"Score: 15 points per pair. Quick consecutive pairs give a 🔥 combo bonus.",
+    "help.rules":"Each band (A1/A2/B1) practises three forms — singular, plural and past participle — then a second round with different verbs.",
+    "help.modes":"Modes: after level 1 you unlock Endless (chase points with your collection) and the Daily Challenge (180 seconds, once per day).",
+    "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
+    "card.tip":"Tap for the meaning",
+    "set.skin":"Theme","set.hue":"Colour hint","set.tap":"Speak on tap","opt.auto":"Auto",
+    "skin.delft":"Delft blue","skin.classic":"Classic",
+    "toast.gravity":"Variant: tiles drop down","banner.empty":"Make a pair — you'll see and hear it here.",
+    "result.recap":"Tap to hear again",
+  },
+};
+function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
+function glossOf(V){ return save.settings.uiLang==="zh" ? V.zh : V.en; }
+function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); }); }
+
+/* ================= 存档 ================= */
+const SAVE_KEY="linkmatch.uitest.v1";   // UI 原型独立存档;首次从正式版 linkmatch.v1 拷贝进度
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, bannerMs:10, dark:"auto", skin:"delft", colorHint:true, tapSpeak:true};
+try{ if(!localStorage.getItem(SAVE_KEY) && localStorage.getItem("linkmatch.v1")){
+  const o=JSON.parse(localStorage.getItem("linkmatch.v1")); if(o&&o.settings) delete o.settings.dark;
+  localStorage.setItem(SAVE_KEY, JSON.stringify(o)); } }catch(e){}
+let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
+try{
+  const s=JSON.parse(localStorage.getItem(SAVE_KEY));
+  if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
+}catch(e){}
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+
+const darkMQ=window.matchMedia?window.matchMedia("(prefers-color-scheme: dark)"):null;
+function isDark(){ const d=save.settings.dark; return d==="auto" ? !!(darkMQ&&darkMQ.matches) : (d===true||d==="true"); }
+function applySettings(){
+  const S=save.settings;
+  document.body.classList.toggle("dark",isDark());
+  document.body.classList.toggle("skin-delft",S.skin!=="classic");
+  document.body.classList.toggle("nohue",!S.colorHint);
+  applyI18n();
+  if(typeof syncSize==="function" && typeof boardEl!=="undefined") syncSize();
+}
+if(darkMQ && darkMQ.addEventListener) darkMQ.addEventListener("change",()=>{ if(save.settings.dark==="auto") applySettings(); });
+
+/* ================= 音效/语音 ================= */
+let actx=null;
+function blip(freq,dur=.08,type="sine",gain=.12){
+  const vol=(save.settings?save.settings.volume:70)/100;
+  if(vol<=0) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(gain*vol,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);
+    o.connect(g).connect(actx.destination);
+    o.start(); o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+/* 瓷铃:五声音阶随连击上行(C 大调五声,从 C5 起),双振荡器 = 基音 + 八度泛音 */
+const PENTA=[0,2,4,7,9];
+function noteFreq(step){ const o=Math.floor(step/5), k=PENTA[((step%5)+5)%5]; return 523.25*Math.pow(2,(o*12+k)/12); }
+function tone(freq,at=0,dur=.35,type="triangle",gain=.09){
+  const vol=(save.settings?save.settings.volume:70)/100;
+  if(vol<=0) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const t0=actx.currentTime+at;
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,t0);
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.linearRampToValueAtTime(gain*vol,t0+0.008);
+    g.gain.exponentialRampToValueAtTime(.0008,t0+dur);
+    o.connect(g).connect(actx.destination);
+    o.start(t0); o.stop(t0+dur+.02);
+  }catch(e){}
+}
+function chime(step){
+  const f=noteFreq(Math.min(step,14));
+  tone(f,0,.42,"triangle",.10); tone(f*2,0,.28,"sine",.035); tone(f*3,0.005,.16,"sine",.015);
+}
+function fanfare(base){ [0,2,4,5].forEach((k,i)=>tone(noteFreq(base+k),i*.07,.4,"triangle",.08)); }
+function thud(){ tone(150,0,.12,"sine",.08); tone(110,.03,.14,"sine",.05); }
+let nlVoice=null;
+function updateVoiceName(){
+  const el=document.getElementById("voiceName");
+  if(el) el.textContent = nlVoice ? nlVoice.name : t("set.novoice");
+}
+function initVoices(){
+  if(!("speechSynthesis" in window)) return;
+  const pick=()=>{
+    const vs=window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v=>(v.lang||"").toLowerCase().replace("_","-")==="nl-nl")
+           || vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl")) || null;
+    updateVoiceName();
+  };
+  pick();
+  window.speechSynthesis.onvoiceschanged=pick;
+}
+function speakPair(V,form,onPart){
+  return new Promise(res=>{
+    const done=()=>{ if(onPart) onPart(-1); res(); };
+    if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ done(); return; }
+    try{
+      window.speechSynthesis.cancel();
+      const seq=[V.inf,form];
+      let i=0;
+      const next=()=>{
+        if(i>=seq.length){ done(); return; }
+        const idx=i;
+        const u=new SpeechSynthesisUtterance(seq[i++]);
+        u.onstart=()=>{ if(onPart) onPart(idx); };
+        u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+        u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+        u.onend=next; u.onerror=next;
+        window.speechSynthesis.speak(u);
+      };
+      next();
+    }catch(e){ done(); }
+  });
+}
+function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
+
+/* ================= SVG 插画(与 tile-match 同源) ================= */
+function ctxOf(style){
+  const dark=document.body.classList.contains("dark");
+  return style==="B"
+    ? {ink: dark?"#cfd8e3":"#3a4750", sw:4, body:"none", acc:"rgba(255,150,100,.25)", teal:"rgba(84,184,165,.25)", white:"rgba(255,255,255,.45)"}
+    : {ink: dark?"#e8edf5":"#39424e", sw:0, body: dark?"#ff9d7a":"#ff8a66", acc:"#ffc94d", teal:"#54b8a5", white:"#ffffff"};
+}
+function limb(ctx,pts){
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+  return `<path d="${d}" fill="none" stroke="${ctx.ink}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+function person(ctx,pose,x,y,flip=false){
+  const flipG=flip?` transform="translate(${2*x},0) scale(-1,1)"`:"";
+  let s="";
+  const head=(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="8.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>${ctx.sw?"":`<circle cx="${cx-2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/><circle cx="${cx+2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/>`}`;
+  if(pose==="sit"){
+    s+=head(x,y-38);
+    s+=limb(ctx,[[x,y-29.5],[x,y-14]]);
+    s+=limb(ctx,[[x,y-14],[x+9,y-11],[x+11,y]]);
+    s+=limb(ctx,[[x,y-14],[x+6,y-9],[x+7,y]]);
+    s+=limb(ctx,[[x,y-24],[x+8,y-17]]);
+    s+=limb(ctx,[[x,y-24],[x-6,y-16]]);
+    return `<g${flipG}>${s}</g>`;
+  }
+  if(pose==="lie"){
+    s+=limb(ctx,[[x-14,y-30],[x-26,y-27]])
+      +limb(ctx,[[x-6,y-31],[x-20,y-24]])
+      +`<rect x="${x-24}" y="${y-40}" width="34" height="13" rx="6.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>`
+      +head(x+18,y-34);
+    return `<g${flipG}>${s}</g>`;
+  }
+  const lean=pose==="run"?3:0;
+  s+=head(x+lean,y-38);
+  s+=limb(ctx,[[x+lean,y-29.5],[x,y-12]]);
+  const legEnds={
+    stand:[[-6,0],[6,0]], open:[[-6,0],[6,0]],
+    walk:[[-9,0],[8,-1]], run:[[-10,-1],[9,0]],
+    hold:[[-5,0],[6,0]],  reach:[[-5,0],[6,0]],
+  }[pose]||[[-6,0],[6,0]];
+  s+=limb(ctx,[[x,y-12],[x+legEnds[0][0],y+legEnds[0][1]]]);
+  s+=limb(ctx,[[x,y-12],[x+legEnds[1][0],y+legEnds[1][1]]]);
+  const armEnds={
+    stand:[[-8,-14],[8,-14]], open:[[-13,-33],[13,-33]],
+    walk:[[-9,-18],[9,-15]],  run:[[-9,-20],[13,-24]],
+    hold:[[10,-20],[12,-16]], reach:[[16,-24],[-7,-15]],
+  }[pose]||[[-8,-14],[8,-14]];
+  for(const e of armEnds) s+=limb(ctx,[[x+lean,y-26],[x+e[0],y+e[1]]]);
+  return `<g${flipG}>${s}</g>`;
+}
+function bgCircle(ctx,hue){
+  return `<circle cx="60" cy="60" r="52" fill="hsl(${hue} 45% 55% / ${ctx.sw?0.10:0.16})"/>`;
+}
+function ground(ctx,y=96){
+  return `<line x1="26" y1="${y}" x2="94" y2="${y}" stroke="${ctx.ink}" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+function gift(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-10" y="-9" width="20" height="17" rx="2.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="0" y1="-9" x2="0" y2="8" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/><path d="M0 -9 C -7 -16, -12 -10, 0 -9 C 12 -10, 7 -16, 0 -9" fill="none" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/></g>`;}
+function box(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-9" y="-8" width="18" height="16" rx="2" fill="${ctx.teal}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="-9" y1="0" x2="9" y2="0" stroke="${ctx.ink}" stroke-width="2.2" stroke-opacity=".5"/></g>`;}
+function ball(ctx,x,y){return `<g transform="translate(${x} ${y})"><circle r="7.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><path d="M-5 -4 A 6.5 6.5 0 0 1 5 -4" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".5"/></g>`;}
+function apple(ctx,x,y){return `<g transform="translate(${x} ${y})"><circle r="8.5" fill="${ctx.sw?"rgba(255,107,87,.3)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><circle cx="6" cy="-5" r="3.2" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}"/><path d="M0 -8 Q 1 -12 4 -13" fill="none" stroke="${ctx.ink}" stroke-width="2"/></g>`;}
+function arrow(ctx,x1,y1,x2,y2){const a=Math.atan2(y2-y1,x2-x1),hl=6;return `<g stroke="${ctx.ink}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" fill="none"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><path d="M${x2-hl*Math.cos(a-.5)} ${y2-hl*Math.sin(a-.5)} L${x2} ${y2} L${x2-hl*Math.cos(a+.5)} ${y2-hl*Math.sin(a+.5)}"/></g>`;}
+function door(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-10" y="-34" width="20" height="34" rx="2.5" fill="${ctx.sw?"rgba(255,201,77,.35)":"#ffe3ad"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2.5}" ${ctx.sw?"":'stroke-opacity=".5"'}/><circle cx="5" cy="-17" r="1.8" fill="${ctx.ink}" fill-opacity=".6"/></g>`;}
+function flagMound(ctx,x,y){return `<g transform="translate(${x} ${y})"><path d="M-20 10 Q 0 -8 20 10 Z" fill="${ctx.sw?"rgba(84,184,165,.3)":"#cfe8e0"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="0" y1="-1" x2="0" y2="-24" stroke="${ctx.ink}" stroke-width="3" stroke-linecap="round"/><path d="M0 -24 L14 -19 L0 -14 Z" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/></g>`;}
+function dashedCircle(ctx,x,y,r){return `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${ctx.ink}" stroke-opacity=".4" stroke-width="2" stroke-dasharray="4 5"/>`;}
+function sparkles(ctx,x,y){let s="";const pts=[[x-18,y-40],[x+16,y-46],[x+22,y-26]];for(const [px,py] of pts){s+=`<path d="M${px} ${py-4} L${px+1.6} ${py-1.6} L${px+4} ${py} L${px+1.6} ${py+1.6} L${px} ${py+4} L${px-1.6} ${py+1.6} L${px-4} ${py} L${px-1.6} ${py-1.6} Z" fill="${ctx.acc}" stroke="${ctx.ink}" stroke-width="1.4" stroke-opacity=".4"/>`;}return s;}
+function heart(ctx,x,y,s=1){return `<path transform="translate(${x} ${y}) scale(${s})" d="M0 3 C -6 -4, -12 1, -6 6 L0 11 L6 6 C 12 1, 6 -4, 0 3 Z" fill="${ctx.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>`;}
+function speedLines(ctx,x,y){return `<g stroke="${ctx.ink}" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"><line x1="${x-16}" y1="${y-10}" x2="${x-30}" y2="${y-10}"/><line x1="${x-12}" y1="${y-22}" x2="${x-28}" y2="${y-22}"/><line x1="${x-16}" y1="${y-34}" x2="${x-26}" y2="${y-34}"/></g>`;}
+function pencilPaper(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-26" y="-14" width="46" height="32" rx="3" fill="${ctx.sw?"rgba(255,255,255,.55)":"#fff"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2}" ${ctx.sw?"":'stroke-opacity=".35"'}/><path d="M-19 -5 q 5 4 10 0 t 10 0" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".55"/><g transform="rotate(40 26 -10)"><rect x="20" y="-26" width="6" height="22" rx="1.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/></g></g>`;}
+
+/* ---- 道具库 ---- */
+const PROP={
+  glass:(c,x,y)=>`<path d="M${x-7} ${y-12} L${x-5} ${y+8} L${x+5} ${y+8} L${x+7} ${y-12} Z" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.2"/>`,
+  chair:(c,x,y)=>`<rect x="${x-11}" y="${y-18}" width="21" height="4.5" rx="2.2" fill="${c.teal}"/><rect x="${x-10}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/><rect x="${x+7}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/>`,
+  rug:(c,x,y)=>`<ellipse cx="${x}" cy="${y+2}" rx="26" ry="6" fill="${c.sw?"rgba(255,201,77,.3)":"#ffd9a8"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
+  lamppost:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-52}" stroke="${c.ink}" stroke-width="3.5" stroke-opacity=".7" stroke-linecap="round"/><circle cx="${x}" cy="${y-56}" r="5.5" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
+  book:(c,x,y)=>`<path d="M${x-12} ${y-9} Q ${x-4} ${y-13} ${x} ${y-9} Q ${x+4} ${y-13} ${x+12} ${y-9} L${x+12} ${y+8} Q ${x+4} ${y+4} ${x} ${y+8} Q ${x-4} ${y+4} ${x-12} ${y+8} Z" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-9}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="1.8"/>`,
+  bubbleSay:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-8}" y1="${y-2}" x2="${x+8}" y2="${y-2}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  bubbleQ:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="14" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  bubbleThink:(c,x,y)=>`<circle cx="${x}" cy="${y-6}" r="12" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><circle cx="${x-10}" cy="${y+9}" r="2.6" fill="${c.ink}" fill-opacity=".55"/><circle cx="${x-15}" cy="${y+15}" r="1.8" fill="${c.ink}" fill-opacity=".4"/>`,
+  bubbleOff:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-30 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  hammer:(c,x,y)=>`<g transform="rotate(-35 ${x} ${y})"><rect x="${x-4}" y="${y-14}" width="8" height="12" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><rect x="${x-1.6}" y="${y-2}" width="3.2" height="16" rx="1.6" fill="${c.ink}"/></g>`,
+  bulb:(c,x,y)=>`<path d="M${x} ${y-14} a8.5 8.5 0 0 0 -5 15.4 c 1.4 1 1.8 2 1.8 3.4 h6.4 c0-1.4 .4-2.4 1.8-3.4 a8.5 8.5 0 0 0 -5 -15.4z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x-3}" y1="${y+7}" x2="${x+3}" y2="${y+7}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  fork2:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.8" fill="none" stroke-linecap="round"><path d="M${x} ${y+10} L${x} ${y} L${x-10} ${y-10}"/><path d="M${x} ${y} L${x+10} ${y-10}"/></g>`,
+  startLine:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-30}" stroke="${c.ink}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/><rect x="${x+2}" y="${y-30}" width="14" height="9" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}/>`,
+  magnifier:(c,x,y)=>`<circle cx="${x-3}" cy="${y-4}" r="8.5" fill="rgba(160,210,235,.4)" stroke="${c.ink}" stroke-width="2.8"/><line x1="${x+3}" y1="${y+3}" x2="${x+11}" y2="${y+11}" stroke="${c.ink}" stroke-width="3.4" stroke-linecap="round"/>`,
+  person2:(c,x,y)=>person(c,"stand",x,y),
+  tagPrice:(c,x,y)=>`<g transform="rotate(18 ${x} ${y})"><path d="M${x-10} ${y-8} h12 l8 8 -8 8 h-12 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x+6}" cy="${y}" r="1.8" fill="${c.ink}"/></g>`,
+  coinS:(c,x,y)=>`<circle r="7" cx="${x}" cy="${y}" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800" fill="${c.ink}">€</text>`,
+  trophyDown:(c,x,y)=>`<g transform="rotate(180 ${x} ${y})"><path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/></g><line x1="${x+12}" y1="${y-10}" x2="${x+12}" y2="${y+6}" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x+9} ${y+3} l3 3 l3 -3" fill="none" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/>`,
+  trophy:(c,x,y)=>`<path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-8} ${y-6} h-4 a4 4 0 0 0 4 5M${x+8} ${y-6} h4 a4 4 0 0 1 -4 5" fill="none" stroke="${c.ink}" stroke-width="2.2"/><rect x="${x-2.5}" y="${y+5}" width="5" height="5" fill="${c.ink}" fill-opacity=".7"/>`,
+  frameWall:(c,x,y)=>`<rect x="${x-11}" y="${y-26}" width="22" height="17" rx="2" fill="${c.sw?"rgba(255,255,255,.4)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-4}" y1="${y-30}" x2="${x-4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/><line x1="${x+4}" y1="${y-30}" x2="${x+4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/>`,
+  tombstone:(c,x,y)=>`<path d="M${x-10} ${y} v-14 a10 10 0 0 1 20 0 v14 z" fill="${c.sw?"rgba(255,255,255,.35)":"#cfd4dc"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-16}" x2="${x}" y2="${y-6}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-5}" y1="${y-11}" x2="${x+5}" y2="${y-11}" stroke="${c.ink}" stroke-width="2.4"/>`,
+  padlock:(c,x,y)=>`<rect x="${x-9}" y="${y-6}" width="18" height="14" rx="3" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-5} ${y-6} v-4 a5 5 0 0 1 10 0 v4" fill="none" stroke="${c.ink}" stroke-width="2.6"/><circle cx="${x}" cy="${y+1}" r="2" fill="${c.ink}"/>`,
+  car:(c,x,y)=>`<path d="M${x-20} ${y-4} l4 -8 h16 l6 8 h6 v9 h-32 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x-10}" cy="${y+6}" r="4.5" fill="${c.ink}"/><circle cx="${x+11}" cy="${y+6}" r="4.5" fill="${c.ink}"/>`,
+  ropePull:(c,x,y)=>`<path d="M${x-34} ${y-24} Q ${x-16} ${y-16} ${x-4} ${y-20}" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><circle cx="${x-34}" cy="${y-24}" r="3" fill="${c.ink}" fill-opacity=".6"/>`,
+  notes:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x}" cy="${y+6}" r="3"/><rect x="${x+2.2}" y="${y-10}" width="2.2" height="16"/><circle cx="${x+12}" cy="${y+2}" r="3"/><rect x="${x+14.2}" y="${y-14}" width="2.2" height="16"/><path d="M${x+2.2} ${y-10} l14 -4" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  balloon:(c,x,y)=>`<ellipse cx="${x}" cy="${y-8}" rx="9" ry="11" fill="${c.sw?"rgba(255,150,100,.3)":c.body}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y+3} q 2 4 0 8" fill="none" stroke="${c.ink}" stroke-width="1.8"/>`,
+  iceCube:(c,x,y)=>`<rect x="${x-9}" y="${y-12}" width="18" height="16" rx="3" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-14} ${y+10} q7 5 14 0 t14 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  jugPour:(c,x,y)=>`<path d="M${x-8} ${y-14} h14 l-2 12 h-10 z" fill="${c.sw?"rgba(160,210,235,.45)":"#a8cfe2"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-8} ${y-14} l-6 6" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x-16}" cy="${y+4}" r="1.8" fill="${c.ink}" fill-opacity=".5"/><circle cx="${x-14}" cy="${y+10}" r="1.8" fill="${c.ink}" fill-opacity=".5"/>`,
+  strawGlass:(c,x,y)=>`<path d="M${x-7} ${y-10} L${x-5} ${y+10} L${x+5} ${y+10} L${x+7} ${y-10} Z" fill="rgba(160,210,235,.5)" stroke="${c.ink}" stroke-width="2.2"/><line x1="${x+2}" y1="${y-8}" x2="${x+9}" y2="${y-22}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  towelZig:(c,x,y)=>`<path d="M${x-14} ${y-4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x-14} ${y+4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".55"/>`,
+  ropeKnot:(c,x,y)=>`<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${c.ink}" stroke-width="3.4"/><path d="M${x-14} ${y-6} q6 6 14 4M${x+14} ${y+6} q-6 -6 -14 -4" fill="none" stroke="${c.ink}" stroke-width="2.8" stroke-linecap="round"/>`,
+  envelope:(c,x,y)=>`<rect x="${x-12}" y="${y-8}" width="24" height="16" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-12} ${y-8} l12 8 l12 -8" fill="none" stroke="${c.ink}" stroke-width="2"/>`,
+  appleBite:(c,x,y)=>apple(c,x,y)+`<path d="M${x+7} ${y+2} q3 2 2 5" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".6"/>`,
+  inwardArrows:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M${x-22} ${y-8} l10 6"/><path d="M${x+22} ${y-8} l-10 6"/></g>`,
+  burstJump:(c,x,y)=>`<g stroke="${c.acc}" stroke-width="2.8" stroke-linecap="round"><line x1="${x-14}" y1="${y-2}" x2="${x-20}" y2="${y-8}"/><line x1="${x+14}" y1="${y-2}" x2="${x+20}" y2="${y-8}"/><line x1="${x}" y1="${y-8}" x2="${x}" y2="${y-16}"/></g>`,
+  noteBell:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x-4}" cy="${y+6}" r="3.2"/><rect x="${x-1.6}" y="${y-12}" width="2.4" height="18"/><path d="M${x-1.6} ${y-12} q8 2 8 8" fill="none" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  boatSink:(c,x,y)=>`<g transform="rotate(-12 ${x} ${y})"><path d="M${x-16} ${y-6} h32 l-5 8 h-22 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x}" y1="${y-6}" x2="${x}" y2="${y-18}" stroke="${c.ink}" stroke-width="2.4"/></g><path d="M${x-18} ${y+6} q6 4 12 0 t12 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"/>`,
+  rainCloud:(c,x,y)=>`<path d="M${x-14} ${y-6} a7 7 0 0 1 7 -9 a8 8 0 0 1 15 2 a6 6 0 0 1 -2 7 z" fill="${c.sw?"rgba(255,255,255,.4)":"#dfe6f2"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-8}" y1="${y+2}" x2="${x-10}" y2="${y+8}"/><line x1="${x}" y1="${y+2}" x2="${x-2}" y2="${y+8}"/></g>`,
+  starBurst:(c,x,y)=>sparkles(c,x,y)+sparkles(c,x+14,y-6),
+  boxS:(c,x,y)=>box(c,x,y),
+  swords:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="3" stroke-linecap="round"><line x1="${x-12}" y1="${y-12}" x2="${x+10}" y2="${y+10}"/><line x1="${x+12}" y1="${y-12}" x2="${x-10}" y2="${y+10}"/></g>`,
+  starBig:(c,x,y)=>`<path d="M${x} ${y-12} l3.4 7 7.6 1 -5.5 5.4 1.3 7.6 -6.8 -3.6 -6.8 3.6 1.3 -7.6 -5.5 -5.4 7.6 -1 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/>`,
+  heartCross:(c,x,y)=>`<path d="M${x} ${y-2} C ${x-7} ${y-10}, ${x-14} ${y-4}, ${x-7} ${y+2} L${x} ${y+8} L${x+7} ${y+2} C ${x+14} ${y-4}, ${x+7} ${y-10}, ${x} ${y-2} Z" fill="${c.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y-6} v10M${x-5} ${y-1} h10" stroke="${c.sw?c.ink:"#fff"}" stroke-width="2.6" stroke-linecap="round"/>`,
+  scaleBalance:(c,x,y)=>`<line x1="${x}" y1="${y-16}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="2.6"/><line x1="${x-14}" y1="${y-12}" x2="${x+14}" y2="${y-12}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/><path d="M${x+19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/>`,
+  footprints:(c,x,y)=>`<g fill="${c.ink}" fill-opacity=".55"><ellipse cx="${x-8}" cy="${y-4}" rx="4.5" ry="6" transform="rotate(-14 ${x-8} ${y-4})"/><ellipse cx="${x+4}" cy="${y+6}" rx="4.5" ry="6" transform="rotate(-14 ${x+4} ${y+6})"/></g>`,
+  brokenCircle:(c,x,y)=>`<path d="M${x} ${y-13} a13 13 0 1 1 -9 4" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><line x1="${x+4}" y1="${y-6}" x2="${x+12}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/><line x1="${x+12}" y1="${y-6}" x2="${x+4}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/>`,
+  checkCircle:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="12" fill="none" stroke="${c.ink}" stroke-width="2.8"/><path d="M${x-6} ${y-4} l4 5 l8 -9" fill="none" stroke="${c.sw?c.ink:"#3f9e6e"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+  snowflake:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"><line x1="${x}" y1="${y-12}" x2="${x}" y2="${y+12}"/><line x1="${x-10.4}" y1="${y-6}" x2="${x+10.4}" y2="${y+6}"/><line x1="${x-10.4}" y1="${y+6}" x2="${x+10.4}" y2="${y-6}"/><line x1="${x}" y1="${y-12}" x2="${x-3}" y2="${y-8}"/><line x1="${x}" y1="${y-12}" x2="${x+3}" y2="${y-8}"/></g>`,
+  bangMark:(c,x,y)=>`<circle cx="${x}" cy="${y+8}" r="2" fill="${c.ink}"/><path d="M${x} ${y-12} l1.6 12 h-3.2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="1.6"/><g stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-10}" y1="${y-8}" x2="${x-14}" y2="${y-12}"/><line x1="${x+10}" y1="${y-8}" x2="${x+14}" y2="${y-12}"/></g>`,
+  pathCurve:(c,x,y)=>`<path d="M${x-24} ${y+8} q 14 -10 8 -18 q -6 -8 6 -14" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/><path d="M${x-14} ${y-22} l6 -4 l0 7z" fill="${c.ink}"/>`,
+  dashedQ:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-dasharray="5 5"/><text x="${x}" y="${y+1}" text-anchor="middle" font-size="15" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  paperLines:(c,x,y)=>`<rect x="${x-13}" y="${y-10}" width="26" height="20" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="1.6" stroke-opacity=".55"><line x1="${x-9}" y1="${y-5}" x2="${x+9}" y2="${y-5}"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}"/></g>`,
+  forbidSign:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="#d64541" stroke-width="3.4"/><line x1="${x-9}" y1="${y-13}" x2="${x+9}" y2="${y+5}" stroke="#d64541" stroke-width="3.4"/>`,
+  stairs:(c,x,y)=>`<g fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}><rect x="${x-2}" y="${y-8}" width="14" height="8"/><rect x="${x+6}" y="${y-16}" width="14" height="8"/><rect x="${x+14}" y="${y-24}" width="14" height="8"/></g>`,
+  wallBar:(c,x,y)=>`<rect x="${x+2}" y="${y-30}" width="10" height="30" rx="2" fill="${c.sw?"rgba(255,255,255,.3)":"#d8cfc0"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55"><line x1="${x-14}" y1="${y-18}" x2="${x-4}" y2="${y-18}"/></g>`,
+  stinkApple:(c,x,y)=>apple(c,x,y)+`<path d="M${x+9} ${y-4} q4 -2 3 -6" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/>`,
+  coinBehind:(c,x,y)=>coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  arrowsMeet:(c,x,y)=>arrow(c,x-24,y+8,x-4,y)+arrow(c,x+24,y+8,x+4,y)+sparkles(c,x,y-6),
+  doorProp:(c,x,y)=>door(c,x,y),
+  flagMoundP:(c,x,y)=>flagMound(c,x,y),
+};
+
+/* ---- 手绘场景(前 12 词) ---- */
+const ART={
+  zijn:c=>bgCircle(c,215)+ground(c)+person(c,"open",60,96)+sparkles(c,60,60),
+  hebben:c=>bgCircle(c,12)+ground(c)+person(c,"hold",56,96)+box(c,72,78),
+  gaan:c=>bgCircle(c,275)+ground(c)+door(c,88,96)+person(c,"walk",46,96)+arrow(c,22,66,38,66),
+  komen:c=>bgCircle(c,160)+ground(c)+door(c,32,96)+person(c,"walk",74,96,true)+arrow(c,98,66,82,66),
+  zien:c=>bgCircle(c,48)+eyeBig(c,60,62)+sparkles(c,60,60),
+  geven:c=>bgCircle(c,330)+ground(c)+person(c,"reach",48,96)+gift(c,74,80)+heart(c,84,58,.9),
+  nemen:c=>bgCircle(c,65)+ground(c)+person(c,"hold",54,96)+ball(c,74,76),
+  blijven:c=>bgCircle(c,190)+flagMound(c,78,96)+person(c,"stand",58,94)+dashedCircle(c,58,68,26),
+  lopen:c=>bgCircle(c,130)+ground(c)+speedLines(c,52,74)+person(c,"run",62,96),
+  eten:c=>bgCircle(c,356)+apple(c,60,74)+`<ellipse cx="60" cy="90" rx="17" ry="5.5" fill="${c.sw?"rgba(255,255,255,.4)":"#fff"}" stroke="${c.ink}" stroke-width="2"/>`,
+  schrijven:c=>bgCircle(c,250)+pencilPaper(c,58,74),
+  slapen:c=>bgCircle(c,300)+`<rect x="26" y="80" width="66" height="8" rx="3" fill="${c.teal}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M28 -30 a 9 9 0 1 0 9 11" transform="translate(32 118)" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/>`+`<g transform="translate(0 0)">${person(c,"lie",48,92)}</g>`,
+  zien_art:null,
+};
+function eyeBig(ctx,x,y){return `<g transform="translate(${x} ${y})"><path d="M-26 0 Q 0 -22 26 0 Q 0 22 -26 0 Z" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${ctx.ink}" stroke-width="3.2"/><circle r="9.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><circle r="3.6" fill="${ctx.ink}"/></g>`;}
+ART.zien=c=>bgCircle(c,48)+eyeBig(c,60,62)+sparkles(c,60,60);
+
+/* ---- 场景组合表(其余 73 词) ---- */
+const SCENES={
+  drinken:{p:"sit",pr:[["glass",80,76]]},
+  zitten:{p:"sit",pr:[["chair",58,96]]},
+  liggen:{p:"lie",px:44,py:104,pr:[["rug",50,104]]},
+  staan:{p:"stand",pr:[["lamppost",86,96]]},
+  lezen:{p:"sit",pr:[["book",78,76]]},
+  spreken:{p:"stand",pr:[["bubbleSay",82,48]]},
+  doen:{p:"stand",pr:[["hammer",80,72]]},
+  weten:{p:"stand",pr:[["bulb",56,26]]},
+  zeggen:{p:"stand",pr:[["bubbleSay",84,48]]},
+  houden:{p:"open",pr:[["boxS",60,34]]},
+  kiezen:{p:"stand",pr:[["fork2",62,42]]},
+  beginnen:{p:"walk",pr:[["startLine",36,96]]},
+  begrijpen:{p:"stand",pr:[["bulb",58,24],["sparkles",84,52]]},
+  brengen:{p:"walk",pr:[["gift",80,76],["arrowR",18,64]]},
+  denken:{p:"stand",pr:[["bubbleThink",82,44]]},
+  vinden:{p:"stand",pr:[["magnifier",80,72]]},
+  helpen:{p:"reach",pr:[["person2",86,96],["heart",66,58]]},
+  kopen:{p:"stand",pr:[["tagPrice",80,72],["coinS",62,80]]},
+  krijgen:{p:"hold",pr:[["gift",74,74],["arrowL",100,66]]},
+  vragen:{p:"stand",pr:[["bubbleQ",84,46]]},
+  wassen:{p:"stand",pr:[["apple",82,60],["glass",88,78]]},
+  dragen:{p:"hold",pr:[["boxS",72,66]]},
+  verliezen:{p:"stand",pr:[["trophyDown",82,66]]},
+  winnen:{p:"open",pr:[["trophy",60,30]]},
+  hangen:{p:"stand",pr:[["frameWall",84,52]]},
+  sterven:{p:"stand",pr:[["tombstone",82,84]]},
+  vergeten:{p:"stand",pr:[["bubbleQ",84,46],["dashedCircle",58,64,18]]},
+  bieden:{p:"reach",pr:[["envelope",76,72]]},
+  trekken:{p:"reach",pr:[["ropePull",58,72]]},
+  zingen:{p:"stand",pr:[["notes",82,44]]},
+  vallen:{p:"jump",pr:[["arrowD",88,44]]},
+  sluiten:{p:"stand",pr:[["padlock",80,70]]},
+  rijden:{p:"hold",pr:[["car",72,82]]},
+  zwijgen:{p:"stand",pr:[["bubbleOff",84,48]]},
+  wijzen:{p:"reach",pr:[["arrowR",72,56]]},
+  werpen:{p:"hold",pr:[["ball",90,54]]},
+  gelden:{p:"stand",pr:[["paperLines",80,70],["checkCircle",88,58]]},
+  smelten:{p:"stand",pr:[["iceCube",80,76]]},
+  zwellen:{p:"stand",pr:[["balloon",80,58]]},
+  binden:{p:"hold",pr:[["ropeKnot",80,72]]},
+  zenden:{p:"hold",pr:[["envelope",76,70],["arrowR",88,58]]},
+  bijten:{p:"stand",pr:[["appleBite",80,74]]},
+  gieten:{p:"stand",pr:[["jugPour",80,66]]},
+  wringen:{p:"hold",pr:[["towelZig",80,72]]},
+  zuigen:{p:"stand",pr:[["strawGlass",80,74]]},
+  krimpen:{p:"stand",pr:[["inwardArrows",58,58]]},
+  springen:{p:"jump",pr:[["burstJump",60,80]]},
+  klinken:{p:"stand",pr:[["noteBell",82,46]]},
+  zinken:{p:"stand",pr:[["boatSink",80,78]]},
+  lijden:{p:"stand",pr:[["rainCloud",82,42]]},
+  scheppen:{p:"open",pr:[["starBurst",60,30]]},
+  heffen:{p:"open",pr:[["boxS",60,32],["arrowR",88,50]]},
+  vriezen:{p:"stand",pr:[["snowflake",82,48]]},
+  schrikken:{p:"stand",pr:[["bangMark",82,44]]},
+  vechten:{p:"stand",pr:[["swords",80,70]]},
+  prijzen:{p:"stand",pr:[["starBig",82,44]]},
+  genezen:{p:"stand",pr:[["heartCross",80,70]]},
+  wegen:{p:"stand",pr:[["scaleBalance",80,62]]},
+  treden:{p:"walk",pr:[["footprints",80,88]]},
+  schenden:{p:"stand",pr:[["brokenCircle",80,66]]},
+  besluiten:{p:"stand",pr:[["checkCircle",80,66]]},
+  bedriegen:{p:"hold",pr:[["coinBehind",30,72]]},
+  bederven:{p:"stand",pr:[["stinkApple",80,74]]},
+  ontbreken:{p:"stand",pr:[["dashedQ",80,62]]},
+  beschrijven:{p:"stand",pr:[["paperLines",80,70],["pencilPaper",88,74]]},
+  vermijden:{p:"duck",pr:[["arrowR",84,52]]},
+  wijken:{p:"duck",pr:[["arrowR",84,44]]},
+  schuiven:{p:"hold",pr:[["boxS",78,80],["speedLines",70,74]]},
+  klimmen:{p:"walk",pr:[["stairs",72,96]]},
+  dringen:{p:"hold",pr:[["wallBar",86,96]]},
+  verbieden:{p:"stand",pr:[["forbidSign",80,52]]},
+  verlopen:{p:"walk",pr:[["pathCurve",36,92]]},
+  treffen:{p:"open",pr:[["arrowsMeet",60,46]]},
+};
+function genericArt(vIdx,c){
+  const V=VERBS[vIdx];
+  const letter=V.inf[0].toUpperCase();
+  let deco=`<circle cx="35" cy="31" r="3.2" fill="${c.acc}"/><circle cx="88" cy="38" r="2.6" fill="${c.acc}"/>`;
+  return bgCircle(c,V.hue)+`<text x="60" y="75" text-anchor="middle" font-weight="800" font-size="52" font-family="inherit" fill="${c.ink}">${letter}</text>`+deco+ground(c);
+}
+function sceneSVG(vIdx,c){
+  const V=VERBS[vIdx];
+  const sc=SCENES[V.inf]||{};
+  const pose=sc.p||"stand";
+  const px=sc.px||54, py=sc.py||96;
+  let inner=bgCircle(c,V.hue)+ground(c);
+  inner+=person(c,pose,px,py,!!sc.f);
+  if(sc.pr) for(const [name,x,y] of sc.pr){ if(PROP[name]) inner+=PROP[name](c,x,y); }
+  return inner;
+}
+function artSVG(vIdx,style){
+  const c=ctxOf(style);
+  const bespoke=ART[VERBS[vIdx].inf];
+  if(bespoke) return `<g>${bespoke(c)}</g>`;
+  if(SCENES[VERBS[vIdx].inf]) return `<g>${sceneSVG(vIdx,c)}</g>`;
+  return `<g>${genericArt(vIdx,c)}</g>`;
+}
+
+/* ================= 连连看引擎 ================= */
+const COLS=4, ROWS=7;
+const RING=16;                       // 外圈连线带宽(px)
+const PAIR_POINTS=15, CLEAR_BONUS=100;
+const BANNER_DEFAULT_S=10;               // 横幅秒数默认值(=连击窗口,可在设置调 5-30s)
+const IDLE_HINT_MS_DEFAULT=12000;
+
+const boardEl=document.getElementById("grid");
+const wrapEl=document.getElementById("boardWrap");
+const pathSvg=document.getElementById("pathSvg");
+const bannerEl=document.getElementById("learnBanner");
+
+let tiles=[];                        // {v,k:'inf'|'form',r,c,el,alive}
+let occ=[];                          // (ROWS+2)x(COLS+2) 外圈坐标占用
+let curLevel=null, busy=false, selected=null;
+let scoreRun=0, streak=0, lastScoreShown=-1;
+let levelFont=12, hintTimer=null, pendingHint=false, lastAction=Date.now();
+let layout={ring:RING, tw:80, th:60};
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
+const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
+
+/* ---- 尺寸:确定性布局 ---- */
+function syncSize(){
+  const hud=document.getElementById("hud"), dock=document.getElementById("dock");
+  const W=window.innerWidth, H=window.innerHeight;
+  const wide = W>=900 && W>H*1.15;                 // 宽屏:棋盘 + 右侧学习栏
+  document.body.classList.toggle("wide",wide);
+  const SIDE=300, GAP=28;
+  const deco=14;                                   // 棋盘外框装饰(白边+描线)
+  let tw, th;
+  if(wide){
+    const availH=H - hud.offsetHeight - 40 - RING*2 - deco;
+    const availW=Math.min(W-SIDE-GAP-48, 900) - RING*2 - deco;
+    th=availH/ROWS; tw=Math.min(th*1.45, availW/COLS);
+    th=Math.min(th, tw*1.0);
+  }else{
+    // 手机竖屏优先:宽度吃满(16px 侧边距),高度不够再收;格子在 4:3 与 1:1 之间自适应,多出的高度给字
+    const availH=Math.max(240, H - hud.offsetHeight - dock.offsetHeight - 26) - RING*2 - deco;
+    const availW=Math.min(W-32, 560) - RING*2 - deco;
+    tw=availW/COLS;
+    th=Math.min(availH/ROWS, tw*0.98);
+    tw=Math.min(tw, th*1.5);
+  }
+  layout={ring:RING, tw, th};
+  const gridW=tw*COLS, gridH=th*ROWS;
+  boardEl.style.width=gridW+"px"; boardEl.style.height=gridH+"px";
+  boardEl.style.left=RING+"px"; boardEl.style.top=RING+"px";
+  wrapEl.style.width=(gridW+RING*2)+"px";
+  wrapEl.style.height=(gridH+RING*2)+"px";
+  hud.style.width=(wide ? gridW+RING*2+GAP+SIDE : gridW+RING*2)+"px";
+  dock.style.width=wide ? SIDE+"px" : (gridW+RING*2)+"px";
+  // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块
+  const ctx=measureCanvas.getContext("2d");
+  ctx.font='700 100px '+getComputedStyle(document.body).getPropertyValue("--tile-font");
+  let maxW=1;
+  const src=tiles.length?tiles:(curLevel&&curLevel.verbs?curLevel.verbs.map(vi=>({v:vi,f:curLevel.type,k:"inf"})):[]);
+  for(const t of src){
+    const V=VERBS[t.v];
+    maxW=Math.max(maxW, ctx.measureText(V.inf).width, ctx.measureText(V[t.f]||V.sg).width);
+  }
+  levelFont=Math.max(8.5,Math.min(wide?26:22, 100*(tw*0.86-8)/maxW, th*0.36));
+  for(const t of tiles){ if(t.el){ t.el.firstChild.style.fontSize=levelFont+"px"; positionTile(t); } }
+}
+const measureCanvas=document.createElement("canvas");
+
+function positionTile(t){
+  t.el.style.left=(t.c*100/COLS)+"%";
+  t.el.style.top=(t.r*100/ROWS)+"%";
+  t.el.style.width=(100/COLS)+"%";
+  t.el.style.height=(100/ROWS)+"%";
+  t.el.dataset.r=t.r; t.el.dataset.c=t.c;
+}
+function cellCenter(r,c){   // 外圈坐标(含 0 与 ROWS+1/COLS+1 的环)
+  const x = c===0 ? layout.ring/2 : c===COLS+1 ? layout.ring+COLS*layout.tw+layout.ring/2 : layout.ring+(c-0.5)*layout.tw;
+  const y = r===0 ? layout.ring/2 : r===ROWS+1 ? layout.ring+ROWS*layout.th+layout.ring/2 : layout.ring+(r-0.5)*layout.th;
+  return [x,y];
+}
+
+/* ---- 布点:14 对 + 可解性模拟 ---- */
+function buildPairsFrom(picks){   // picks = [{v, f}]:每词原形×2 + 变位×2(变位形式由 f 决定)
+  const cells=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) cells.push([r,c]);
+  const tiles=[];
+  for(const p of picks){
+    tiles.push({v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f},{v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f});
+  }
+  // 洗牌(词块与位置都随机)
+  for(let tries=0;tries<60;tries++){
+    const pos=[...cells];
+    for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+    const tl=[...tiles];
+    for(let i=tl.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [tl[i],tl[j]]=[tl[j],tl[i]]; }
+    const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    pos.forEach(([r,c],i)=>{ g[r][c]={...tl[i]}; });
+    if(simulateSolvable(g)) return g;
+  }
+  // 兜底:相邻成对放置(必然可解)
+  const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let n=0;
+  for(const p of picks){
+    for(let k=0;k<2;k++){
+      const r=Math.floor(n/COLS), c=n%COLS;
+      g[r][c]={v:p.v,k:"inf",f:p.f}; n++;
+      const r2=Math.floor(n/COLS), c2=n%COLS;
+      g[r2][c2]={v:p.v,k:"form",f:p.f}; n++;
+    }
+  }
+  return g;
+}
+function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type}))); }
+function occFrom(g){
+  const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) o[r+1][c+1]=true;
+  return o;
+}
+// 路径搜索:≤2 折角,BFS(方向,折角数),含外圈
+function findPathOcc(occ,ar,ac,br,bc){
+  const A=[ar+1,ac+1], B=[br+1,bc+1];
+  const H=ROWS+2, W=COLS+2;
+  const pass=(r,c)=> r>=0&&r<H&&c>=0&&c<W && ((r===B[0]&&c===B[1]) || !occ[r][c]);
+  const best=Array.from({length:H},()=>Array.from({length:W},()=>[9,9,9,9]));
+  const par=Array.from({length:H},()=>Array.from({length:W},()=>null));
+  const q=[];
+  for(let d=0;d<4;d++){
+    const r=A[0]+DR[d], c=A[1]+DC[d];
+    if(pass(r,c) && best[r][c][d]>0){
+      best[r][c][d]=0;
+      if(!par[r][c]) par[r][c]=[null,null,null,null];
+      par[r][c][d]={cell:[A[0],A[1]],dir:-1};
+      q.push([r,c,d,0]);
+    }
+  }
+  let hit=null;
+  while(q.length && !hit){
+    const [r,c,d,t]=q.shift();
+    if(r===B[0]&&c===B[1]){ hit=[r,c,d]; break; }
+    for(const nd of [d,(d+1)%4,(d+3)%4]){
+      const nt=t+(nd===d?0:1);
+      if(nt>2) continue;
+      const r2=r+DR[nd], c2=c+DC[nd];
+      if(!pass(r2,c2)) continue;
+      if(best[r2][c2][nd]>nt){
+        best[r2][c2][nd]=nt;
+        if(!par[r2][c2]) par[r2][c2]=[null,null,null,null];
+        par[r2][c2][nd]={cell:[r,c],dir:d};
+        q.push([r2,c2,nd,nt]);
+      }
+    }
+  }
+  if(!hit) return null;
+  const pts=[];
+  let cur=hit;
+  while(cur){
+    const [r,c,d]=cur;
+    pts.push([r,c]);
+    const p=par[r][c][d];
+    if(!p) break;
+    if(p.dir===-1){ pts.push([p.cell[0],p.cell[1]]); break; }
+    cur=[p.cell[0],p.cell[1],p.dir];
+  }
+  pts.reverse();
+  return pts;   // 外圈坐标折线(含 A、B)
+}
+const DR=[-1,0,1,0], DC=[0,1,0,-1];
+function pairConnectable(g,a,b){   // a,b = [r,c];判定同动词 + inf/form 配对 + 路径
+  const ta=g[a[0]][a[1]], tb=g[b[0]][b[1]];
+  if(!ta||!tb) return false;
+  if(ta.v!==tb.v) return false;
+  if(ta.k===tb.k) return false;    // 必须 inf + form
+  return !!findPathOcc(occFrom(g),a[0],a[1],b[0],b[1]);
+}
+function findAnyPair(g){
+  const list=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) list.push([r,c]);
+  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){
+    const a=list[i], b=list[j];
+    const ta=g[a[0]][a[1]], tb=g[b[0]][b[1]];
+    if(ta.v!==tb.v||ta.k===tb.k) continue;
+    if(findPathOcc(occFrom(g),a[0],a[1],b[0],b[1])) return [a,b];
+  }
+  return null;
+}
+function simulateSolvable(g){
+  const clone=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) clone[r][c]=g[r][c]?{...g[r][c]}:null;
+  let left=ROWS*COLS;
+  while(left>0){
+    const p=findAnyPair(clone);
+    if(!p) return false;
+    clone[p[0][0]][p[0][1]]=null; clone[p[1][0]][p[1][1]]=null;
+    left-=2;
+  }
+  return true;
+}
+function reshuffleRemaining(){
+  const list=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(board[r][c]) list.push({t:board[r][c],r,c});
+  if(list.length<4) return;
+  for(let tries=0;tries<80;tries++){
+    const pos=[...list.map(p=>[p.r,p.c])];
+    for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+    const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    list.forEach((p,i)=>{ g[pos[i][0]][pos[i][1]]={v:p.t.v,k:p.t.k}; });
+    if(findAnyPair(g)){ applyShuffle(pos,list); return; }
+  }
+  applyShuffleShallow(list);
+}
+function applyShuffle(pos,list){   // list[i].t 移到 pos[i](正式版此处只换了 board 副本,块不动 = 洗牌无效)
+  for(const p of list){ board[p.r][p.c]=null; }
+  list.forEach((p,i)=>{
+    const [r,c]=pos[i];
+    board[r][c]=p.t; p.t.r=r; p.t.c=c;
+    positionTile(p.t);
+  });
+}
+// 兜底:把剩余块按"原形+变位"成对放入行主序相邻格(经典路径下必然可连)
+function applyShuffleShallow(list){
+  // 按动词分组:原形与形式各自排队,配成对
+  const infs=[], forms=[];
+  for(const p of list){ (p.t.k==="inf"?infs:forms).push(p.t); }
+  const pairs=[];
+  while(infs.length && forms.length){
+    const inf=infs.shift(), form=forms.find(f=>f.v===inf.v);
+    if(form){ forms.splice(forms.indexOf(form),1); pairs.push([inf,form]); }
+    else pairs.push([inf, forms.shift()]);   // 数量失衡的兜底(正常不会发生)
+  }
+  while(infs.length) pairs.push([infs.shift(), infs.shift()]);
+  while(forms.length){ const a=forms.shift(); const b=forms.shift()||a; pairs.push([a,b]); }
+  // 行主序收集格子,成对放入相邻格
+  const pos=[...list.map(p=>[p.r,p.c])];
+  pos.sort((A,B)=> A[0]===B[0] ? A[1]-B[1] : A[0]-B[0]);
+  for(const p of list){ board[p.r][p.c]=null; }
+  pairs.forEach(([a,b],i)=>{
+    const [r1,c1]=pos[i*2], [r2,c2]=pos[i*2+1];
+    if(a){ a.r=r1; a.c=c1; board[r1][c1]=a; positionTile(a); }
+    if(b){ b.r=r2; b.c=c2; board[r2][c2]=b; positionTile(b); }
+  });
+}
+
+/* ---- 渲染 ---- */
+function buildBoardDOM(){
+  boardEl.innerHTML="";
+  pathSvg.innerHTML="";
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const t=board[r][c];
+    const el=document.createElement("div");
+    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+t.f);
+    el.style.setProperty("--h",VERBS[t.v].hue);
+    const face=document.createElement("div");
+    face.className="face";
+    const w=document.createElement("span"); w.className="w";
+    w.textContent=t.k==="inf"?VERBS[t.v].inf:VERBS[t.v][t.f];
+    face.appendChild(w);
+    face.style.fontSize=levelFont+"px";
+    el.appendChild(face);
+    el._t=t; t.el=el;
+    positionTile(t);
+    boardEl.appendChild(el);
+  }
+}
+function occNow(){
+  const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
+  for(const t of tiles) if(t.alive) o[t.r+1][t.c+1]=true;
+  return o;
+}
+function findAnyPairNow(){
+  const alive=tiles.filter(t=>t.alive);
+  for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){
+    const a=alive[i], b=alive[j];
+    if(a.v!==b.v||a.k===b.k) continue;
+    const o=occNow();
+    if(findPathOcc(o,a.r,a.c,b.r,b.c)) return [a,b];
+  }
+  return null;
+}
+
+/* ---- 关卡流程 ---- */
+async function startLink(idx){
+  const lv=LINK_LEVELS[idx];
+  if(!lv) return;
+  abandonSession();
+  mode="levels";
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
+  curLevel=lv;
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").innerHTML=displayId(lv)+(lv.variant==="down"?IC_DOWN:"");
+  wrapEl.classList.remove("finale"); bannerPlaceholder();
+  syncSize();
+  // 布点(可解)
+  board=buildPairs();
+  tiles=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
+  buildBoardDOM();
+  pairsLeft=PAIR_TOTAL;
+  updateHUD();
+  busy=false;
+  lastAction=Date.now();
+  if(lv.variant==="down") setTimeout(()=>toast(t("toast.gravity")),350);
+}
+function displayId(lv){ return `${lv.band} · ${t(SHORT_KEY[lv.type])}`; }
+const PAIR_TOTAL=ROWS*COLS/2;
+let pairsLeft=PAIR_TOTAL;
+
+/* ---- 模式:无尽 / 每日挑战(过第 1 关解锁;只用已收集动词) ---- */
+const MODE_UNLOCK=2, DAILY_SECONDS=180;
+let mode="levels";           // "levels" | "endless" | "daily"
+let modeRng=Math.random;     // 每日:当日种子;无尽:真随机
+const MODE_FORMS=["sg","pl","pp"];
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function dailySeed(){        // 日期字符串 → 确定性 rng(全玩家同日同盘)
+  const key=todayKey();
+  let h=1779033703 ^ key.length;
+  for(const ch of key){ h=Math.imul(h^ch.charCodeAt(0),3432918353); h=((h<<13)|(h>>>19))>>>0; }
+  return ()=>{ h=Math.imul(h^(h>>>16),2246822507); h=Math.imul(h^(h>>>13),3266489909); h^=h>>>16; return (h>>>0)/4294967296; };
+}
+function shuffleWith(arr,r){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function collectedPool(){
+  const all=new Set(); TIERS.forEach(tr=>tr.pool.forEach(vi=>all.add(vi)));
+  const got=[...all].filter(vi=>(save.counts[VERBS[vi].inf]||0)>0);
+  return got.length?got:[0,1,2,3,4,5,6];
+}
+function sampleModeVerbs(pool,n,r){   // 取 n 个 {v,f}:同一盘内变位词串不重复(同动词可换形式再入)
+  const picks=[], seenStr=new Set(), seenPair=new Set();
+  const tryPush=(vi)=>{
+    if(picks.length>=n) return;
+    for(const f of shuffleWith(MODE_FORMS,r)){
+      const s=VERBS[vi][f];
+      if(seenStr.has(s)||seenPair.has(vi+"/"+f)) continue;
+      seenStr.add(s); seenPair.add(vi+"/"+f); picks.push({v:vi,f}); return;
+    }
+  };
+  shuffleWith(pool,r).forEach(tryPush);
+  let guard=0;
+  while(picks.length<n && guard++<300){ tryPush(pool[Math.floor(r()*pool.length)]); }
+  while(picks.length<n){ const vi=pool[guard++%pool.length]; picks.push({v:vi,f:MODE_FORMS[guard%3]}); }  // 极端兜底(收词过少)
+  return picks;
+}
+function dealModeBoard(){
+  const picks=sampleModeVerbs(collectedPool(),7,mode==="daily"?modeRng:Math.random);
+  clearSel(); clearHint();
+  wrapEl.classList.remove("finale");
+  board=buildPairsFrom(picks);
+  tiles=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
+  buildBoardDOM();
+  syncSize();   // 按新盘词长校字号
+  pairsLeft=PAIR_TOTAL;
+  updateHUD();
+}
+function startEndless(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  abandonSession();
+  mode="endless"; modeRng=Math.random;
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
+  curLevel={id:"Oneindig"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.endless");
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+}
+function startDaily(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 每日限一次:今天已完成,拒绝再开
+  abandonSession();
+  mode="daily"; modeRng=dailySeed();
+  curLevel={id:"Dagelijks"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.daily");
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+  startDailyTimer();
+}
+
+/* ---- 每日挑战计时(180s,时间到=当日完成) ---- */
+let dailyLeft=0, dailyIv=null;
+function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } }
+function updateTimerTag(){
+  const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
+  const el=document.getElementById("timerTag");
+  el.style.display=""; el.textContent=`⏱ ${m}:${s}`;
+}
+function startDailyTimer(){
+  dailyLeft=DAILY_SECONDS;
+  updateTimerTag();
+  stopDailyTimer();
+  dailyIv=setInterval(()=>{
+    if(mode!=="daily"||!curLevel){ stopDailyTimer(); return; }
+    dailyLeft--; updateTimerTag();
+    if(dailyLeft<=0){ stopDailyTimer(); endTimeUp(); }
+  },1000);
+}
+function endTimeUp(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const key=todayKey();
+    const prev=save.dailyBest[key]||0;
+    const rec=scoreRun>prev;
+    save.dailyBest[key]=Math.max(prev,scoreRun);   // 0 分也记录:菜单完成态要能显示
+    save.dailyDone=key;
+    persist();
+    curLevel=null;
+    updateHUD();   // curLevel 已空:隐藏计时器
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
+    b.onclick=()=>{ hideResult(); openMenu(); };
+    btns.appendChild(b);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
+
+/* ---- 反馈层:粒子 / 飘分 / 翻面飞入图鉴 / 夸奖 ---- */
+const fxEl=document.getElementById("fx");
+const reduceMotion=window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function fxBurst(x,y,hue,n=12,spread=46){
+  if(reduceMotion) return;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("i"); p.className="fx-p";
+    const a=Math.random()*Math.PI*2, d=spread*(.55+Math.random()*.6), sz=5+Math.random()*6;
+    const col = i%3===0 ? "var(--card)" : (save.settings.colorHint ? `hsl(${hue} 60% 55%)` : "var(--accent)");
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${col};border:1.5px solid var(--accent);`;
+    fxEl.appendChild(p);
+    const rot=(Math.random()*360)|0;
+    p.animate([
+      {transform:`translate(${x}px,${y}px) rotate(0deg) scale(1)`, opacity:1},
+      {transform:`translate(${x+Math.cos(a)*d}px,${y+Math.sin(a)*d+18}px) rotate(${rot}deg) scale(.4)`, opacity:0}
+    ],{duration:520+Math.random()*260, easing:"cubic-bezier(.2,.7,.3,1)"}).onfinish=()=>p.remove();
+  }
+}
+function fxScore(x,y,pts){
+  const el=document.createElement("div"); el.className="fx-score"; el.textContent="+"+pts;
+  fxEl.appendChild(el);
+  const w=el.offsetWidth;
+  el.animate([
+    {transform:`translate(${x-w/2}px,${y-10}px) scale(.6)`, opacity:0},
+    {transform:`translate(${x-w/2}px,${y-26}px) scale(1.1)`, opacity:1, offset:.25},
+    {transform:`translate(${x-w/2}px,${y-56}px) scale(1)`, opacity:0}
+  ],{duration:900, easing:"ease-out"}).onfinish=()=>el.remove();
+}
+function fxFlyToBook(tileEl,v){
+  const r=tileEl.getBoundingClientRect();
+  const book=document.getElementById("btnBook").getBoundingClientRect();
+  const card=document.createElement("div"); card.className="fx-card";
+  const side=Math.min(r.width,r.height);
+  card.style.width=side+"px"; card.style.height=side+"px";
+  card.innerHTML=`<svg viewBox="0 0 120 120">${artSVG(v,save.style)}</svg>`;
+  fxEl.appendChild(card);
+  const x0=r.left+(r.width-side)/2, y0=r.top+(r.height-side)/2;
+  const x1=book.left+book.width/2-side/2, y1=book.top+book.height/2-side/2;
+  const mx=(x0+x1)/2, my=Math.min(y0,y1)-60;
+  const anim=card.animate([
+    {transform:`translate(${x0}px,${y0}px) scaleX(0)`, opacity:1},
+    {transform:`translate(${x0}px,${y0}px) scale(1.12)`, opacity:1, offset:.22},
+    {transform:`translate(${x0}px,${y0}px) scale(1.0)`, opacity:1, offset:.42},
+    {transform:`translate(${mx}px,${my}px) scale(.62)`, opacity:1, offset:.72},
+    {transform:`translate(${x1}px,${y1}px) scale(.22)`, opacity:.2}
+  ],{duration:reduceMotion?300:1050, easing:"cubic-bezier(.45,0,.3,1)"});
+  anim.onfinish=()=>{
+    card.remove();
+    const b=document.getElementById("btnBook");
+    b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
+  };
+}
+const PRAISE={3:"Goed!",5:"Prachtig!",8:"Geweldig!",12:"Fantastisch!",16:"Ongelooflijk!"};
+function fxPraise(text){
+  const el=document.createElement("div"); el.className="fx-praise"; el.textContent=text;
+  const br=wrapEl.getBoundingClientRect();
+  el.style.left=(br.left+br.width/2)+"px"; el.style.top=(br.top+br.height*.42)+"px";
+  fxEl.appendChild(el);
+  el.animate([
+    {scale:.5, opacity:0, rotate:"-6deg"},
+    {scale:1.12, opacity:1, rotate:"2deg", offset:.25},
+    {scale:1, opacity:1, rotate:"0deg", offset:.7},
+    {scale:1.05, opacity:0, rotate:"0deg"}
+  ],{duration:1100, easing:"ease-out"}).onfinish=()=>el.remove();
+}
+function tileCenter(t){
+  const r=t.el.getBoundingClientRect();
+  return [r.left+r.width/2, r.top+r.height/2];
+}
+function fxConfetti(){
+  if(reduceMotion) return;
+  const br=wrapEl.getBoundingClientRect();
+  const hues=[215,12,48,160,330];
+  for(let i=0;i<46;i++){
+    setTimeout(()=>fxBurst(br.left+br.width*(.15+Math.random()*.7), br.top+br.height*(.2+Math.random()*.5), hues[i%5], 3, 90),i*18);
+  }
+}
+
+/* ---- 关卡变体:消除后下落(第二轮关卡;宁易勿难,只做"下落"一种) ---- */
+function applyGravity(){
+  if(!curLevel || curLevel.variant!=="down") return false;
+  let moved=false;
+  for(let c=0;c<COLS;c++){
+    let write=ROWS-1;
+    for(let r=ROWS-1;r>=0;r--){
+      const t=board[r][c];
+      if(!t) continue;
+      if(r!==write){ board[write][c]=t; board[r][c]=null; t.r=write; positionTile(t); moved=true; }
+      write--;
+    }
+  }
+  return moved;
+}
+
+const FINALE_PAIRS=3;
+async function attemptPair(a,b){
+  if(busy) return;
+  busy=true;
+  // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
+  const validPair = a && b && a!==b && a.v===b.v && a.k!==b.k;
+  const o=occNow();
+  const path=validPair ? findPathOcc(o,a.r,a.c,b.r,b.c) : null;
+  if(!path){
+    a.el.classList.add("shake"); b.el.classList.add("shake");
+    thud();
+    setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320);
+    if(streak>0){ streak=0; updateHUD(); }
+    busy=false;
+    return;
+  }
+  const finale = pairsLeft<=FINALE_PAIRS;
+  const V=VERBS[a.v];
+  const formWord=a.k==="form"?wordOf(a):wordOf(b);
+  // 计分:每对 15;连击(横幅窗口内)加成
+  streak++;
+  let pts=PAIR_POINTS;
+  if(streak>=2){ pts+=10*(streak-1); }
+  scoreRun+=pts;
+  if(a.k==="form"||b.k==="form"){
+    const inf=V.inf;
+    save.counts[inf]=(save.counts[inf]||0)+1;
+    persist();
+  }
+  // 1) 连线(终盘加速)
+  const pd=drawPath(path, V.hue, finale?150:220);
+  chime(streak-1 + (finale?2:0));
+  a.el.classList.add("pop"); b.el.classList.add("pop");
+  a.alive=false; b.alive=false;
+  pairsLeft--;
+  updateHUD();
+  showLearnBanner(a.v, formWord);
+  await sleep(pd);
+  // 2) 碎片 + 飘分 + 翻面飞入图鉴(克隆体在 #fx 层,不阻塞棋盘)
+  const ca=tileCenter(a), cb=tileCenter(b);
+  fxBurst(ca[0],ca[1],V.hue); fxBurst(cb[0],cb[1],V.hue);
+  fxScore((ca[0]+cb[0])/2,(ca[1]+cb[1])/2,pts);
+  fxFlyToBook(a.k==="inf"?a.el:b.el, a.v);
+  if(PRAISE[streak]){ fxPraise(PRAISE[streak]); if(streak>=5) fanfare(streak>=8?4:2); }
+  a.el.classList.add("vanish"); b.el.classList.add("vanish");
+  await sleep(finale?60:110);
+  a.el.remove(); b.el.remove();
+  board[a.r][a.c]=null; board[b.r][b.c]=null;
+  if(applyGravity()) await sleep(330);
+  wrapEl.classList.toggle("finale", pairsLeft>0 && pairsLeft<=FINALE_PAIRS);
+  busy=false;
+  if(pairsLeft<=0){
+    wrapEl.classList.remove("finale");
+    scoreRun+=CLEAR_BONUS;
+    updateHUD();
+    fxConfetti(); fanfare(5);
+    await sleep(mode==="levels"?1100:600);
+    if(mode==="levels"){
+      finishLevel();
+    }else{
+      dealModeBoard();   // 无尽/每日:清盘→发下一盘,连击窗口延续
+      busy=false;
+    }
+  }else if(!findAnyPairNow()){
+    toast(t("toast.nopair"));
+    await sleep(400);
+    reshuffleRemaining();
+  }
+}
+function drawPath(path,hue,dur=220){
+  const svg=document.getElementById("pathSvg");
+  svg.setAttribute("viewBox",`0 0 ${wrapEl.clientWidth} ${wrapEl.clientHeight}`);
+  const pts=path.map(([r,c])=>cellCenter(r,c).map(n=>Math.round(n)));
+  const d="M"+pts.map(p=>p.join(" ")).join(" L");
+  const cs=getComputedStyle(document.body);
+  const ink=cs.getPropertyValue("--accent").trim()||"#2a56a8";
+  const col=save.settings.colorHint ? `hsl(${hue} 60% ${isDark()?62:45}%)` : ink;
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.style.setProperty("--pd",dur+"ms");
+  g.innerHTML=
+    `<path class="ln glow" pathLength="1" d="${d}" stroke="${col}" stroke-width="13"/>`+
+    `<path class="ln" pathLength="1" d="${d}" stroke="${col}" stroke-width="6"/>`+
+    `<path class="ln" pathLength="1" d="${d}" stroke="#fff" stroke-opacity=".75" stroke-width="2"/>`+
+    `<circle r="5.5" fill="#fff" stroke="${col}" stroke-width="2.5"><animateMotion dur="${dur}ms" fill="freeze" path="${d}"/></circle>`+
+    pts.slice(1,-1).map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${col}"/>`).join("");
+  svg.appendChild(g);
+  setTimeout(()=>{ g.classList.add("fade"); setTimeout(()=>g.remove(),360); }, dur+260);
+  return dur;
+}
+
+/* ---- 横幅(所有模式,10s=连击窗口) ---- */
+let bannerTimer=null, bannerVerb=null;
+function karaoke(i){   // 朗读到哪个词,哪个词亮
+  document.getElementById("bannerInf").classList.toggle("say",i===0);
+  document.getElementById("bannerForm").classList.toggle("say",i===1);
+}
+function bannerPlaceholder(){
+  document.getElementById("bannerArt").innerHTML="";
+  document.getElementById("bannerInf").textContent="";
+  document.getElementById("bannerForm").textContent="";
+  document.getElementById("bannerGloss").textContent=t("banner.empty");
+}
+function hideBanner(){
+  clearTimeout(bannerTimer); bannerTimer=null; bannerVerb=null; karaoke(-1);
+  stopSpeech();
+  bannerEl.classList.remove("show");
+  if(streak>0){ streak=0; updateHUD(); }   // 连击倒计时随卡片结束
+}
+function showLearnBanner(v,formWord){
+  clearTimeout(bannerTimer);
+  const V=VERBS[v];
+  bannerVerb=v;
+  document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
+  document.getElementById("bannerInf").textContent=V.inf;
+  document.getElementById("bannerForm").textContent="— "+formWord;
+  document.getElementById("bannerGloss").textContent=glossOf(V);
+  bannerEl.style.setProperty("--h",V.hue);
+  bannerEl.classList.remove("show");
+  void bannerEl.offsetWidth;
+  bannerEl.classList.add("show");
+  bannerEl.style.setProperty("--bdur",(save.settings.bannerMs||BANNER_DEFAULT_S)+"s");
+  const say=()=>speakPair(V,formWord,karaoke);
+  bannerEl.onclick=say;                     // 点横幅 = 再听一遍(原形 → 变位)
+  bannerTimer=setTimeout(hideBanner,(save.settings.bannerMs||BANNER_DEFAULT_S)*1000);
+  say();
+}
+const IC_TILE=`<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="2"/><path d="M12 6.5l1.6 3.6 3.9.4-2.9 2.6.8 3.8L12 15l-3.4 1.9.8-3.8-2.9-2.6 3.9-.4z" fill="currentColor"/></svg>`;
+const IC_TULIP=`<svg viewBox="0 0 24 24"><path d="M12 21v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 17c-2.5-.2-4.5-1.6-5-4 2.4-.2 4.2.9 5 2.6M12 17c2.5-.2 4.5-1.6 5-4-2.4-.2-4.2.9-5 2.6" fill="currentColor" fill-opacity=".7"/><path d="M7 4.5l2.4 2L12 3l2.6 3.5L17 4.5V9a5 5 0 0 1-10 0z" fill="currentColor"/></svg>`;
+const IC_DOWN=`<svg class="var-ic" viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function updateHUD(){
+  document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
+  document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
+  document.getElementById("timerTag").style.display=(mode==="daily"&&curLevel)?"":"none";
+  const st=document.getElementById("scoreTag");
+  st.innerHTML=`${IC_TILE}<span>${scoreRun}</span>`;
+  if(scoreRun!==lastScoreShown){
+    st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun;
+    // 无尽/每日:最佳分实时入库(中途离开/刷新不丢)
+    if(mode==="endless" && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
+    if(mode==="daily"){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
+  }
+  const ct=document.getElementById("comboTag");
+  if(streak>=2){
+    ct.style.display=""; ct.innerHTML=`${IC_TULIP}×${streak}`;
+    ct.className="combo-tag"+(streak>=8?" t4":streak>=5?" t3":streak>=3?" t2":"");
+  }
+  else ct.style.display="none";
+}
+
+/* ---- 提示 ---- */
+function hint(){
+  if(busy||!curLevel) return;
+  const p=findAnyPairNow();
+  if(!p){ toast(t("toast.nopair")); reshuffleRemaining(); return; }
+  clearHint();
+  for(const t of p){ t.el.classList.add("hint"); }
+  hintTimer=setTimeout(clearHint,2600);
+}
+function clearHint(){
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  boardEl.querySelectorAll(".hint").forEach(el=>el.classList.remove("hint"));
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("on"),1800);
+}
+
+/* ---- 选择/配对输入 ---- */
+boardEl.addEventListener("click",e=>{
+  if(busy||!curLevel) return;
+  const el=e.target.closest(".tile");
+  if(!el) return;
+  const t=el._t;
+  lastAction=Date.now();
+  if(!selected){
+    selected=t; el.classList.add("sel"); tone(880,0,.06,"sine",.03);
+    if(save.settings.tapSpeak) speakVerb(wordOf(t));
+    for(const x of tiles){ if(x.alive && x!==t && x.v===t.v) x.el.classList.add("peer"); }
+    return;
+  }
+  if(selected===t){ clearSel(); return; }
+  const a=selected, b=t;
+  clearSel();
+  attemptPair(a,b);
+});
+function clearSel(){
+  if(selected){ selected.el.classList.remove("sel"); selected=null; }
+  boardEl.querySelectorAll(".peer").forEach(el=>el.classList.remove("peer"));
+}
+</script>
+<script>
+"use strict";
+/* ================= i18n ================= */
+let board=[];                        // 由引擎脚本赋值
+function abandonSession(){ stopSpeech(); hideBanner(); }
+function speakVerb(word){
+  return new Promise(res=>{
+    if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
+    try{
+      window.speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(word);
+      u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+      u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+      u.onend=()=>res(); u.onerror=()=>res();
+      window.speechSynthesis.speak(u);
+    }catch(e){ res(); }
+  });
+}
+function finishLevel(){
+  const idx=LINK_LEVELS.indexOf(curLevel);
+  const lvId=LINK_LEVELS[idx].id;
+  const disp=displayId(curLevel);
+  save.done[lvId]=true;
+  if(idx+2>save.lUnlocked){ save.lUnlocked=idx+2; }
+  const prev=save.best[lvId]||0;
+  const rec=scoreRun>prev;
+  if(rec){ save.best[lvId]=scoreRun; }
+  persist();
+  curLevel=null;
+  document.getElementById("resultTitle").textContent=t("result.title");
+  document.getElementById("resultText").innerHTML=
+    t("result.done")+"<br>"+`⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+  // 复盘:本关 7 个词 原形 → 变位,点一下再听
+  const lvDone=LINK_LEVELS[idx];
+  const recap=document.createElement("div"); recap.className="recap";
+  for(const vi of lvDone.verbs){
+    const V=VERBS[vi], f=V[lvDone.type];
+    const rb=document.createElement("button");
+    rb.innerHTML=`${V.inf} <i>→</i> ${f}`;
+    rb.onclick=()=>speakPair(V,f);
+    recap.appendChild(rb);
+  }
+  const rt=document.getElementById("resultText");
+  rt.appendChild(recap);
+  const tip=document.createElement("div"); tip.style.cssText="font-size:11px;color:#98a1b0;"; tip.textContent=t("result.recap");
+  rt.appendChild(tip);
+  const btns=document.getElementById("resultBtns");
+  btns.innerHTML="";
+  if(idx<LINK_LEVELS.length-1){
+    const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next");
+    b.onclick=()=>{ hideResult(); startLink(idx+1); };
+    btns.appendChild(b);
+  }
+  const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
+  b2.onclick=()=>{ hideResult(); startLink(idx); };
+  btns.appendChild(b2);
+  const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
+  b3.onclick=()=>{ hideResult(); openMenu(); };
+  btns.appendChild(b3);
+  document.getElementById("resultModal").classList.add("on");
+  blip(523,.1); setTimeout(()=>blip(659,.1),110); setTimeout(()=>blip(784,.16),220);
+}
+function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
+
+/* ================= 菜单 ================= */
+function openMenu(){
+  if(curLevel){ stopSpeech(); hideBanner(); }   // 会话保活:棋盘保留
+  showMenuView("main");
+  const resume=document.getElementById("mResume");
+  resume.style.display=curLevel?"flex":"none";
+  resume.onclick=()=>document.getElementById("menuScreen").classList.remove("on");
+  const mc=document.getElementById("mContinue");
+  const nextIdx=LEVELS_done();
+  mc.style.display=nextIdx<LINK_LEVELS.length?"":"none";
+  // 无尽/每日按钮:解锁态 + 今日完成态 + 副标题
+  const unlockedModes=save.lUnlocked>=MODE_UNLOCK;
+  const dailyDone=save.dailyDone===todayKey();
+  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes||dailyDone);
+  document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
+  const dBest=save.dailyBest[todayKey()];
+  document.getElementById("mDailySub").textContent=unlockedModes
+    ?(dBest!=null?`${dailyDone?"✓ ":""}${t("result.today")}: ${dBest}`:t("menu.newdaily"))
+    :t("menu.needlevel");
+  const eBest=save.best["Oneindig"];
+  document.getElementById("mEndlessSub").textContent=unlockedModes
+    ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
+    :t("menu.needlevel");
+  document.getElementById("menuScreen").classList.add("on");
+}
+function LEVELS_done(){
+  for(let i=0;i<LINK_LEVELS.length;i++){ if(!save.done[LINK_LEVELS[i].id]) return i; }
+  return LINK_LEVELS.length;
+}
+function showMenuView(v){
+  document.getElementById("menuMain").style.display=v==="main"?"":"none";
+  document.getElementById("menuLevels").style.display=v==="levels"?"":"none";
+  if(v==="levels") renderLevelGrid();
+}
+function renderLevelGrid(){
+  const g=document.getElementById("lvGrid");
+  g.innerHTML="";
+  LINK_LEVELS.forEach((lv,i)=>{
+    const b=document.createElement("button");
+    const locked=i>save.lUnlocked-1;
+    const within=i%6, round=Math.floor(within/3);   // 每档 6 关:0-2 第一轮,3-5 第二轮
+    b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
+    b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`+(round>0?`<span class="lv-round">${IC_DOWN}</span>`:"")
+      +(save.done[lv.id]?`<svg class="lv-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`:"");
+    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
+    g.appendChild(b);
+  });
+}
+
+/* ================= 设置 ================= */
+function seg(el,opts,cur,cb){
+  el.innerHTML="";
+  for(const [val,label] of opts){
+    const btn=document.createElement("button");
+    btn.textContent=label;
+    if(String(val)===String(cur)) btn.classList.add("sel");
+    btn.onclick=()=>{ cb(val); persist(); applySettings(); renderSettings(); };
+    el.appendChild(btn);
+  }
+}
+function openSettings(){
+  renderSettings();
+  document.getElementById("settingsModal").classList.add("on");
+}
+function renderSettings(){
+  const S=save.settings;
+  updateVoiceName();
+  seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
+  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"],["en","English"]],S.uiLang,v=>S.uiLang=v);
+  document.getElementById("setVolume").value=S.volume;
+  document.getElementById("setTts").value=S.ttsVolume;
+  const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;
+  document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
+  const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
+  document.getElementById("bannerVal").textContent=`${S.bannerMs||10} s`;
+  seg(document.getElementById("setDark"),[["auto",t("opt.auto")],[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v==="auto"?"auto":(v===true||v==="true")));
+  seg(document.getElementById("setSkin"),[["delft",t("skin.delft")],["classic",t("skin.classic")]],S.skin,v=>S.skin=v);
+  seg(document.getElementById("setHue"),[[true,t("opt.on")],[false,t("opt.off")]],S.colorHint,v=>S.colorHint=(v===true||v==="true"));
+  seg(document.getElementById("setTap"),[[true,t("opt.on")],[false,t("opt.off")]],S.tapSpeak,v=>S.tapSpeak=(v===true||v==="true"));
+}
+
+/* ================= 图鉴 ================= */
+const bookCollapsed={};
+function toggleBookGroup(band){
+  bookCollapsed[band]=!bookCollapsed[band];
+  openBook();
+}
+function openBook(){
+  const list=document.getElementById("bookList");
+  list.innerHTML="";
+  const bands=[...new Set(TIERS.map(t=>t.band))];
+  for(const band of bands){
+    const collapsed=!!bookCollapsed[band];
+    const head=document.createElement("button");
+    head.className="book-group";
+    head.innerHTML=`<i>${collapsed?"▸":"▾"}</i> ${band}`;
+    head.onclick=()=>toggleBookGroup(band);
+    list.appendChild(head);
+    if(collapsed) continue;
+    const tier=TIERS.find(t=>t.band===band);
+    for(const vi of tier.pool){
+      const V=VERBS[vi];
+      const got=(save.counts[V.inf]||0)>0;
+      const row=document.createElement("div");
+      row.className="book-row"+(got?" viewable":"");
+      row.innerHTML=got
+        ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+          <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
+        :`<div class="book-art empty">?</div>
+          <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
+      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(vi); }
+      list.appendChild(row);
+    }
+  }
+  document.getElementById("bookDrawer").classList.add("on");
+}
+let cardResolve=null;
+function showCard(vi){
+  return new Promise(res=>{
+    cardResolve=res;
+    const V=VERBS[vi];
+    document.getElementById("cardArt").innerHTML=artSVG(vi,save.style);
+    document.getElementById("cardInf").textContent=V.inf;
+    document.getElementById("cardForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
+    document.getElementById("cardGloss").textContent=glossOf(V);
+    document.getElementById("cardTip").textContent=t("card.tip");
+    document.getElementById("cardModal").classList.remove("gloss-open");
+    document.getElementById("cardModal").classList.add("on");
+    stopSpeech(); speakVerb(V.inf);
+  });
+}
+function closeCard(){
+  document.getElementById("cardModal").classList.remove("on");
+  stopSpeech();
+  if(cardResolve){ const r=cardResolve; cardResolve=null; r(); }
+}
+
+/* ================= 提示等待(闲置) ================= */
+setInterval(()=>{
+  const wait=(save.settings.hintWait||0)*1000;
+  if(curLevel && !busy && !anyOverlayOpen() && !boardEl.querySelector(".hint") && Date.now()-lastAction>wait){
+    lastAction=Date.now();
+    hint();
+  }
+},1000);
+
+/* ================= 事件绑定 ================= */
+document.getElementById("btnMenu").onclick=openMenu;
+document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
+document.getElementById("btnBook").onclick=openBook;
+document.getElementById("mDaily").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  document.getElementById("menuScreen").classList.remove("on");
+  startDaily();
+};
+document.getElementById("mEndless").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  document.getElementById("menuScreen").classList.remove("on");
+  startEndless();
+};
+document.getElementById("mContinue").onclick=()=>{
+  document.getElementById("menuScreen").classList.remove("on");
+  startLink(LEVELS_done());
+};
+document.getElementById("mLevels").onclick=()=>showMenuView("levels");
+document.getElementById("mBack").onclick=()=>showMenuView("main");
+document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("mSettings").onclick=openSettings;
+document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
+document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
+document.getElementById("setHintWait").oninput=e=>{
+  save.settings.hintWait=+e.target.value; persist();
+  document.getElementById("hintWaitVal").textContent=save.settings.hintWait>0?`${save.settings.hintWait} s`:t("opt.off");
+};
+document.getElementById("setBanner").oninput=e=>{
+  save.settings.bannerMs=+e.target.value; persist();
+  document.getElementById("bannerVal").textContent=`${save.settings.bannerMs} s`;
+};
+document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
+document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
+document.getElementById("cardPanel").onclick=()=>{
+  const m=document.getElementById("cardModal");
+  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="…"; }
+  else closeCard();
+};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
+["bookDrawer","helpModal","settingsModal"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
+});
+window.addEventListener("resize",()=>{ syncSize(); });
+if(window.visualViewport) window.visualViewport.addEventListener("resize",()=>syncSize());
+let lastVW=window.innerWidth, lastVH=window.innerHeight;
+setInterval(()=>{ if(window.innerWidth!==lastVW || window.innerHeight!==lastVH){ lastVW=window.innerWidth; lastVH=window.innerHeight; syncSize(); } },1200);
+
+/* ================= 调试钩子 ================= */
+window.NLM3={
+  state:()=>({level:curLevel&&curLevel.id, mode, dailyLeft, pairs:pairsLeft, score:scoreRun, streak, busy,
+    board:board.map(row=>row.map(t=>t?[t.v,t.k]:null))}),
+  verbs:VERBS, levels:LINK_LEVELS,
+  findPair:()=>{ const p=findAnyPairNow(); return p?[p[0].r,p[0].c,p[1].r,p[1].c]:null; },
+  connect:(r1,c1,r2,c2)=>attemptPair(board[r1][c1],board[r2][c2]),
+  settings:()=>({...save.settings}),
+  forceTimeUp:()=>{ dailyLeft=1; },
+  save:()=>save,
+};
+
+/* ================= 启动 ================= */
+initVoices();
+applySettings();
+bannerPlaceholder();
+syncSize();
+updateHUD();
+openMenu();
+</script>
+</body>
+</html>

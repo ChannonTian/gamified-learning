@@ -25,6 +25,7 @@ gamified-learning/
 │   └── README.md       ← 游戏说明
 ├── link-match/
 │   ├── index.html      ← 第二个产品:动词连连看(独立,不依赖 tile-match)
+│   ├── link-match-ui-test.html ← UI 原型(皮肤系统/Delft 美术/反馈/响应式;存档 linkmatch.uitest.v1),试玩定夺后并回
 │   ├── README.md       ← 游戏说明
 │   └── test/
 │       └── path-engine.test.mjs ← 路径引擎回归(零依赖,node 直跑;改引擎必跑)
@@ -64,6 +65,7 @@ gamified-learning/
 - **link-match v1.3(2026-10-02)**:无尽(清盘连发、连击跨盘、最佳实时入库)+ 每日挑战(180s、日期种子、每日一次带 ✓);词形挂到每块(t.f),`syncSize` 按盘面量字号;QA 钩子增 `mode/dailyLeft/save()/forceTimeUp()`。
 - **link-match v1.4(2026-10-02)**:关卡 9→18(每档两轮,第二轮换词);横幅时长进设置(5-30s,默认 10,兼连击窗口)。
 - **four-match v0.1(2026-10-03)**:四消独立原型上线 https://channontian.github.io/gamified-learning/four-match/ ——四形同消、A1 3 关、每关 3 词、6×6、12 类型;玩法观察(偏松、字号偏小)记 DEVLOG,待试玩定夺后再决定是否继续投入。
+- **link-match UI 原型(2026-10-03)**:`link-match/link-match-ui-test.html`——皮肤系统(`body.skin-*`,荷兰语限定 `skin-delft` 代尔夫特蓝陶;别的语言另做皮肤)、颜色弱提示保留可关、连线描画+碎屑+翻面飞入图鉴+五声音阶连击+夸奖词、跟读高亮/点选朗读/结算复盘、终盘冲刺、第二轮关卡下落变体、手机优先+宽屏侧栏。待用户试玩定夺后并回 index.html(同时修正式版 applyShuffle 洗牌无效 bug)。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)
