@@ -1,5 +1,16 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-04 · v1.5(link-match)试玩反馈六连 + 内容收完(108 词 / 51 关 / 生存模式)
+
+- **#1+#3 形式分组重排**(用户:每关形式不同容易混淆):关卡改为**形式分组**——每档内先单数过去式各轮、再复数、最后分词(A1 顺序 sg×3→pl×3→pp×3);关卡网格加档位标题行(A1/A2/B1),轮次角标保留。
+- **#2 界面用语**(用户问 level 是否荷兰语):调研确认 **"level" 就是荷兰语游戏界面标准用词**(荷兰游戏社区/词典均接受;"niveau" 更多指难度/CEFR 等级)→ "Verder spelen" 改 **"Volgend level"**(zh 下一关/en Next level)。来源:tweakers.net、vertalen.nu。
+- **#4 手感加强**(用户:消除反馈再强一点):折线改**描入动画**(dasharray+transition,取代 SMIL 的可靠方案)+ 底层宽辉光;两端**粒子扩散环**;消除位置**得分弹字**(+pts ×连击);块消除先 flash 亮起再 pop 消散;音效改**低频"咚"+双音上扬**(连击≥3 加第三音)。
+- **#5 生存模式**:过第 1 关解锁;每次配对成功续命 15s(点错只断连击不失败),超时结束入最佳分(`best["Survival"]`);HUD 计时芯片 ≤5s 变红脉冲;菜单入口带最佳分副标题;清盘连发、死局重排均不停表。
+- **#6 空白利用**:棋盘与操作坞之间新增**词行**(wordRow)——本盘 7 词的"原形→变位"chips,色点对应动词颜色,点击朗读(speakPair),配对消除后划线变淡=被动复习+进度可见;矮屏(<600px)自动隐藏。
+- **#7 内容收完**:词库 85→**108 词**(新增 kunnen/moeten/willen/mogen/zoeken/zwemmen/vliegen/stelen/schieten/roepen/verdwijnen/duiken/verstaan/genieten/dwingen/glijden/kruipen/bestaan/onthouden/vertrekken/verschijnen/bevriezen/stinken;调研纠正 mogen pp=**gemogen** 非古体 gemoogd);TIERS 改按词名定义(不再用脆弱的索引区间);轮数=⌈池/7⌉ → **51 关**(A1 9 / A2 18 / B1 24),验证**每词每形式≥1 次、关内无重复**。
+- **迁移**:旧序(档,轮,形式)→新序(档,形式,轮)的 done/best 按映射精确搬家(18 关旧进度零丢失),counts/dailyBest/Oneindig 原样保留;lvOrder="v2" 防重跑。
+- QA:新档菜单(4 模式锁态+Volgend level 文案)、51 关网格+3 档标题+42 角标、旧档迁移逐键核对、L1 bot 全清(第二轮新词)、动效元素逐一验证(弹字/粒子/描线 dasharray/词行点亮,消除瞬间截图确认外圈辉光)、生存全流程(续命数值精确 15000→14381→递减→重置、超时结算、最佳分、紧急态红脉冲、切模式清理)、路径引擎回归全绿、console 零错误、QA 存档清理。
+
 ## 2026-10-03 · four-match v0.1 四消独立原型(用户:先做一个单独的四消原型)
 
 - 落地封存方案:原形+三变位**四形同消**、从 A1 起、每关 3 词、12 类型/36 格(6×6)。独立单文件 `four-match/`,存档 `nlm4.prototype.v1`、钩子 `window.NLM4`,与 tile-match/link-match 解耦。

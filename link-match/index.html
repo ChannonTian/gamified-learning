@@ -144,6 +144,47 @@
   .tile.shake .face{animation:shakeX .3s ease;}
   @keyframes shakeX{ 0%,100%{translate:0;} 25%{translate:-4px 0;} 75%{translate:4px 0;} }
 
+  /* ---------- 手感加强:闪亮 + 粒子 + 得分弹字 ---------- */
+  .tile.flash .face{ animation:flashAnim .18s ease; }
+  @keyframes flashAnim{ 0%{ filter:brightness(1.28) saturate(1.3); } 100%{ filter:brightness(1); } }
+  #pathSvg .spark{ animation:sparkAnim .5s ease-out forwards; transform-box:fill-box; transform-origin:center; }
+  @keyframes sparkAnim{ 0%{ scale:.3; opacity:.95; } 100%{ scale:2.8; opacity:0; } }
+  #pathSvg .ring{ animation:ringAnim .55s ease-out forwards; transform-box:fill-box; transform-origin:center; }
+  @keyframes ringAnim{ 0%{ scale:.4; opacity:.7; } 100%{ scale:3.2; opacity:0; } }
+  .score-pop{
+    position:absolute; z-index:8; pointer-events:none;
+    font-weight:800; font-size:15px; color:var(--accent);
+    text-shadow:0 1px 0 rgba(255,255,255,.6);
+    animation:popRise .8s ease-out forwards; white-space:nowrap;
+  }
+  @keyframes popRise{ 0%{ translate:0 6px; opacity:0; scale:.7; } 18%{ opacity:1; scale:1.08; } 100%{ translate:0 -26px; opacity:0; scale:1; } }
+
+  /* ---------- 盘下词行(学习条) ---------- */
+  #wordRow{
+    display:flex; flex-wrap:wrap; gap:6px; justify-content:center;
+    padding:0 4px 8px; min-height:34px;
+  }
+  .wchip{
+    display:inline-flex; align-items:baseline; gap:5px;
+    padding:5px 10px; border-radius:11px;
+    border:1px solid var(--line); background:var(--paper);
+    font-size:11.5px; font-weight:700; color:var(--ink);
+    cursor:pointer; transition:opacity .25s, border-color .25s;
+  }
+  .wchip small{ font-size:10px; font-weight:600; color:#98a1b0; }
+  .wchip.done{ opacity:.45; border-color:transparent; background:transparent; }
+  .wchip.done small{ text-decoration:line-through; }
+  @media (max-height:600px){ #wordRow{ display:none; } }
+
+  /* ---------- 计时器紧急态 + 关卡档标题 ---------- */
+  .tag.urgent{ color:#fff; background:#e05645; animation:urgentPulse .7s ease infinite; }
+  @keyframes urgentPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(224,86,69,.5);} 50%{ box-shadow:0 0 0 5px rgba(224,86,69,0);} }
+  .band-head{
+    grid-column:1/-1;
+    font-size:11px; font-weight:800; letter-spacing:.12em;
+    color:#98a1b0; margin:10px 2px 6px;
+  }
+
   /* ---------- 底部操作坞 + 教学横幅 ---------- */
   #dock{
     position:relative;
@@ -324,6 +365,8 @@
     <svg id="pathSvg"></svg>
   </div>
 
+  <div id="wordRow"></div>
+
   <div id="dock">
     <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
     <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
@@ -349,6 +392,7 @@
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
       <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
       <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
+      <button class="menu-btn" id="mSurvival"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M6.8 12h2.6l1.4-3.2 2.4 6.4 1.4-3.2h2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="m-label"><span data-i18n="menu.survival">Overleven</span><small id="mSurvivalSub"></small></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
@@ -543,25 +587,54 @@ const VERBS=[
   {inf:"verbieden",sg:"verbood", pl:"verboden", pp:"verboden",   en:"to forbid",zh:"禁止"},
   {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen",   en:"to proceed",zh:"进行"},
   {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen",  en:"to meet",  zh:"遇到"},
+  {inf:"kunnen",   sg:"kon",     pl:"konden",   pp:"gekund",     en:"can; to be able",  zh:"能;会"},
+  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoet",     en:"must; to have to", zh:"必须;得"},
+  {inf:"willen",   sg:"wilde",   pl:"wilden",   pp:"gewild",     en:"to want",  zh:"想要"},
+  {inf:"mogen",    sg:"mocht",   pl:"mochten",  pp:"gemogen",    en:"may; to be allowed",  zh:"可以;被允许"},
+  {inf:"zoeken",   sg:"zocht",   pl:"zochten",  pp:"gezocht",    en:"to look for",  zh:"找;寻找"},
+  {inf:"zwemmen",  sg:"zwam",    pl:"zwammen",  pp:"gezwommen",  en:"to swim",  zh:"游泳"},
+  {inf:"vliegen",  sg:"vloog",   pl:"vlogen",   pp:"gevlogen",   en:"to fly",   zh:"飞;乘飞机"},
+  {inf:"stelen",   sg:"stal",    pl:"stolen",   pp:"gestolen",   en:"to steal", zh:"偷"},
+  {inf:"schieten", sg:"schoot",  pl:"schoten",  pp:"geschoten",  en:"to shoot", zh:"射;射击"},
+  {inf:"roepen",   sg:"riep",    pl:"riepen",   pp:"geroepen",   en:"to call; to shout",  zh:"喊;叫"},
+  {inf:"verdwijnen", sg:"verdween", pl:"verdwenen", pp:"verdwenen", en:"to disappear",  zh:"消失"},
+  {inf:"duiken",   sg:"dook",    pl:"doken",    pp:"gedoken",    en:"to dive",  zh:"潜水;跳入"},
+  {inf:"verstaan", sg:"verstond", pl:"verstonden", pp:"verstaan", en:"to understand",  zh:"听懂;理解"},
+  {inf:"genieten", sg:"genoot",  pl:"genoten",  pp:"genoten",    en:"to enjoy", zh:"享受"},
+  {inf:"dwingen",  sg:"dwong",   pl:"dwongen",  pp:"gedwongen",  en:"to force", zh:"强迫;迫使"},
+  {inf:"glijden",  sg:"gleed",   pl:"gleden",   pp:"gegleden",   en:"to slide; to glide",  zh:"滑;滑动"},
+  {inf:"kruipen",  sg:"kroop",   pl:"kropen",   pp:"gekropen",   en:"to crawl", zh:"爬;匍匐"},
+  {inf:"bestaan",  sg:"bestond", pl:"bestonden", pp:"bestaan",   en:"to exist", zh:"存在"},
+  {inf:"onthouden", sg:"onthield", pl:"onthielden", pp:"onthouden", en:"to remember",  zh:"记住"},
+  {inf:"vertrekken", sg:"vertrok", pl:"vertrokken", pp:"vertrokken", en:"to depart",  zh:"出发;离开"},
+  {inf:"verschijnen", sg:"verscheen", pl:"verschenen", pp:"verschenen", en:"to appear",  zh:"出现"},
+  {inf:"bevriezen", sg:"bevroor", pl:"bevroren", pp:"bevroren",   en:"to freeze (solid)",  zh:"结冰;冻结"},
+  {inf:"stinken",  sg:"stonk",   pl:"stonken",  pp:"gestonken",  en:"to stink", zh:"发臭"},
 ];
 VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
 
 /* 每关 7 词;A1/A2/B1 各三关(sg→pl→pp),词池轮转覆盖 */
-const TIERS=[
-  {band:"A1", pool:[0,1,2,3,4,5,6,8,9,12,13,14,15,16,17]},
-  {band:"A2", pool:[7,10,11,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]},
-  {band:"B1", pool:[45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84]},
+const TIER_NAMES=[
+  {band:"A1", names:["zijn","hebben","gaan","komen","zien","geven","nemen","lopen","eten","drinken","zitten","liggen","staan","lezen","spreken","kunnen","moeten","willen","mogen","zoeken"]},
+  {band:"A2", names:["slapen","blijven","schrijven","doen","weten","zeggen","houden","kiezen","beginnen","begrijpen","brengen","denken","vinden","helpen","kopen","krijgen","vragen","wassen","dragen","verliezen","winnen","hangen","sterven","vergeten","bieden","trekken","zingen","vallen","sluiten","rijden","zwemmen","vliegen","stelen","schieten","roepen","verdwijnen","duiken","verstaan"]},
+  {band:"B1", names:["zwijgen","wijzen","werpen","gelden","smelten","zwellen","binden","zenden","bijten","gieten","wringen","zuigen","krimpen","springen","klinken","zinken","lijden","scheppen","heffen","vriezen","schrikken","vechten","prijzen","genezen","wegen","treden","schenden","besluiten","bedriegen","bederven","ontbreken","beschrijven","vermijden","wijken","schuiven","klimmen","dringen","verbieden","verlopen","treffen","genieten","dwingen","glijden","kruipen","bestaan","onthouden","vertrekken","verschijnen","bevriezen","stinken"]},
 ];
+const VIDX={}; VERBS.forEach((v,i)=>{ VIDX[v.inf]=i; });
+const TIERS=TIER_NAMES.map(t=>({band:t.band, pool:t.names.map(n=>VIDX[n])}));
 const LINK_TYPES=["sg","pl","pp"];
 const LINK_LEVELS=[];
+const LV_ROUNDS=[];
 TIERS.forEach((t,ti)=>{
-  for(let round=0;round<2;round++){          // 每档两轮:第二轮换一批词
-    LINK_TYPES.forEach((ty,ki)=>{
+  const R=Math.ceil(t.pool.length/7);      // 轮数=覆盖全池所需;每关 7 词
+  LV_ROUNDS.push(R);
+  LINK_TYPES.forEach((ty,fi)=>{            // 形式分组:先单数过去式各轮,再复数,最后分词(用户试玩反馈 #1/#3)
+    for(let round=0;round<R;round++){
+      const start=((fi*R)+round)*7 % t.pool.length;
       const verbs=[];
-      for(let k=0;k<7;k++) verbs.push(t.pool[((round*3+ki)*7+k)%t.pool.length]);
+      for(let k=0;k<7;k++) verbs.push(t.pool[(start+k)%t.pool.length]);
       LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, verbs});
-    });
-  }
+    }
+  });
 });
 const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
 const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
@@ -569,9 +642,9 @@ const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
 /* ================= i18n ================= */
 const I18N={
   nl:{
-    "menu.back":"Terug naar spel","menu.continue":"Verder spelen","menu.levels":"Levels",
-    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
-    "mode.endless":"Oneindig","mode.daily":"Dagelijks","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
+    "menu.back":"Terug naar spel","menu.continue":"Volgend level","menu.levels":"Levels",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.survival":"Overleven","menu.survivalnew":"Elke koppel binnen de tijd!","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
+    "mode.endless":"Oneindig","mode.daily":"Dagelijks","mode.survival":"Overleven","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
@@ -590,14 +663,14 @@ const I18N={
     "help.goal":"Doel: vind alle 14 paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
     "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een 🔥-combinatiebonus.",
     "help.rules":"Elke band (A1/A2/B1) oefent drie vormen — enkelvoud, meervoud en voltooid deelwoord — daarna een tweede ronde met andere werkwoorden.",
-    "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig (puntjagen met jouw verzameling) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
+    "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
     "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "card.tip":"Tik voor de betekenis",
   },
   zh:{
-    "menu.back":"回到当前游戏","menu.continue":"继续游戏","menu.levels":"关卡选择",
-    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
-    "mode.endless":"无尽模式","mode.daily":"每日挑战","result.timeup":"时间到!","result.today":"今日",
+    "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.survival":"生存模式","menu.survivalnew":"每次消除之间限时,超时即结束","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
+    "mode.endless":"无尽模式","mode.daily":"每日挑战","mode.survival":"生存","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
@@ -616,14 +689,14 @@ const I18N={
     "help.goal":"目标:找出全部 14 对配对。卡住时棋盘会自动重新洗牌。",
     "help.score":"计分:每对 +15 分;快速连续配对有 🔥 连击加成。",
     "help.rules":"每档(A1/A2/B1)各练三种形式:单数、复数、过去分词;一轮之后再练一轮新词。",
-    "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)与每日挑战(180 秒,每天一次)。",
+    "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。",
     "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "card.tip":"点击查看释义",
   },
   en:{
-    "menu.back":"Back to game","menu.continue":"Continue","menu.levels":"Levels",
-    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
-    "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
+    "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
+    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.survival":"Survival","menu.survivalnew":"Beat the clock between pairs","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
+    "mode.endless":"Endless","mode.daily":"Daily","mode.survival":"Survival","result.timeup":"Time's up!","result.today":"Today",
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
@@ -642,7 +715,7 @@ const I18N={
     "help.goal":"Goal: find all 14 pairs before you get stuck. If you do get stuck, the board reshuffles.",
     "help.score":"Score: 15 points per pair. Quick consecutive pairs give a 🔥 combo bonus.",
     "help.rules":"Each band (A1/A2/B1) practises three forms — singular, plural and past participle — then a second round with different verbs.",
-    "help.modes":"Modes: after level 1 you unlock Endless (chase points with your collection) and the Daily Challenge (180 seconds, once per day).",
+    "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day).",
     "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
     "card.tip":"Tap for the meaning",
   },
@@ -659,6 +732,20 @@ try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
 }catch(e){}
+// v1.5 关卡重排迁移:旧序(档,轮,形式)→新序(档,形式,轮),done/best 按映射精确搬家,进度不丢
+if(save.lvOrder!=="v2" && LINK_LEVELS.length>18){
+  const BASE=[0]; for(let i=1;i<LV_ROUNDS.length;i++) BASE.push(BASE[i-1]+LV_ROUNDS[i-1]*3);
+  const map=k=>{
+    const i=+String(k).slice(1);
+    if(isNaN(i)||i>=18) return i;
+    const b=Math.floor(i/6), w=i%6, r=Math.floor(w/3), f=w%3;
+    return BASE[b]+f*LV_ROUNDS[b]+r;
+  };
+  const nd={}, nb={};
+  for(const k in save.done){ if(save.done[k]&&/^L\d+$/.test(k)) nd["L"+map(k)]=true; }
+  for(const k in save.best){ if(/^L\d+$/.test(k)) nb["L"+map(k)]=save.best[k]; else nb[k]=save.best[k]; }
+  save.done=nd; save.best=nb; save.lvOrder="v2";
+}
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
 
 function applySettings(){
@@ -995,8 +1082,8 @@ const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
-  const hud=document.getElementById("hud"), dock=document.getElementById("dock");
-  const usedH=hud.offsetHeight + dock.offsetHeight + 30;
+  const hud=document.getElementById("hud"), dock=document.getElementById("dock"), wr=document.getElementById("wordRow");
+  const usedH=hud.offsetHeight + dock.offsetHeight + (wr?wr.offsetHeight:0) + 30;
   const availH=Math.max(240, window.innerHeight - usedH) - RING*2;   // 网格可用高(扣外圈)
   const th=Math.min(availH/ROWS, (window.innerWidth*0.94 - RING*2)/COLS*0.75);
   const tw=th*4/3;
@@ -1008,6 +1095,7 @@ function syncSize(){
   wrapEl.style.height=(gridH+RING*2)+"px";
   document.getElementById("hud").style.width=(gridW+RING*2)+"px";
   document.getElementById("dock").style.width=(gridW+RING*2)+"px";
+  document.getElementById("wordRow").style.width=(gridW+RING*2)+"px";
   // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块
   const ctx=measureCanvas.getContext("2d");
   ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
@@ -1040,9 +1128,9 @@ function buildPairsFrom(picks){   // picks = [{v, f}]:每词原形×2 + 变位×
   const cells=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) cells.push([r,c]);
   const tiles=[];
-  for(const p of picks){
-    tiles.push({v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f},{v:p.v,k:"inf",f:p.f},{v:p.v,k:"form",f:p.f});
-  }
+  picks.forEach((p,pi)=>{
+    tiles.push({v:p.v,k:"inf",f:p.f,chip:pi},{v:p.v,k:"form",f:p.f,chip:pi},{v:p.v,k:"inf",f:p.f,chip:pi},{v:p.v,k:"form",f:p.f,chip:pi});
+  });
   // 洗牌(词块与位置都随机)
   for(let tries=0;tries<60;tries++){
     const pos=[...cells];
@@ -1056,14 +1144,14 @@ function buildPairsFrom(picks){   // picks = [{v, f}]:每词原形×2 + 变位×
   // 兜底:相邻成对放置(必然可解)
   const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
   let n=0;
-  for(const p of picks){
+  picks.forEach((p,pi)=>{
     for(let k=0;k<2;k++){
       const r=Math.floor(n/COLS), c=n%COLS;
-      g[r][c]={v:p.v,k:"inf",f:p.f}; n++;
+      g[r][c]={v:p.v,k:"inf",f:p.f,chip:pi}; n++;
       const r2=Math.floor(n/COLS), c2=n%COLS;
-      g[r2][c2]={v:p.v,k:"form",f:p.f}; n++;
+      g[r2][c2]={v:p.v,k:"form",f:p.f,chip:pi}; n++;
     }
-  }
+  });
   return g;
 }
 function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type}))); }
@@ -1250,6 +1338,8 @@ async function startLink(idx){
   tiles=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
+  renderWordRow(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type})));
+  syncSize();
   pairsLeft=PAIR_TOTAL;
   updateHUD();
   busy=false;
@@ -1300,6 +1390,19 @@ function sampleModeVerbs(pool,n,r){   // 取 n 个 {v,f}:同一盘内变位词�
   while(picks.length<n){ const vi=pool[guard++%pool.length]; picks.push({v:vi,f:MODE_FORMS[guard%3]}); }  // 极端兜底(收词过少)
   return picks;
 }
+// 盘下词行:本盘 7 词的原形→变位(被动复习;点击朗读;配对消除后划线变淡)
+function renderWordRow(picks){
+  const row=document.getElementById("wordRow");
+  row.innerHTML="";
+  picks.forEach((p,pi)=>{
+    const V=VERBS[p.v];
+    const b=document.createElement("button");
+    b.className="wchip";
+    b.innerHTML=`<i style="background:hsl(${V.hue} 62% 62%)"></i>${V.inf}<small>${V[p.f]}</small>`;
+    b.onclick=()=>speakPair(V, V[p.f]);
+    row.appendChild(b);
+  });
+}
 function dealModeBoard(){
   const picks=sampleModeVerbs(collectedPool(),7,mode==="daily"?modeRng:Math.random);
   clearSel(); clearHint();
@@ -1307,6 +1410,7 @@ function dealModeBoard(){
   tiles=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
+  renderWordRow(picks);
   syncSize();   // 按新盘词长校字号
   pairsLeft=PAIR_TOTAL;
   updateHUD();
@@ -1384,6 +1488,61 @@ function endTimeUp(){
   wait();
 }
 
+/* ---- 生存模式:每对之间限时,点错不失败,超时结束 ---- */
+const SURVIVAL_SECONDS=15;
+let survivalDeadline=null, survivalIv=null;
+function stopSurvivalTimer(){ if(survivalIv){ clearInterval(survivalIv); survivalIv=null; } survivalDeadline=null; }
+function updateSurvivalTag(){
+  const el=document.getElementById("timerTag");
+  if(!survivalDeadline) return;
+  const s=Math.max(0, Math.ceil((survivalDeadline-Date.now())/1000));
+  el.textContent=`⏱ ${s}`;
+  el.classList.toggle("urgent", s<=5);
+}
+function startSurvival(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  abandonSession();
+  mode="survival";
+  curLevel={id:"Survival"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.survival");
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+  survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000;
+  updateSurvivalTag();
+  if(survivalIv) clearInterval(survivalIv);
+  survivalIv=setInterval(()=>{
+    if(mode!=="survival"||!curLevel){ clearInterval(survivalIv); survivalIv=null; return; }
+    updateSurvivalTag();
+    if(Date.now()>=survivalDeadline){ clearInterval(survivalIv); survivalIv=null; endSurvival(); }
+  },250);
+}
+function endSurvival(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const prev=save.best["Survival"]||0;
+    const rec=scoreRun>prev;
+    save.best["Survival"]=Math.max(prev,scoreRun);
+    persist();
+    curLevel=null;
+    updateHUD();
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
+    b.onclick=()=>{ hideResult(); openMenu(); };
+    btns.appendChild(b);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
+
 async function attemptPair(a,b){
   if(busy) return;
   busy=true;
@@ -1399,9 +1558,8 @@ async function attemptPair(a,b){
     busy=false;
     return;
   }
-  // 成功:折线动画
+  // 成功:折线动画 + 音效 + 闪亮 + 弹字
   drawPath(path);
-  blip(560+streak*40,.09,"triangle",.08);
   const V=VERBS[a.v];
   const formWord=a.k==="form"?wordOf(a):wordOf(b);
   // 计分:每对 15;连击(横幅窗口内)加成
@@ -1409,6 +1567,7 @@ async function attemptPair(a,b){
   let pts=PAIR_POINTS;
   if(streak>=2){ pts+=10*(streak-1); }
   scoreRun+=pts;
+  successJingle(streak);
   if(a.k==="form"||b.k==="form"){
     const inf=V.inf;
     save.counts[inf]=(save.counts[inf]||0)+1;
@@ -1417,10 +1576,15 @@ async function attemptPair(a,b){
   a.alive=false; b.alive=false;
   occNow();
   pairsLeft--;
-  a.el.classList.add("gone"); b.el.classList.add("gone");
+  a.el.classList.add("flash"); b.el.classList.add("flash");
+  popScore(pts,streak,b.r+1,b.c+1);
+  for(const x of [a,b]){ const cw=document.getElementById("wordRow").children[x.chip]; if(cw) cw.classList.add("done"); }
+  if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
   updateHUD();
   showLearnBanner(a.v, formWord);
-  await sleep(300);
+  await sleep(170);
+  a.el.classList.add("gone"); b.el.classList.add("gone");
+  await sleep(290);
   a.el.remove(); b.el.remove();
   board[a.r][a.c]=null; board[b.r][b.c]=null;
   await sleep(150);
@@ -1445,10 +1609,47 @@ async function attemptPair(a,b){
 function drawPath(path){
   const svg=document.getElementById("pathSvg");
   svg.setAttribute("viewBox",`0 0 ${wrapEl.clientWidth} ${wrapEl.clientHeight}`);
-  const pts=path.map(([r,c])=>cellCenter(r,c).map(n=>Math.round(n)).join(",")).join(" ");
+  const ptsStr=path.map(([r,c])=>cellCenter(r,c).map(n=>Math.round(n)).join(",")).join(" ");
   const col=getComputedStyle(document.body).getPropertyValue("--accent").trim()||"#e8734a";
-  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
-  setTimeout(()=>{ if(svg.firstChild) svg.removeChild(svg.firstChild); },450);
+  // 底层辉光 + 主线描入(transition 驱动,比 SMIL 可靠)
+  svg.innerHTML=
+    `<polyline points="${ptsStr}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>`+
+    `<polyline points="${ptsStr}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const main=svg.querySelectorAll("polyline")[1];
+  let L=0; try{ L=main.getTotalLength(); }catch(e){}
+  if(L>0){
+    main.style.strokeDasharray=L;
+    main.style.strokeDashoffset=L;
+    void main.getBoundingClientRect();   // 强制布局,确保 transition 从偏移态出发
+    main.style.transition="stroke-dashoffset .24s ease-out";
+    main.style.strokeDashoffset="0";
+  }
+  // 两端粒子 + 扩散环
+  for(const [r,c] of [path[0], path[path.length-1]]){
+    const [x,y]=cellCenter(r,c);
+    svg.insertAdjacentHTML("beforeend",
+      `<circle class="ring" cx="${Math.round(x)}" cy="${Math.round(y)}" r="10" fill="none" stroke="${col}" stroke-width="3"/>`+
+      `<circle class="spark" cx="${Math.round(x)}" cy="${Math.round(y)}" r="7" fill="${col}"/>`);
+  }
+  setTimeout(()=>{ svg.innerHTML=""; },560);
+}
+// 得分弹字:在消除块位置升起 "+pts ×streak"
+function popScore(pts,streak,tr,tc){
+  const [x,y]=cellCenter(tr,tc);
+  const el=document.createElement("div");
+  el.className="score-pop";
+  el.textContent=`+${pts}${streak>=2?"  ×"+streak:""}`;
+  el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
+  wrapEl.appendChild(el);
+  setTimeout(()=>el.remove(),820);
+}
+// 成功音效:低频"咚"+ 双音上扬,连击≥3 加第三个音
+function successJingle(streak){
+  const base=540+Math.min(streak,8)*45;
+  blip(170,.06,"sine",.07);
+  blip(base,.07,"triangle",.09);
+  setTimeout(()=>blip(base*1.335,.09,"triangle",.07),70);
+  if(streak>=3) setTimeout(()=>blip(base*1.782,.12,"triangle",.06),150);
 }
 
 /* ---- 横幅(所有模式,10s=连击窗口) ---- */
@@ -1478,7 +1679,9 @@ function showLearnBanner(v,formWord){
 function updateHUD(){
   document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
   document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
-  document.getElementById("timerTag").style.display=(mode==="daily"&&curLevel)?"":"none";
+  const tt=document.getElementById("timerTag");
+  tt.style.display=((mode==="daily"||mode==="survival")&&curLevel)?"":"none";
+  if(tt.style.display==="none") tt.classList.remove("urgent");
   const st=document.getElementById("scoreTag");
   st.textContent=`⭐ ${scoreRun}`;
   if(scoreRun!==lastScoreShown){
@@ -1608,6 +1811,11 @@ function openMenu(){
   document.getElementById("mEndlessSub").textContent=unlockedModes
     ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
     :t("menu.needlevel");
+  const sBest=save.best["Survival"];
+  document.getElementById("mSurvival").classList.toggle("locked",!unlockedModes);
+  document.getElementById("mSurvivalSub").textContent=unlockedModes
+    ?(sBest?`${t("result.best")}: ${sBest}`:t("menu.survivalnew"))
+    :t("menu.needlevel");
   document.getElementById("menuScreen").classList.add("on");
 }
 function LEVELS_done(){
@@ -1622,14 +1830,21 @@ function showMenuView(v){
 function renderLevelGrid(){
   const g=document.getElementById("lvGrid");
   g.innerHTML="";
-  LINK_LEVELS.forEach((lv,i)=>{
-    const b=document.createElement("button");
-    const locked=i>save.lUnlocked-1;
-    const within=i%6, round=Math.floor(within/3);   // 每档 6 关:0-2 第一轮,3-5 第二轮
-    b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
-    b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`+(round>0?`<span class="lv-round">${round+1}</span>`:"");
-    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
-    g.appendChild(b);
+  const base={}; LINK_LEVELS.forEach((lv,i)=>{ if(base[lv.band]==null) base[lv.band]=i; });
+  TIERS.forEach(tr=>{
+    const head=document.createElement("div");
+    head.className="band-head"; head.textContent=tr.band;
+    g.appendChild(head);
+    LINK_LEVELS.forEach((lv,i)=>{
+      if(lv.band!==tr.band) return;
+      const b=document.createElement("button");
+      const locked=i>save.lUnlocked-1;
+      const round=(i-base[lv.band])%LV_ROUNDS[TIERS.indexOf(tr)];
+      b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
+      b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`+(round>0?`<span class="lv-round">${round+1}</span>`:"");
+      b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
+      g.appendChild(b);
+    });
   });
 }
 
@@ -1743,6 +1958,11 @@ document.getElementById("mEndless").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
   startEndless();
 };
+document.getElementById("mSurvival").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  document.getElementById("menuScreen").classList.remove("on");
+  startSurvival();
+};
 document.getElementById("mContinue").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
   startLink(LEVELS_done());
@@ -1779,13 +1999,14 @@ setInterval(()=>{ if(window.innerWidth!==lastVW || window.innerHeight!==lastVH){
 
 /* ================= 调试钩子 ================= */
 window.NLM3={
-  state:()=>({level:curLevel&&curLevel.id, mode, dailyLeft, pairs:pairsLeft, score:scoreRun, streak, busy,
+  state:()=>({level:curLevel&&curLevel.id, mode, dailyLeft, survivalLeft:survivalDeadline?Math.max(0,survivalDeadline-Date.now()):null, pairs:pairsLeft, score:scoreRun, streak, busy,
     board:board.map(row=>row.map(t=>t?[t.v,t.k]:null))}),
   verbs:VERBS, levels:LINK_LEVELS,
   findPair:()=>{ const p=findAnyPairNow(); return p?[p[0].r,p[0].c,p[1].r,p[1].c]:null; },
   connect:(r1,c1,r2,c2)=>attemptPair(board[r1][c1],board[r2][c2]),
   settings:()=>({...save.settings}),
   forceTimeUp:()=>{ dailyLeft=1; },
+  forceSurvivalEnd:()=>{ if(survivalDeadline) survivalDeadline=Date.now()-1; },
   save:()=>save,
 };
 

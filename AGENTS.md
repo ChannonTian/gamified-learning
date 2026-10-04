@@ -36,7 +36,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig), dailyBest{日期:分}, dailyDone, counts{}, style, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值)。
+- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值);改关卡顺序要像 v1.5 一样做映射迁移。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -64,6 +64,7 @@ gamified-learning/
 - **link-match v1.3(2026-10-02)**:无尽(清盘连发、连击跨盘、最佳实时入库)+ 每日挑战(180s、日期种子、每日一次带 ✓);词形挂到每块(t.f),`syncSize` 按盘面量字号;QA 钩子增 `mode/dailyLeft/save()/forceTimeUp()`。
 - **link-match v1.4(2026-10-02)**:关卡 9→18(每档两轮,第二轮换词);横幅时长进设置(5-30s,默认 10,兼连击窗口)。
 - **four-match v0.1(2026-10-03)**:四消独立原型上线 https://channontian.github.io/gamified-learning/four-match/ ——四形同消、A1 3 关、每关 3 词、6×6、12 类型;玩法观察(偏松、字号偏小)记 DEVLOG,待试玩定夺后再决定是否继续投入。
+- **link-match v1.5(2026-10-04,试玩六连反馈)**:**108 词 / 51 关**——形式分组(每档内先 sg 各轮→pl→pp,轮数=⌈池/7⌉),TIERS 改按词名定义(索引区间易碎,勿回退);菜单 "Volgend level"(调研:"level" 是荷兰语游戏标准用语,"niveau" 指难度/CEFR);消除手感(描线 dasharray+transition、端点粒子、得分弹字、flash/pop、双音阶音效);**生存模式**(每对间 15s 续命、超时结束、best["Survival"]、≤5s 红脉冲);盘下**词行 wordRow**(7 词 chips 点击朗读、消除划线、<600px 高自动隐藏);旧档迁移 lvOrder="v2"(旧序→新序 done/best 映射搬家)。钩子增 `forceSurvivalEnd()/survivalLeft`。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)
