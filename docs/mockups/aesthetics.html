@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koppelen — esthetiek-richtingen / 美术方向效果图</title>
+<style>
+  body{ background:#e9e5db; margin:0; padding:34px 26px 50px; font-family:ui-sans-serif,system-ui,"Segoe UI",-apple-system,sans-serif; }
+  .gallery{ display:flex; gap:34px; align-items:flex-start; flex-wrap:nowrap; }
+  .concept{ flex:none; width:452px; }
+  .concept h2{ font-size:15px; margin:0 0 2px; }
+  .concept .refs{ font-size:11.5px; color:#6b6558; margin:0 0 10px; line-height:1.45; }
+  .phone{ width:452px; background:#fff; border-radius:34px; padding:12px; box-shadow:0 10px 34px rgba(40,35,25,.18); box-sizing:border-box; }
+  .screen{ border-radius:26px; overflow:hidden; position:relative; height:852px; box-sizing:border-box; }
+
+  /* ============ 共用结构(每概念覆写视觉) ============ */
+  .hud{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; }
+  .hud .l{ display:flex; align-items:center; gap:8px; }
+  .menuic{ width:34px; height:34px; display:flex; flex-direction:column; justify-content:center; gap:5px; padding-left:8px; }
+  .menuic i{ display:block; height:2.6px; background:currentColor; border-radius:2px; }
+  .lvl, .goal, .score{ font-size:12.5px; font-weight:800; }
+  .board{ position:relative; margin:8px auto 0; }
+  .board svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .tile{ position:absolute; display:flex; align-items:center; justify-content:center; box-sizing:border-box; font-weight:800; user-select:none; }
+  .tile small{ display:block; }
+  .wordrow{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding:10px 10px 6px; }
+  .chip{ display:inline-flex; align-items:baseline; gap:5px; font-size:11px; font-weight:700; }
+  .chip small{ font-size:9.5px; font-weight:600; }
+  .chip.done{ text-decoration:line-through; }
+  .chip i{ width:7px; height:7px; border-radius:50%; display:inline-block; align-self:center; }
+  .dock{ display:flex; gap:12px; justify-content:center; padding:8px 0 16px; }
+  .dock button{ display:flex; align-items:center; gap:7px; font-weight:800; font-size:12.5px; padding:11px 18px; border-radius:999px; }
+  .tile.sel{ }
+  .empt{ position:absolute; }
+
+  /* ============ A · Bauhaus / De Stijl (Itten · Mondrian) ============ */
+  .A .screen{ background:#f2eee2; }
+  .A .hud{ border-bottom:3px solid #14100b; padding-bottom:10px; color:#14100b; }
+  .A .menuic{ border:2.5px solid #14100b; border-radius:0; background:#f9f6ee; }
+  .A .lvl{ background:#14100b; color:#f9f6ee; padding:5px 9px; letter-spacing:.08em; }
+  .A .goal{ border:2.5px solid #14100b; padding:4px 10px; background:#f9f6ee; position:relative; overflow:hidden; }
+  .A .goal i{ position:absolute; left:0; top:0; bottom:0; background:#d13c2c; width:64%; z-index:0; }
+  .A .goal span{ position:relative; z-index:1; }
+  .A .score{ background:#d13c2c; color:#fff; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2.5px solid #14100b; }
+  .A .board{ border:3px solid #14100b; background:#fbf9f1; }
+  .A .gridline{ position:absolute; background:#14100b; opacity:.14; }
+  .A .tile{ border:2.5px solid #14100b; font-family:"Arial Black",Arial,sans-serif; text-transform:uppercase; letter-spacing:.04em; font-size:14.5px; }
+  .A .tile.form{ background:#f9f6ee; color:#14100b; }
+  .A .tile.form .shape{ position:absolute; right:5px; top:5px; width:13px; height:13px; border:2.5px solid #14100b; }
+  .A .tile.form.s-sg .shape{ border-radius:50%; background:var(--v); border-color:#14100b; }
+  .A .tile.form.s-pl .shape{ background:transparent; }
+  .A .tile.form.s-pp .shape{ clip-path:polygon(0 0,100% 0,100% 100%,28% 100%,0 72%); background:var(--v); }
+  .A .tile.inf{ background:var(--v); color:#fbf9f1; }
+  .A .tile.inf::after{ content:""; position:absolute; left:10%; right:10%; bottom:6px; height:3px; background:#14100b; }
+  .A .tile.sel{ outline:4px solid #d13c2c; outline-offset:2px; }
+  .A .empt::after{ content:"·"; position:absolute; left:50%; top:50%; transform:translate(-50%,-52%); color:#14100b; opacity:.28; font-size:18px; font-weight:900; }
+  .A .wordrow .chip{ border:2px solid #14100b; background:#f9f6ee; padding:3px 8px; color:#14100b; text-transform:uppercase; font-size:9.5px; letter-spacing:.05em; }
+  .A .wordrow .chip.done{ background:#e3b52e; }
+  .A .wordrow .chip i{ display:none; }
+  .A .dock button{ border:2.5px solid #14100b; background:#f9f6ee; color:#14100b; border-radius:0; text-transform:uppercase; letter-spacing:.06em; font-size:11px; }
+  .A .dock button b{ color:#d13c2c; }
+
+  /* ============ B · LeWitt / KAMI 折纸 ============ */
+  .B .screen{ background:#eae3d3; }
+  .B .hud{ color:#2a2620; }
+  .B .menuic{ border:1.6px solid #2a2620; border-radius:9px; }
+  .B .lvl{ padding:4px 9px; border:1.6px solid #2a2620; border-radius:9px; background:#f4efe2; }
+  .B .goal{ border:1.6px solid #2a2620; border-radius:999px; padding:5px 12px; background:#f4efe2; position:relative; overflow:hidden; }
+  .B .goal i{ position:absolute; left:0; top:0; bottom:0; background:#c25b4e; width:64%; opacity:.85; }
+  .B .goal span{ position:relative; }
+  .B .score{ border:1.6px solid #2a2620; border-radius:9px; padding:5px 9px; background:#f4efe2; }
+  .B .board{ background:#f4efe2; border:1.6px solid #2a2620; border-radius:6px; background-image:radial-gradient(#2a2620 0.8px, transparent 0.8px); background-size:22px 22px; background-position:8px 8px; opacity:1; }
+  .B .board .dotgrid{ position:absolute; inset:0; opacity:.16; }
+  .B .tile{ border:1.4px solid #2a2620; background:var(--v); color:#f9f4e8; font-size:14px; text-shadow:0 1px 0 rgba(0,0,0,.18); overflow:hidden; }
+  .B .tile .fold{ position:absolute; inset:0; background:linear-gradient(118deg, rgba(255,255,255,.20) 0 46%, rgba(0,0,0,.14) 54% 100%); }
+  .B .tile.form{ border-radius:10px; }
+  .B .tile.form.s-sg{ border-radius:16px; }
+  .B .tile.form.s-pl{ border-radius:2px; }
+  .B .tile.form.s-pp{ border-radius:2px 10px 10px 10px; clip-path:polygon(22% 0,100% 0,100% 100%,0 100%,0 22%); }
+  .B .tile.form .corner{ position:absolute; left:0; top:0; width:22%; height:22%; background:#efe9db; border-right:1.4px solid #2a2620; border-bottom:1.4px solid #2a2620; transform:rotate(0.001deg); }
+  .B .tile.inf{ box-shadow:inset 0 -6px 0 rgba(0,0,0,.22); }
+  .B .tile.inf .lab{ position:absolute; left:0; right:0; bottom:3px; text-align:center; font-size:8px; letter-spacing:.22em; color:#f9f4e8; opacity:.85; }
+  .B .tile.sel{ outline:3px solid #2a2620; outline-offset:2px; }
+  .B .wordrow .chip{ border:1.4px solid #2a2620; background:#f4efe2; padding:3px 9px; border-radius:9px; color:#2a2620; }
+  .B .wordrow .chip.done{ background:#ddd3bc; text-decoration-color:#8f8570; }
+  .B .dock button{ border:1.6px solid #2a2620; background:#f4efe2; color:#2a2620; border-radius:11px; }
+
+  /* ============ C · Mini Metro / LineLight 深色光 ============ */
+  .C .screen{ background:#0e1319; }
+  .C .hud{ color:#dfe8f0; }
+  .C .menuic{ border:1.4px solid #3a4652; border-radius:9px; color:#dfe8f0; }
+  .C .lvl{ padding:4px 10px; border:1.4px solid #3a4652; border-radius:999px; letter-spacing:.14em; text-transform:uppercase; font-size:10px; color:#dfe8f0; }
+  .C .goal{ border:1.4px solid #3a4652; border-radius:999px; padding:5px 12px; position:relative; overflow:hidden; }
+  .C .goal i{ position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,#2b6f9e,#7ad0ff); width:64%; opacity:.9; }
+  .C .goal span{ position:relative; }
+  .C .score{ border:1.4px solid #3a4652; border-radius:999px; padding:5px 10px; color:#7ad0ff; text-shadow:0 0 10px rgba(122,208,255,.6); }
+  .C .board{ background:#121922; border:1px solid #1f2933; border-radius:16px; }
+  .C .tile{ background:#18202b; border:1.5px solid var(--line,#31404e); border-radius:10px; color:#e8f1f8; font-size:13.5px; font-weight:700; box-shadow:0 0 12px color-mix(in srgb, var(--glow) 26%, transparent), inset 0 0 8px color-mix(in srgb, var(--glow) 12%, transparent); }
+  .C .tile.form.s-sg{ border-radius:16px; }
+  .C .tile.form.s-pl{ border-radius:3px; }
+  .C .tile.form.s-pp{ border-radius:3px 12px 12px 12px; clip-path:polygon(20% 0,100% 0,100% 100%,0 100%,0 20%); }
+  .C .tile.inf{ border-color:color-mix(in srgb, var(--glow) 62%, #31404e); box-shadow:0 0 18px color-mix(in srgb, var(--glow) 40%, transparent); }
+  .C .tile.inf::after{ content:""; position:absolute; left:16%; right:16%; bottom:6px; height:2.5px; border-radius:2px; background:var(--glow); box-shadow:0 0 8px var(--glow); }
+  .C .tile.sel{ outline:2.5px solid #7ad0ff; outline-offset:2px; box-shadow:0 0 24px rgba(122,208,255,.55); }
+  .C .wordrow .chip{ border:1.2px solid #26313d; background:#141b24; padding:4px 10px; border-radius:999px; color:#c9d6e2; }
+  .C .wordrow .chip.done{ opacity:.38; }
+  .C .dock button{ border:1.4px solid #2b3745; background:#141b24; color:#dfe8f0; border-radius:999px; }
+
+  /* ============ D · grug 粗糙手作 + 留白 ============ */
+  .D .screen{ background:#ece1c9; }
+  .D .hud{ color:#3b332a; padding-top:26px; }
+  .D .menuic{ border:2.2px solid #3b332a; border-radius:12px 14px 11px 15px; }
+  .D .lvl{ font-size:14px; border-bottom:2.5px solid #3b332a; padding:0 3px 2px; }
+  .D .goal{ border:2.2px solid #3b332a; padding:4px 11px; border-radius:14px 11px 15px 12px; background:#f6efdd; transform:rotate(-1deg); }
+  .D .score{ font-size:15px; border:2.2px solid #3b332a; width:40px; height:40px; border-radius:52% 48% 55% 45%/48% 52% 46% 54%; display:flex; align-items:center; justify-content:center; background:#e3b52e; transform:rotate(2deg); }
+  .D .board{ background:transparent; }
+  .D .tile{ background:color-mix(in srgb, var(--v) 20%, #faf3e3); border:2.2px solid #3b332a; color:#3b332a; font-size:14px; font-family:"Chalkboard SE","Comic Sans MS","Marker Felt",cursive; box-shadow:3px 4px 0 rgba(59,51,42,.16); }
+  .D .tile.form{ border-radius:12px 15px 11px 16px; }
+  .D .tile.form.s-sg{ border-radius:18px 14px 19px 13px; }
+  .D .tile.form.s-pl{ border-radius:3px 6px 4px 7px; }
+  .D .tile.form.s-pp{ border-radius:14px 6px 15px 5px; clip-path:polygon(24% 0,100% 0,100% 100%,0 100%,0 24%); }
+  .D .tile.inf::after{ content:""; position:absolute; left:12%; right:8%; bottom:7px; height:0; border-top:2.6px solid #3b332a; border-bottom:1.6px solid #3b332a; padding-top:1.5px; transform:rotate(-.7deg); }
+  .D .tile.sel{ outline:3px dashed #b3543c; outline-offset:3px; transform:rotate(-2deg) scale(1.03); }
+  .D .wordrow .chip{ border:2px solid #3b332a; background:#f6efdd; padding:3px 10px; border-radius:11px 14px 10px 13px; color:#3b332a; }
+  .D .wordrow .chip.done{ background:transparent; opacity:.5; }
+  .D .dock button{ border:2.2px solid #3b332a; background:#f6efdd; color:#3b332a; border-radius:14px 11px 16px 12px; box-shadow:2px 3px 0 rgba(59,51,42,.16); }
+  .D .dock button:first-child{ transform:rotate(-1.2deg); }
+  .D .dock button:last-child{ transform:rotate(1.1deg); }
+</style>
+</head>
+<body>
+<div class="gallery" id="gallery"></div>
+
+<script>
+/* 盘面数据:4×7,24 块(komen 一对已清 = 4 空格),展示 gaan 的外圈两折连线 + lopen 选中态 */
+const TILES=[
+  [0,0,"lopen","inf"],[0,1,"gaan","inf"],[0,2,"zien","form"],
+  [1,0,"zien","inf"],[1,1,"lopen","form"],[1,2,"gaan","form"],[1,3,"geven","inf"],
+  [2,1,"geven","form"],[2,2,"nemen","inf"],[2,3,"blijven","inf"],
+  [3,0,"lopen","inf"],[3,1,"zien","form"],[3,2,"nemen","form"],[3,3,"blijven","form"],
+  [4,0,"nemen","form"],[4,1,"blijven","form"],[4,2,"lopen","form"],[4,3,"geven","inf"],
+  [5,0,"geven","form"],[5,1,"blijven","inf"],[5,3,"gaan","inf"],
+  [6,0,"gaan","form"],[6,1,"nemen","inf"],[6,2,"zien","inf"]
+];
+const EMPTY=[[0,3],[2,0],[5,2],[6,3]];
+const COLS=4, ROWS=7, TW=92, TH=64, GAP=8, RING=18;
+const BW=RING*2+COLS*TW+(COLS-1)*GAP, BH=RING*2+ROWS*TH+(ROWS-1)*GAP;
+function rc(r,c){ return [RING+c*(TW+GAP), RING+r*(TH+GAP)]; }
+const WORD={lopen:["lopen","liep"],gaan:["gaan","ging"],zien:["zien","zag"],nemen:["nemen","nam"],geven:["geven","gaf"],blijven:["blijven","bleef"],komen:["komen","kwam"]};
+const FKEY={inf:"inf",form:"form"};
+
+/* 每概念:动词色 + 连线画法 */
+const HUES={
+  A:{lopen:"#d13c2c",gaan:"#2b5fa8",zien:"#e3b52e",geven:"#14100b",nemen:"#d13c2c",blijven:"#2b5fa8"},
+  B:{lopen:"#c25b4e",gaan:"#4a6fa5",zien:"#c9a13b",geven:"#5f8c6a",nemen:"#7a5fa0",blijven:"#b06a3b"},
+  C:{lopen:"#e8836a",gaan:"#6aa8e8",zien:"#e8c86a",geven:"#7ad0a0",nemen:"#b48ae8",blijven:"#e89ab8"},
+  D:{lopen:"#c96f4a",gaan:"#6f8c5a",zien:"#b8894a",geven:"#4a7a8c",nemen:"#8c5a6a",blijven:"#a3543f"}
+};
+function lineSVG(k){
+  // gaan form2 (6,0) → gaan inf2 (5,3):绕底部外圈两折
+  const [ax,ay]=rc(6,0), [bx,by]=rc(5,3);
+  const x1=ax+TW/2, y1=ay+TH/2;
+  const x2=bx+TW/2, y2=by+TH/2;
+  const yBot=BH-RING/2, xRight=BW-RING/2;
+  const pts=`${x1},${y1+TH/2-2} ${x1},${yBot} ${xRight},${yBot} ${xRight},${y2} ${x2},${y2}`;
+  if(k==="A") return `<polyline points="${pts}" fill="none" stroke="#14100b" stroke-width="4.5" stroke-linejoin="round" opacity=".92"/>`;
+  if(k==="B") return `<polyline points="${pts}" fill="none" stroke="#4a6fa5" stroke-width="11" stroke-linejoin="round" opacity=".25"/>
+    <polyline points="${pts}" fill="none" stroke="#4a6fa5" stroke-width="5.5" stroke-linejoin="round"/>
+    <polyline points="${pts}" fill="none" stroke="#dce8f5" stroke-width="1.6" stroke-dasharray="9 7" stroke-linejoin="round" opacity=".8"/>`;
+  if(k==="C") return `<polyline points="${pts}" fill="none" stroke="#7ad0ff" stroke-width="12" stroke-linejoin="round" opacity=".16"/>
+    <polyline points="${pts}" fill="none" stroke="#7ad0ff" stroke-width="5" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(122,208,255,.9))"/>
+    <polyline points="${pts}" fill="none" stroke="#eaf7ff" stroke-width="1.8" stroke-linejoin="round"/>`;
+  return `<polyline points="${pts}" fill="none" stroke="#3b332a" stroke-width="3.6" stroke-linejoin="round" stroke-dasharray="9 6" stroke-linecap="round"/>`;
+}
+function tileHTML(k,t,sel){
+  const [r,c,v,f]=t, [x,y]=rc(r,c);
+  const w=TW, h=TH;
+  const text=f==="inf"?WORD[v][0]:WORD[v][1];
+  let cls=`tile ${f==="inf"?"inf":"form s-"+f} ${sel?"sel":""}`;
+  let style=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;--v:${HUES[k][v]};`;
+  if(k==="C") style+=`--glow:${HUES.C[v]};--line:${HUES.C[v]}55;`;
+  if(k==="D"&&!sel) style+=`transform:rotate(${((r*7+c)%5-2)*0.8}deg);`;
+  let inner="";
+  if(k==="A"&&f!=="inf") inner=`<span class="shape"></span>`;
+  if(k==="B"){ inner=`<span class="fold"></span>`+(f==="pp"?`<span class="corner"></span>`:"")+(f==="inf"?`<span class="lab">INFINITIEF</span>`:""); }
+  return `<div class="${cls}" style="${style}">${inner}<span>${text}</span></div>`;
+}
+function conceptHTML(k,name,refs){
+  const hue=HUES[k];
+  let tiles="";
+  for(const t of TILES) tiles+=tileHTML(k,t, t[0]===3&&t[1]===0&&t[2]==="lopen");
+  let empt="";
+  for(const [r,c] of EMPTY){ const [x,y]=rc(r,c); empt+=`<div class="empt" style="left:${x}px;top:${y}px;width:${TW}px;height:${TH}px;"></div>`; }
+  const chips=Object.keys(WORD).map(v=>{
+    const done=v==="komen";
+    return `<span class="chip${done?" done":""}"><i style="background:${hue[v]}"></i>${WORD[v][0]}<small>${WORD[v][1]}</small></span>`;
+  }).join("");
+  return `<div class="concept ${k}">
+    <h2>${name}</h2><p class="refs">${refs}</p>
+    <div class="phone"><div class="screen">
+      <div class="hud">
+        <div class="l"><span class="menuic"><i></i><i></i><i></i></span><span class="lvl">A1.2 · enk.</span></div>
+        <div class="goal"><i></i><span>7/14</span></div>
+        <div class="score">135</div>
+      </div>
+      <div class="board" style="width:${BW}px;height:${BH}px;">
+        ${k==="A"?`<div class="gridline" style="left:0;right:0;top:${RING+TH+GAP/2-1}px;height:2px;"></div><div class="gridline" style="left:0;right:0;top:${RING+2*(TH+GAP)-GAP/2-1}px;height:2px;"></div>`:""}
+        ${empt}${tiles}
+        <svg viewBox="0 0 ${BW} ${BH}">${lineSVG(k)}</svg>
+      </div>
+      <div class="wordrow">${chips}</div>
+      <div class="dock">
+        <button><b>💡</b> Hint</button>
+        <button>▤ Verzameling</button>
+      </div>
+    </div></div>
+  </div>`;
+}
+document.getElementById("gallery").innerHTML=
+  conceptHTML("A","A · 包豪斯 / 风格派","Itten 色彩对比 · Mondrian 三原色+黑网格:Bauhaus 基本形(圆/方/切角)直接承担「形式编码」,动词=三原色,原形块=实色倒置。")+
+  conceptHTML("B","B · LeWitt / KAMI 折纸","Sol LeWitt 的理性结构 + KAMI 2 的纸感:每块是一张「染色折纸」,对角折痕与折角承担形式,色相表达动词;墨线标注,点阵底纹。")+
+  conceptHTML("C","C · Mini Metro / LineLight 深色光","几何极简的动态美感 + 深色模式用光:暗盘上词块以色相描边+柔光晕发光,连线是一根发光的「光轨」,HUD 细线小字距标签(Mini Metro 图解语言)。")+
+  conceptHTML("D","D · grug 粗糙手作 + 留白","手作质感与大量留白:纸片词块歪斜 ±2°、手绘边框与双下划线,虚线手绘连线;背景直接是桌面,不装框。");
+</script>
+</body>
+</html>
