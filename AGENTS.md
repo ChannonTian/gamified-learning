@@ -66,6 +66,7 @@ gamified-learning/
 - **four-match v0.1(2026-10-03)**:四消独立原型上线 https://channontian.github.io/gamified-learning/four-match/ ——四形同消、A1 3 关、每关 3 词、6×6、12 类型;玩法观察(偏松、字号偏小)记 DEVLOG,待试玩定夺后再决定是否继续投入。
 - **four-match v0.2(2026-10-04,用户试玩反馈三连)**:原形块胶囊+**粗下划线**;棋盘 6×6→**5×7**(块更大);内容铺 **99 词/33 关(A1–B2)**(B1 补 bevelen/buigen,B2 新增 12 词),菜单按档分节;布盘改**只禁 4 连**(3 连=差一块的好局面)+同动词聚簇错开形式(否则 12 类型/35 格凑不出 ≥2 解,实测验证);顺修 tile-match zwijgen sg "zweg"→"zweeg"(冻结产品一字数据纠错)。
 - **link-match v1.5(2026-10-04,试玩六连反馈)**:**108 词 / 51 关**——形式分组(每档内先 sg 各轮→pl→pp,轮数=⌈池/7⌉),TIERS 改按词名定义(索引区间易碎,勿回退);菜单 "Volgend level"(调研:"level" 是荷兰语游戏标准用语,"niveau" 指难度/CEFR);消除手感(描线 dasharray+transition、端点粒子、得分弹字、flash/pop、双音阶音效);**生存模式**(每对间 15s 续命、超时结束、best["Survival"]、≤5s 红脉冲);盘下**词行 wordRow**(7 词 chips 点击朗读、消除划线、<600px 高自动隐藏);旧档迁移 lvOrder="v2"(旧序→新序 done/best 映射搬家)。钩子增 `forceSurvivalEnd()/survivalLeft`。
+- **link-match v1.6(2026-10-04,试玩三连)**:关卡名编号化 **A1.1–B1.24**(lv.num)+形式标注,轮次角标取消;attemptPair **全同步非阻塞**(状态即落账、动画/收尾走 setTimeout、游玩中不置 busy)——改它必须保留残块 alive 守卫与 drawPath 按节点移除(防背靠背连对互吞);选中不再立即点亮同动词块,闲置 hintWait 后才提示(选中→peer 点亮 / 未选中→整对;=0 全关)。
 - 已否决/搁置:原形百搭块(易混淆)。
 
 ## 已踩过的坑(别再踩)

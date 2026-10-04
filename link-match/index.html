@@ -627,12 +627,13 @@ const LV_ROUNDS=[];
 TIERS.forEach((t,ti)=>{
   const R=Math.ceil(t.pool.length/7);      // 轮数=覆盖全池所需;每关 7 词
   LV_ROUNDS.push(R);
+  let num=0;
   LINK_TYPES.forEach((ty,fi)=>{            // 形式分组:先单数过去式各轮,再复数,最后分词(用户试玩反馈 #1/#3)
     for(let round=0;round<R;round++){
       const start=((fi*R)+round)*7 % t.pool.length;
       const verbs=[];
       for(let k=0;k<7;k++) verbs.push(t.pool[(start+k)%t.pool.length]);
-      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, verbs});
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, num:++num, verbs});
     }
   });
 });
@@ -662,7 +663,7 @@ const I18N={
     "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
     "help.goal":"Doel: vind alle 14 paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
     "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een 🔥-combinatiebonus.",
-    "help.rules":"Elke band (A1/A2/B1) oefent drie vormen — enkelvoud, meervoud en voltooid deelwoord — daarna een tweede ronde met andere werkwoorden.",
+    "help.rules":"Levels heten A1.1, A1.2, …: binnen elke band komen eerst alle enkelvoud-rondes, daarna de meervoud-rondes en tot slot het voltooid deelwoord.",
     "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
     "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "card.tip":"Tik voor de betekenis",
@@ -688,7 +689,7 @@ const I18N={
     "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
     "help.goal":"目标:找出全部 14 对配对。卡住时棋盘会自动重新洗牌。",
     "help.score":"计分:每对 +15 分;快速连续配对有 🔥 连击加成。",
-    "help.rules":"每档(A1/A2/B1)各练三种形式:单数、复数、过去分词;一轮之后再练一轮新词。",
+    "help.rules":"关卡名为 A1.1、A1.2……每档先练完所有单数轮,再复数轮,最后过去分词轮。",
     "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。",
     "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "card.tip":"点击查看释义",
@@ -714,7 +715,7 @@ const I18N={
     "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
     "help.goal":"Goal: find all 14 pairs before you get stuck. If you do get stuck, the board reshuffles.",
     "help.score":"Score: 15 points per pair. Quick consecutive pairs give a 🔥 combo bonus.",
-    "help.rules":"Each band (A1/A2/B1) practises three forms — singular, plural and past participle — then a second round with different verbs.",
+    "help.rules":"Levels are named A1.1, A1.2, …: within each band all singular rounds come first, then the plural rounds, then the past participle.",
     "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day).",
     "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
     "card.tip":"Tap for the meaning",
@@ -1345,7 +1346,7 @@ async function startLink(idx){
   busy=false;
   lastAction=Date.now();
 }
-function displayId(lv){ return `${lv.band} · ${t(SHORT_KEY[lv.type])}`; }
+function displayId(lv){ return `${lv.band}.${lv.num} · ${t(SHORT_KEY[lv.type])}`; }
 const PAIR_TOTAL=ROWS*COLS/2;
 let pairsLeft=PAIR_TOTAL;
 
@@ -1543,20 +1544,19 @@ function endSurvival(){
   wait();
 }
 
-async function attemptPair(a,b){
-  if(busy) return;
-  busy=true;
+/* 全程非阻塞(用户反馈:动效不得挡住快速连击):状态同步落账,动画与收尾走 setTimeout */
+function attemptPair(a,b){
+  if(busy) return false;
   // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
-  const validPair = a && b && a!==b && a.v===b.v && a.k!==b.k;
+  const validPair = a && b && a!==b && a.alive && b.alive && a.v===b.v && a.k!==b.k;
   const o=occNow();
   const path=validPair ? findPathOcc(o,a.r,a.c,b.r,b.c) : null;
   if(!path){
-    a.el.classList.add("shake"); b.el.classList.add("shake");
+    if(a&&a.el){ a.el.classList.add("shake"); b.el.classList.add("shake");
+      setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320); }
     blip(180,.08,"sine",.05);
-    setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320);
     if(streak>0){ streak=0; updateHUD(); }
-    busy=false;
-    return;
+    return false;
   }
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
   drawPath(path);
@@ -1569,12 +1569,11 @@ async function attemptPair(a,b){
   scoreRun+=pts;
   successJingle(streak);
   if(a.k==="form"||b.k==="form"){
-    const inf=V.inf;
-    save.counts[inf]=(save.counts[inf]||0)+1;
+    save.counts[V.inf]=(save.counts[V.inf]||0)+1;
     persist();
   }
   a.alive=false; b.alive=false;
-  occNow();
+  board[a.r][a.c]=null; board[b.r][b.c]=null;   // 立即腾格:后续配对即刻可判
   pairsLeft--;
   a.el.classList.add("flash"); b.el.classList.add("flash");
   popScore(pts,streak,b.r+1,b.c+1);
@@ -1582,29 +1581,23 @@ async function attemptPair(a,b){
   if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
   updateHUD();
   showLearnBanner(a.v, formWord);
-  await sleep(170);
-  a.el.classList.add("gone"); b.el.classList.add("gone");
-  await sleep(290);
-  a.el.remove(); b.el.remove();
-  board[a.r][a.c]=null; board[b.r][b.c]=null;
-  await sleep(150);
-  busy=false;
+  setTimeout(()=>{ a.el.classList.add("gone"); b.el.classList.add("gone"); },170);
+  setTimeout(()=>{ a.el.remove(); b.el.remove(); },470);
   if(pairsLeft<=0){
     scoreRun+=CLEAR_BONUS;
     updateHUD();
-    await sleep(450);
-    if(mode==="levels"){
-      finishLevel();
-    }else{
-      blip(660,.1,"triangle",.07);   // 无尽/每日:清盘→发下一盘,连击窗口延续
-      dealModeBoard();
-      busy=false;
-    }
+    setTimeout(()=>{
+      if(mode==="levels"){ if(curLevel) finishLevel(); }
+      else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
+    },480);
   }else if(!findAnyPairNow()){
-    toast(t("toast.nopair"));
-    await sleep(400);
-    reshuffleRemaining();
+    setTimeout(()=>{
+      if(!curLevel) return;
+      toast(t("toast.nopair"));
+      reshuffleRemaining();
+    },500);
   }
+  return true;
 }
 function drawPath(path){
   const svg=document.getElementById("pathSvg");
@@ -1624,14 +1617,16 @@ function drawPath(path){
     main.style.transition="stroke-dashoffset .24s ease-out";
     main.style.strokeDashoffset="0";
   }
-  // 两端粒子 + 扩散环
+  // 两端粒子 + 扩散环;只移除自己这批节点(快速连对时互不干扰)
+  const nodes=[];
   for(const [r,c] of [path[0], path[path.length-1]]){
     const [x,y]=cellCenter(r,c);
     svg.insertAdjacentHTML("beforeend",
       `<circle class="ring" cx="${Math.round(x)}" cy="${Math.round(y)}" r="10" fill="none" stroke="${col}" stroke-width="3"/>`+
       `<circle class="spark" cx="${Math.round(x)}" cy="${Math.round(y)}" r="7" fill="${col}"/>`);
   }
-  setTimeout(()=>{ svg.innerHTML=""; },560);
+  nodes.push(...svg.querySelectorAll("polyline,circle"));
+  setTimeout(()=>{ nodes.forEach(n=>n.remove()); },560);
 }
 // 得分弹字:在消除块位置升起 "+pts ×streak"
 function popScore(pts,streak,tr,tc){
@@ -1722,10 +1717,10 @@ boardEl.addEventListener("click",e=>{
   const el=e.target.closest(".tile");
   if(!el) return;
   const t=el._t;
+  if(!t||!t.alive) return;   // 消除动画中的残块不可再选
   lastAction=Date.now();
   if(!selected){
-    selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04);
-    for(const x of tiles){ if(x.alive && x!==t && x.v===t.v) x.el.classList.add("peer"); }
+    selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04);   // 选中即点亮已移除:等 hintWait 再提示(用户反馈 #3)
     return;
   }
   if(selected===t){ clearSel(); return; }
@@ -1830,7 +1825,6 @@ function showMenuView(v){
 function renderLevelGrid(){
   const g=document.getElementById("lvGrid");
   g.innerHTML="";
-  const base={}; LINK_LEVELS.forEach((lv,i)=>{ if(base[lv.band]==null) base[lv.band]=i; });
   TIERS.forEach(tr=>{
     const head=document.createElement("div");
     head.className="band-head"; head.textContent=tr.band;
@@ -1839,9 +1833,8 @@ function renderLevelGrid(){
       if(lv.band!==tr.band) return;
       const b=document.createElement("button");
       const locked=i>save.lUnlocked-1;
-      const round=(i-base[lv.band])%LV_ROUNDS[TIERS.indexOf(tr)];
       b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
-      b.innerHTML=`${lv.band}<small>${t(SHORT_KEY[lv.type])}</small>`+(round>0?`<span class="lv-round">${round+1}</span>`:"");
+      b.innerHTML=`${lv.band}.${lv.num}<small>${t(SHORT_KEY[lv.type])}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
       g.appendChild(b);
     });
@@ -1937,8 +1930,13 @@ function closeCard(){
 /* ================= 提示等待(闲置) ================= */
 setInterval(()=>{
   const wait=(save.settings.hintWait||0)*1000;
-  if(curLevel && !busy && !anyOverlayOpen() && !boardEl.querySelector(".hint") && Date.now()-lastAction>wait){
-    lastAction=Date.now();
+  if(!curLevel||busy||anyOverlayOpen()) return;
+  if(!(wait>0) || Date.now()-lastAction<=wait) return;   // hintWait=0(Off)=完全关闭
+  if(boardEl.querySelector(".hint")) return;
+  lastAction=Date.now();
+  if(selected){   // 已选中一块:点亮它的同动词块(延迟提示,不抢在玩家自己发现之前)
+    for(const x of tiles){ if(x.alive&&x!==selected&&x.v===selected.v) x.el.classList.add("peer"); }
+  }else{
     hint();
   }
 },1000);
