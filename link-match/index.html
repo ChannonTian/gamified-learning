@@ -1687,7 +1687,7 @@ function drawPath(path){
   // 端点取两块朝向路径一侧的「边中点」(用户反馈:不连中心)
   const edge=(pt,nxt)=>{
     const [x,y]=cellCenter(pt[0],pt[1]);
-    const dx=nxt[0]-pt[0], dy=nxt[1]-pt[1];
+    const dx=nxt[1]-pt[1], dy=nxt[0]-pt[0];   // pt=[r,c]:列差=水平、行差=垂直(此前轴序颠倒导致斜线)
     if(Math.abs(dx)>=Math.abs(dy)) return [x+Math.sign(dx)*layout.tw/2, y];
     return [x, y+Math.sign(dy)*layout.th/2];
   };
