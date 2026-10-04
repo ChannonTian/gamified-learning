@@ -77,6 +77,7 @@ gamified-learning/
 
 - **交叉消除去重**:行/列连段交叉共享同一块时,消除列表必须按格去重,否则二次置 null 后 t.el 崩、busy 卡死(tile-match v0.86 修复)。
 - **link-match 路径坐标约定(v1.2 坑)**:`findPathOcc(occ, r1, c1, r2, c2)` 收 **0 基棋盘坐标**,内部自己 +1 转外圈;调用方**禁止再 +1**(v1.1 双重偏移 → 有路判不能连/假提示/连线画偏一格,QA bot 因相邻对在偏移系也可连而漏测)。折线回溯的根父指针(dir=-1)处要显式 push 起点 A。改引擎必跑 `node link-match/test/path-engine.test.mjs`(异构参照实现对照+折线合法性+全消链路)。
+- **drawPath 端点方向判定也是 [r,c](v1.9 坑,用户发现)**:`edge()` 里列差才是水平、行差才是垂直(`dx=nxt[1]-pt[1]`),轴序颠倒 → 端点从错误一侧出边、连线出现斜线段。复测办法:连对后导出 `#pathSvg polyline` points,断言相邻点至少共一轴(diag=false)。
 - **异步链路异常会卡死 busy**:await 链外层 try/finally 复位 busy,全局错误捕获(window.__errors)留痕;showResult/updateHUD 等「先置空后使用」的次序错误用 NLM3.errors() 排查。
 
 - 补牌生成的 tile 必须 `boardEl.appendChild`(曾导致棋盘隐形减员)。
