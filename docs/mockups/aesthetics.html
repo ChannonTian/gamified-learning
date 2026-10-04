@@ -108,22 +108,25 @@
 
   /* ============ D · grug 粗糙手作 + 留白 ============ */
   .D .screen{ background:#ece1c9; }
-  .D .hud{ color:#3b332a; padding-top:26px; }
+  .D .hud{ color:#3b332a; padding-top:26px; font-family:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive; }
+  .D .lvl{ font-size:16px; }
+  .D .goal{ font-size:14.5px; }
+  .D .score{ font-size:17px; }
   .D .menuic{ border:2.2px solid #3b332a; border-radius:12px 14px 11px 15px; }
   .D .lvl{ font-size:14px; border-bottom:2.5px solid #3b332a; padding:0 3px 2px; }
   .D .goal{ border:2.2px solid #3b332a; padding:4px 11px; border-radius:14px 11px 15px 12px; background:#f6efdd; transform:rotate(-1deg); }
   .D .score{ font-size:15px; border:2.2px solid #3b332a; width:40px; height:40px; border-radius:52% 48% 55% 45%/48% 52% 46% 54%; display:flex; align-items:center; justify-content:center; background:#e3b52e; transform:rotate(2deg); }
   .D .board{ background:transparent; }
-  .D .tile{ background:color-mix(in srgb, var(--v) 20%, #faf3e3); border:2.2px solid #3b332a; color:#3b332a; font-size:14px; font-family:"Chalkboard SE","Comic Sans MS","Marker Felt",cursive; box-shadow:3px 4px 0 rgba(59,51,42,.16); }
+  .D .tile{ background:color-mix(in srgb, var(--v) 12%, #faf3e3); border:2.2px solid #3b332a; color:#3b332a; font-size:15.5px; font-family:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive; box-shadow:3px 4px 0 rgba(59,51,42,.16); }
   .D .tile.form{ border-radius:12px 15px 11px 16px; }
   .D .tile.form.s-sg{ border-radius:18px 14px 19px 13px; }
   .D .tile.form.s-pl{ border-radius:3px 6px 4px 7px; }
   .D .tile.form.s-pp{ border-radius:14px 6px 15px 5px; clip-path:polygon(24% 0,100% 0,100% 100%,0 100%,0 24%); }
-  .D .tile.inf::after{ content:""; position:absolute; left:12%; right:8%; bottom:7px; height:0; border-top:2.6px solid #3b332a; border-bottom:1.6px solid #3b332a; padding-top:1.5px; transform:rotate(-.7deg); }
+  .D .tile.inf .uline{ position:absolute; left:7%; right:5%; bottom:5px; width:88%; height:10px; }
   .D .tile.sel{ outline:3px dashed #b3543c; outline-offset:3px; transform:rotate(-2deg) scale(1.03); }
-  .D .wordrow .chip{ border:2px solid #3b332a; background:#f6efdd; padding:3px 10px; border-radius:11px 14px 10px 13px; color:#3b332a; }
+  .D .wordrow .chip{ border:2px solid #3b332a; background:#f6efdd; padding:4px 11px; border-radius:11px 14px 10px 13px; color:#3b332a; font-family:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive; font-size:12.5px; }
   .D .wordrow .chip.done{ background:transparent; opacity:.5; }
-  .D .dock button{ border:2.2px solid #3b332a; background:#f6efdd; color:#3b332a; border-radius:14px 11px 16px 12px; box-shadow:2px 3px 0 rgba(59,51,42,.16); }
+  .D .dock button{ border:2.2px solid #3b332a; background:#f6efdd; color:#3b332a; border-radius:14px 11px 16px 12px; box-shadow:2px 3px 0 rgba(59,51,42,.16); font-family:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive; font-size:14px; }
   .D .dock button:first-child{ transform:rotate(-1.2deg); }
   .D .dock button:last-child{ transform:rotate(1.1deg); }
 </style>
@@ -182,6 +185,7 @@ function tileHTML(k,t,sel){
   if(k==="D"&&!sel) style+=`transform:rotate(${((r*7+c)%5-2)*0.8}deg);`;
   let inner="";
   if(k==="A"&&f!=="inf") inner=`<span class="shape"></span>`;
+  if(k==="D"&&f==="inf") inner=`<svg class="uline" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 5.5 Q 22 2 46 4.6 T 98 3.8" stroke="#3b332a" stroke-width="2.7" fill="none" stroke-linecap="round"/><path d="M7 8.6 Q 38 6.2 66 7.6 T 95 6.8" stroke="#3b332a" stroke-width="1.5" fill="none" opacity=".65" stroke-linecap="round"/></svg>`;
   if(k==="B"){ inner=`<span class="fold"></span>`+(f==="pp"?`<span class="corner"></span>`:"")+(f==="inf"?`<span class="lab">INFINITIEF</span>`:""); }
   return `<div class="${cls}" style="${style}">${inner}<span>${text}</span></div>`;
 }

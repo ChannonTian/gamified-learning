@@ -14,6 +14,55 @@
     --dim:rgba(51,65,92,.42);
     --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
   }
+  /* ============ 主题 · Grug 手作(P2;docs/mockups/aesthetics.html 方向 D) ============ */
+  body.theme-grug{
+    --hand:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive;
+    font-family:var(--hand);
+  }
+  body.theme-grug .tag, body.theme-grug .goal-pill, body.theme-grug .score-tag, body.theme-grug .combo-tag,
+  body.theme-grug .dock-btn, body.theme-grug .menu-btn, body.theme-grug .wchip, body.theme-grug .lv-btn,
+  body.theme-grug .btn, body.theme-grug .panel h1, body.theme-grug .panel h2{ font-family:var(--hand); }
+  body.theme-grug:not(.dark){
+    --ink:#3b332a;
+    --paper:#ece1c9;
+    --card:#f6efdd;
+    --line:#d9ccae;
+    --accent:#b3543c;
+    --dim:rgba(59,51,42,.45);
+  }
+  body.theme-grug:not(.dark) .face{
+    background:color-mix(in srgb, hsl(var(--h) 42% 62%) 12%, #faf3e3);
+    color:#3b332a;
+    box-shadow:inset 0 0 0 2.2px #3b332a, 3px 4px 0 rgba(59,51,42,.14);
+  }
+  body.theme-grug:not(.dark) .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
+  body.theme-grug:not(.dark) .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
+  body.theme-grug:not(.dark) .tile.k-pl .face{ border-radius:4px 7px 3px 6px; }
+  body.theme-grug:not(.dark) .tile.k-pp .face{ border-radius:18px 6px 19px 5px; clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%); }
+  body.theme-grug:not(.dark) .tile.k-inf .face::after{
+    content:""; position:absolute; left:7%; right:5%; bottom:5%;
+    height:10px; border-radius:0; background:none;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 5.5 Q22 2 46 4.6 T98 3.8" stroke="%233b332a" stroke-width="2.7" fill="none" stroke-linecap="round"/><path d="M7 8.6 Q38 6.2 66 7.6 T95 6.8" stroke="%233b332a" stroke-width="1.5" fill="none" opacity=".65" stroke-linecap="round"/></svg>');
+    background-size:100% 100%;
+  }
+  body.theme-grug:not(.dark) .tile.k-inf .face::before{ display:none; }
+  body.theme-grug:not(.dark) .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  body.theme-grug:not(.dark) .hud-btn{ border:2.2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); box-shadow:2px 3px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .tag{ border:2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); font-size:15px; }
+  body.theme-grug:not(.dark) .goal-pill{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; background:var(--card); font-size:13.5px; }
+  body.theme-grug:not(.dark) .score-tag{ border:2px solid var(--ink); border-radius:52% 48% 55% 45%/48% 52% 46% 54%; background:#e3b52e; color:#3b332a; font-size:17px; min-width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; }
+  body.theme-grug:not(.dark) .dock-btn{ border:2.2px solid var(--ink); background:var(--card); color:var(--ink); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.15); font-size:14px; }
+  body.theme-grug:not(.dark) .wchip{ border:2px solid var(--ink); background:var(--card); border-radius:12px 15px 11px 14px; font-size:12.5px; }
+  body.theme-grug:not(.dark) .menu-btn{ border:2.2px solid var(--ink); background:var(--card); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.12); font-size:15.5px; }
+  body.theme-grug:not(.dark) .panel{ border:2.5px solid var(--ink); box-shadow:5px 7px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .lv-btn{ border:2px solid var(--ink); border-radius:14px 11px 16px 12px; font-size:14px; }
+  body.theme-grug:not(.dark) .lv-btn.done{ background:#e4e6cf; border-color:var(--ink); }
+  body.theme-grug:not(.dark) .btn{ border:2.2px solid var(--ink); border-radius:14px 12px 16px 13px; }
+  body.theme-grug.dark{
+    --tile-s:14%;
+  }
+  /* ============ /主题 Grug ============ */
+
   body.dark{
     --ink:#dfe5f0;
     --paper:#222834;
@@ -458,6 +507,10 @@
       </div>
     </div>
     <div class="set-row">
+      <label data-i18n="set.theme">Thema</label>
+      <div class="seg" id="setTheme"></div>
+    </div>
+    <div class="set-row">
       <label data-i18n="set.dark">Donkere modus</label>
       <div class="seg" id="setDark"></div>
     </div>
@@ -662,7 +715,7 @@ const I18N={
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
-    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Grug","theme.papier":"Papier",
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
@@ -690,7 +743,7 @@ const I18N={
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
-    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手作 Grug","theme.papier":"纸面",
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
@@ -718,7 +771,7 @@ const I18N={
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
-    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Grug","theme.papier":"Paper",
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
@@ -745,7 +798,7 @@ function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.
 
 /* ================= 存档 ================= */
 const SAVE_KEY="linkmatch.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, bannerMs:10, dark:false};
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, bannerMs:10, theme:"grug", dark:false};
 let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -770,7 +823,16 @@ function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 function applySettings(){
   const S=save.settings;
   document.body.classList.toggle("dark",!!S.dark);
+  document.body.classList.toggle("theme-grug",(S.theme||"grug")==="grug");
   applyI18n();
+}
+/* Grug 主题:词块手作歪斜(确定性角度,随 r,c 变化) */
+function applyTileRotations(){
+  const g=(save.settings.theme||"grug")==="grug";
+  for(const t of tiles){
+    if(!t.el) continue;
+    t.el.style.transform=g?`rotate(${((t.r*7+t.c)%5-2)*0.9}deg)`:"";
+  }
 }
 
 /* ================= 音效/语音 ================= */
@@ -1115,9 +1177,10 @@ function syncSize(){
   document.getElementById("hud").style.width=(gridW+RING*2)+"px";
   document.getElementById("dock").style.width=(gridW+RING*2)+"px";
   document.getElementById("wordRow").style.width=(gridW+RING*2)+"px";
-  // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块
+  // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块;Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
-  ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
+  const hand=(save.settings.theme||"grug")==="grug";
+  ctx.font=(hand?'700 100px "Chalkboard SE","Comic Sans MS",cursive':'700 100px -apple-system, "Segoe UI", system-ui, sans-serif');
   let maxW=1;
   const src=tiles.length?tiles:(curLevel&&curLevel.verbs?curLevel.verbs.map(vi=>({v:vi,f:curLevel.type,k:"inf"})):[]);
   for(const t of src){
@@ -1357,6 +1420,7 @@ async function startLink(idx){
   tiles=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
+  applyTileRotations();
   renderWordRow(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type})));
   syncSize();
   pairsLeft=PAIR_TOTAL;
@@ -1430,6 +1494,7 @@ function dealModeBoard(){
   tiles=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
+  applyTileRotations();
   renderWordRow(picks);
   syncSize();   // 按新盘词长校字号
   pairsLeft=PAIR_TOTAL;
@@ -1994,6 +2059,7 @@ function renderSettings(){
   document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
   const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
   document.getElementById("bannerVal").textContent=`${S.bannerMs||10} s`;
+  seg(document.getElementById("setTheme"),[["grug","Grug"],["papier","Papier"]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
 
