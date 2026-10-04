@@ -1,5 +1,15 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-04 · v0.9(tile-match)Grug 手作主题 + 连连看 v1.8/v1.9 风格移植(用户:照连连看的改法升级三消美术)
+
+- **Grug 主题系统**(承 link-match v1.8,方向 D):设置新增 `Thema`(Grug **默认** / Papier 原版);`body.theme-grug:not(.dark)` 覆盖暖纸变量、词块纸染 12%+墨线描边+错位硬阴影+weight500、三形式各异手绘圆角(sg 波浪圆角/pl 紧角/pp 切角)、选中虚线圈、HUD/按钮/面板墨线歪斜圆角;`body.theme-grug.dark` 只降饱和,暗色变量级联在后不破坏。**与连连看的实现差异**:三消词块移动走 transform translate,歪斜必须合并进同一 transform(placeTile/tileRot,随重力自动更新),不能用独立 rotate。主题切换时即时重排歪斜+重算字号。
+- **字号按主题测量**:computeLevelFont 用手写字体栈实测(手写体更宽)+ ×0.93 防溢出;词块字重 500。
+- **hint 开关在主题下的语义**:颜色提示关 → grug 纸面纯色(no-color 不吃色染);形状提示关 → 回退统一圆角(grug 手绘圆角带 :not(.no-shape) 作用域)。
+- **emoji 全清**(承 v1.9#5b):⭐→ICO_STAR、🔥→ICO_FLAME、⏱→ICO_CLOCK、🎯→ICO_TARGET(新绘同风格:色块偏移+墨线描边);结果文案/帮助文案内 🎉🏆🔥💡 同步清除(三语言)。**分数框从渐变字改真胶囊**(黄底 #e3b52e 圆胶囊,两主题通用;渐变字会让 SVG 描边透明,link-match 同款问题绕开)。
+- **其余移植**:grugRough 插画滤镜(bannerArt/cardArt/book-art)、`--hot` 统一橙红(score-pop 大字/combo 主按钮)、菜单右上 ✕ + 点面板外回当前对局(仅会话存活)、朗读音量=0 时消除成功补上行确认双音(v1.9#11)。
+- **顺修一个健壮性缺口**(QA bot 撞出):结算弹窗后棋盘若再被 swap(真实玩家被弹窗挡住,自动化会穿过),兜底自愈路径 `pickRefillTile` 读 `level.verbs` 崩——加 level 空回退 [0,1,2]。
+- QA:grug 亮/暗、papier 切换(UI 真路径)四态截图与渲染断言(手写字体/纸染色/歪斜矩阵/胶囊底色/图标 SVG);grugRough 滤镜实测作用于横幅;bot 6 步零错误;弹窗后强制 swap 自愈不再崩;交叉消除负向路径无异常;存档备份/恢复,旧档无 theme 键自动合并默认 grug(与 link-match 同策略)。
+
 ## 2026-10-04 · v1.9(link-match)试玩反馈 13 项(用户逐条清单)
 
 - **1 HUD 语境化**:关卡名缩短为 `A1.2`(去形式标注;网格按钮保留形式小字);中槽按模式切换——闯关/每日=对数进度条、生存=倒计时、无尽=个人最佳分(星图标,实时刷新,修了渲染顺序滞后一拍)。

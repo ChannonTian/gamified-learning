@@ -7,7 +7,7 @@
 用游戏机制**真正承载学习内容**的语言学习游戏合集(拒绝"消消乐+贴皮")。三个产品(**2026-10-02 起任务线主线在 link-match**,tile-match 冻结;2026-10-03 加四消原型,**2026-10-04 四消试玩否决,玩法回归三消**):
 
 - **link-match(主线)**:动词原形↔变位连连看——匹配判定=把原形和它的变位连到一起,检索练习即玩法。
-- **tile-match(冻结于 v0.87)**:荷兰语强变化动词三消。匹配判定=同一动词的"单数过去式+复数过去式+过去分词"三种形式各≥1、3+ 个连成一线。
+- **tile-match(功能冻结于 v0.87;2026-10-04 一次性解冻升 v0.9 美术)**:荷兰语强变化动词三消。匹配判定=同一动词的"单数过去式+复数过去式+过去分词"三种形式各≥1、3+ 个连成一线。
 - **four-match(已否掉)**:四消对照分支,原型 v0.2 保留在线不再迭代——用户试玩:四连太难拼出、频繁重置(复盘见 DEVLOG)。
 
 ## 结构与约定
@@ -36,7 +36,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值);改关卡顺序要像 v1.5 一样做映射迁移。
+- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值);改关卡顺序要像 v1.5 一样做映射迁移。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -72,6 +72,7 @@ gamified-learning/
 - 已否决/搁置:原形百搭块(易混淆);四消判定(match-4,中盘供给不足,2026-10-04 用户否掉)。
 - **link-match v1.9(2026-10-04,试玩 13 项)**:HUD 语境化(短关卡名+中槽按模式切进度/倒计时/最佳分)、词块 weight500+×0.93、菜单 ✕/点外回游戏/图标翻转、分数胶囊、emoji→手绘 SVG(色块偏移+墨线)、下划线一笔、庆祝进分数槽、词行删除、盘面 **4×9=18 对**(轮数=⌈池/9⌉,42 关,迁移 lvOrder v3)、连线虚线+边中点+lit 边框、--hot 统一橙红、朗读关→确认音、插画 grugRough 滤镜(feTurbulence+displacement,零重绘手绘化)。
 - **link-match v1.8(2026-10-04)**:**Grug 手作主题**(用户从四方向效果图选定 D)——`settings.theme` 默认 "grug",Papier 可切回;CSS 在 `body.theme-grug:not(.dark)` 下覆盖(暗色变量级联在后不破坏);tile 歪斜走 applyTileRotations(inline transform,与 scale/translate 动画属性不冲突);字号测量按主题选字体(手写体更宽)。效果图:docs/mockups/aesthetics.html。
+- **tile-match v0.9(2026-10-04,一次性解冻做美术,功能仍冻结)**:移植 link-match v1.8/v1.9 风格——Grug 主题(Thema 设置,Grug 默认/Papier 切回)+ 字号按主题手写字体测量 ×0.93/字重500 + emoji 全清换手绘 SVG(ICO_STAR/FLAME/CLOCK/TARGET)+ 分数真胶囊(**渐变字会吞 SVG 描边**,两主题都改实底)+ grugRough 滤镜 + --hot + 菜单 ✕/点外 + TTS=0 确认音;**与 link-match 实现差异:三消词块移动走 transform translate,歪斜必须合并进同一 transform(tileRot),不能独立 rotate**;hint 开关作用域到主题圆角/色染(no-shape/no-color);顺修弹窗后兜底自愈 pickRefillTile 读 level.verbs 崩(加空回退)。
 
 ## 已踩过的坑(别再踩)
 

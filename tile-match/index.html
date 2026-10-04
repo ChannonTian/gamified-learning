@@ -13,7 +13,65 @@
     --accent:#e8734a;
     --dim:rgba(51,65,92,.42);
     --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
+    --hot:#e06b45;
   }
+  /* ============ 主题 · Grug 手作(link-match v1.8/v1.9 移植;docs/mockups/aesthetics.html 方向 D) ============ */
+  body.theme-grug{
+    --hand:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive;
+    font-family:var(--hand);
+  }
+  body.theme-grug .tag, body.theme-grug .goal-pill, body.theme-grug .score-tag, body.theme-grug .combo-tag,
+  body.theme-grug .dock-btn, body.theme-grug .menu-btn, body.theme-grug .lv-btn,
+  body.theme-grug .btn, body.theme-grug .panel h1, body.theme-grug .panel h2{ font-family:var(--hand); }
+  body.theme-grug:not(.dark){
+    --hot:#c9563c;
+    --ink:#3b332a;
+    --paper:#ece1c9;
+    --card:#f6efdd;
+    --line:#d9ccae;
+    --accent:#b3543c;
+    --dim:rgba(59,51,42,.45);
+  }
+  body.theme-grug:not(.dark) .face{
+    color:#3b332a;
+    box-shadow:inset 0 0 0 2.2px #3b332a, 3px 4px 0 rgba(59,51,42,.14);
+    font-weight:500;
+  }
+  body.theme-grug:not(.dark):not(.no-color) .face{
+    background:color-mix(in srgb, hsl(var(--h) 42% 62%) 12%, #faf3e3);
+  }
+  body.theme-grug:not(.dark).no-color .face{ background:#faf3e3; }
+  body.theme-grug:not(.dark):not(.no-shape) .tile.f-sg .face{ border-radius:16px 20px 15px 21px; }
+  body.theme-grug:not(.dark):not(.no-shape) .tile.f-pl .face{ border-radius:4px 7px 3px 6px; }
+  body.theme-grug:not(.dark):not(.no-shape) .tile.f-pp .face{
+    border-radius:18px 6px 19px 5px;
+    clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%);
+  }
+  body.theme-grug:not(.dark) .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  body.theme-grug:not(.dark) .hud-btn{ border:2.2px solid var(--ink); border-radius:13px 16px 12px 17px; box-shadow:2px 3px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .tag{ border:2px solid var(--ink); border-radius:13px 16px 12px 17px; }
+  body.theme-grug:not(.dark) .goal-pill{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; }
+  body.theme-grug:not(.dark) .score-tag{
+    border:2px solid var(--ink); border-radius:16px 12px 17px 13px;
+    box-shadow:2px 3px 0 rgba(59,51,42,.14);
+  }
+  body.theme-grug:not(.dark) .combo-tag{
+    background:var(--hot); border:2px solid var(--ink); border-radius:14px 11px 16px 12px;
+    box-shadow:2px 3px 0 rgba(59,51,42,.14); animation:comboPop .25s ease;
+  }
+  body.theme-grug:not(.dark) .dock-btn{ border:2.2px solid var(--ink); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.15); }
+  body.theme-grug:not(.dark) .menu-btn{ border:2.2px solid var(--ink); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.12); }
+  body.theme-grug:not(.dark) .menu-btn.primary{ background:var(--hot); color:#fbf3e6; }
+  body.theme-grug:not(.dark) .panel{ border:2.5px solid var(--ink); box-shadow:5px 7px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .lv-btn{ border:2px solid var(--ink); border-radius:14px 11px 16px 12px; }
+  body.theme-grug:not(.dark) .lv-btn.done{ background:#e4e6cf; border-color:var(--ink); }
+  body.theme-grug:not(.dark) .btn{ border:2.2px solid var(--ink); border-radius:14px 12px 16px 13px; }
+  body.theme-grug:not(.dark) .btn.primary{ background:var(--hot); color:#fbf3e6; }
+  body.theme-grug:not(.dark) .score-pop{ color:#3b332a; text-shadow:0 1px 0 rgba(246,239,221,.9); }
+  body.theme-grug:not(.dark) .score-pop.big{ color:var(--hot); }
+  .theme-grug #bannerArt, .theme-grug #cardArt, .theme-grug .book-art svg{ filter:url(#grugRough); }
+  body.theme-grug.dark{ --tile-s:14%; --hot:#c9563c; }
+  /* ============ /主题 Grug ============ */
   body.dark{
     --ink:#dfe5f0;
     --paper:#222834;
@@ -67,13 +125,16 @@
   }
   .goal-pill span{position:relative;}
   .score-tag{
-    font-size:20px; font-weight:800; letter-spacing:.3px; line-height:1;
-    padding:3px 6px;
-    background:linear-gradient(135deg,#f5b942,#e8734a);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
+    font-size:17px; font-weight:800; letter-spacing:.3px; line-height:1;
+    padding:0 12px; min-width:58px; height:38px;
+    display:inline-flex; align-items:center; justify-content:center; gap:5px;
+    background:#e3b52e; color:#3b332a;
+    border:1.5px solid rgba(59,51,42,.28); border-radius:999px;
   }
   .score-tag.bump{animation:scoreBump .32s ease;}
   @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
+  .hico{width:17px; height:17px; flex:none; display:block;}
+  .score-tag .hico{width:19px; height:19px;}
   .combo-tag{
     background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
     padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
@@ -86,7 +147,7 @@
     .ic{width:22px; height:22px;}
     .tag{padding:6px 10px; font-size:13.5px;}
     .goal-pill{padding:6px 10px; font-size:13px; min-width:84px;}
-    .score-tag{font-size:17px;}
+    .score-tag{font-size:15px; height:34px; min-width:52px; padding:0 10px;}
     .combo-tag{padding:5px 11px; font-size:13px;}
     #hud{padding-top:8px; gap:6px;}
   }
@@ -392,6 +453,8 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="grugRough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.046" numOctaves="2" result="n" seed="7"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/></filter></svg>
+
 <div id="app">
   <header id="hud">
     <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
@@ -430,6 +493,7 @@
 <!-- Hoofdmenu -->
 <div class="overlay on" id="menuScreen">
   <div class="panel">
+    <button class="close-x" id="menuClose" title="Sluiten">✕</button>
     <div id="menuMain">
       <h1 style="margin-bottom:14px;">Sterke werkwoorden</h1>
       <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
@@ -491,6 +555,10 @@
     <div class="set-row">
       <label data-i18n="set.shape">Vormhint</label>
       <div class="seg" id="setShape"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.theme">Thema</label>
+      <div class="seg" id="setTheme"></div>
     </div>
     <div class="set-row">
       <label data-i18n="set.dark">Donkere modus</label>
@@ -672,7 +740,7 @@ const IDLE_HINT_MS_DEFAULT=7000;
 
 /* ================= 存档 ================= */
 const SAVE_KEY="nlm3.prototype.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, colorHint:true, shapeHint:true, dark:false}; // hintWait 默认=横幅 10s+2s
+const DEFAULT_SETTINGS={uiLang:"nl", theme:"grug", volume:70, ttsVolume:80, hintWait:12, colorHint:true, shapeHint:true, dark:false}; // hintWait 默认=横幅 10s+2s;theme=UI 主题(grug 手作/papier 原版)
 let save={unlocked:1, collected:[], style:"A", counts:{}, best:{}, dailyBest:{}, dailyDone:null, done:{}, lastLevel:null, settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -693,11 +761,11 @@ const I18N={
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd",
-    "set.color":"Kleurhint","set.shape":"Vormhint","set.dark":"Donkere modus",
+    "set.color":"Kleurhint","set.shape":"Vormhint","set.theme":"Thema","set.dark":"Donkere modus",
     "opt.off":"Uit","opt.on":"Aan",
     "card.tip":"Tik op de kaart voor de betekenis","card.tip2":"Tik nogmaals om verder te spelen",
-    "result.title":"Level gehaald! 🎉","result.done":"Alle {n} werkwoorden verzameld.",
-    "result.record":"nieuw record! 🏆","result.best":"beste","result.zetten":"zetten",
+    "result.title":"Level gehaald!","result.done":"Alle {n} werkwoorden verzameld.",
+    "result.record":"nieuw record!","result.best":"beste","result.zetten":"zetten",
     "btn.next":"Volgende niveau →","btn.again":"Opnieuw","btn.menu":"Menu",
     "toast.shuffle":"Geen combinatie meer — nieuw bord!",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
@@ -706,12 +774,12 @@ const I18N={
     "help.title":"Speluitleg",
     "help.p1":"Sterke werkwoorden matchen: wissel twee aangrenzende blokken en maak een rij van 3 of meer blokken van hetzelfde werkwoord, met de verleden tijd enkelvoud, de verleden tijd meervoud én het voltooid deelwoord in één rij. De rij verdwijnt en je ziet het hele werkwoord.",
     "help.goal":"Doel: verzamel alle werkwoorden van dit niveau. Een werkwoord verzamel je door er één geldige combinatie mee te maken.",
-    "help.score":"Score: elk blok levert 10 punten op. Ketens vermenigvuldigen de punten. Opeenvolgende geslaagde zetten geven een 🔥-combinatiebonus — de reeks vervalt zodra de leerkaart verdwijnt of een zet mislukt.",
+    "help.score":"Score: elk blok levert 10 punten op. Ketens vermenigvuldigen de punten. Opeenvolgende geslaagde zetten geven een combinatiebonus — de reeks vervalt zodra de leerkaart verdwijnt of een zet mislukt.",
     "help.moves":"Zetten: een rij telt alleen als alle drie de vormen erin voorkomen. Anders schuift alles geruisloos terug.",
     "help.form":"Vorm = tijdsvorm",
     "help.l.sg":"afgerond = verl. tijd enk.","help.l.pl":"recht = verl. tijd mv.","help.l.pp":"afgesneden = voltooid deelwoord",
     "help.color":"Kleur = werkwoord: alle vormen van één werkwoord hebben dezelfde (subtiele) kleur. Goed lezen is belangrijker dan kijken.",
-    "help.stuck":"Vastgelopen? Tik op 💡 voor een hint — of wacht even, dan komt er automatisch een. In de niveaumodus verschijnt na elke combinatie een leerkaart met voorlezen.",
+    "help.stuck":"Vastgelopen? Tik op de hintknop — of wacht even, dan komt er automatisch een. In de niveaumodus verschijnt na elke combinatie een leerkaart met voorlezen.",
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands toevoegen",
   },
@@ -723,11 +791,11 @@ const I18N={
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长",
-    "set.color":"颜色提示","set.shape":"形状提示","set.dark":"深色模式",
+    "set.color":"颜色提示","set.shape":"形状提示","set.theme":"界面主题","set.dark":"深色模式",
     "opt.off":"关","opt.on":"开",
     "card.tip":"点击卡片查看释义","card.tip2":"再点一下继续游戏",
-    "result.title":"过关! 🎉","result.done":"已收集本关全部 {n} 个动词。",
-    "result.record":"新纪录! 🏆","result.best":"最佳","result.zetten":"步",
+    "result.title":"过关!","result.done":"已收集本关全部 {n} 个动词。",
+    "result.record":"新纪录!","result.best":"最佳","result.zetten":"步",
     "btn.next":"下一关 →","btn.again":"再来一次","btn.menu":"回菜单",
     "toast.shuffle":"没有可行组合了,重新洗牌!",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
@@ -736,12 +804,12 @@ const I18N={
     "help.title":"玩法介绍",
     "help.p1":"匹配强变化动词:交换相邻两个词块,让同一动词的 3 个及以上词块连成一线,且必须同时包含单数过去式、复数过去式和过去分词。连线消除后展示动词原形。",
     "help.goal":"目标:收集本关全部动词——每完成一次有效消除即收集一个。",
-    "help.score":"计分:每消一块 +10 分;连锁按倍数放大;连续有效交换有 🔥 连击加成——教学卡消失或交换失败,连击即中断。",
+    "help.score":"计分:每消一块 +10 分;连锁按倍数放大;连续有效交换有连击加成——教学卡消失或交换失败,连击即中断。",
     "help.moves":"交换:三种变位形式齐全才会消除;形式不齐则静默弹回。",
     "help.form":"形状 = 变位类型",
     "help.l.sg":"圆角 = 单数过去式","help.l.pl":"直角 = 复数过去式","help.l.pp":"切角 = 过去分词",
     "help.color":"颜色 = 源动词:同一动词同色。颜色很淡,认读词形才是关键。",
-    "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻自动提示。普通关卡每次消除后会弹出教学卡并朗读单词。",
+    "help.stuck":"卡住了?点提示按钮获取提示,或稍等片刻自动提示。普通关卡每次消除后会弹出教学卡并朗读单词。",
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
   },
@@ -754,11 +822,11 @@ const I18N={
     "mode.endless":"Endless","mode.daily":"Daily","result.timeup":"Time's up!","result.today":"Today",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait",
-    "set.color":"Colour hint","set.shape":"Shape hint","set.dark":"Dark mode",
+    "set.color":"Colour hint","set.shape":"Shape hint","set.theme":"Theme","set.dark":"Dark mode",
     "opt.off":"Off","opt.on":"On",
     "card.tip":"Tap the card for the meaning","card.tip2":"Tap again to keep playing",
-    "result.title":"Level cleared! 🎉","result.done":"All {n} verbs collected.",
-    "result.record":"new record! 🏆","result.best":"best","result.zetten":"moves",
+    "result.title":"Level cleared!","result.done":"All {n} verbs collected.",
+    "result.record":"new record!","result.best":"best","result.zetten":"moves",
     "btn.next":"Next level →","btn.again":"Retry","btn.menu":"Menu",
     "toast.shuffle":"No combos left — new board!",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
@@ -767,12 +835,12 @@ const I18N={
     "help.title":"How to play",
     "help.p1":"Match strong verbs: swap two adjacent tiles and make a row of 3 or more tiles of the same verb, containing the singular past, the plural past AND the past participle. The row vanishes and you see the full verb.",
     "help.goal":"Goal: collect every verb of the level. You collect a verb by making one valid combo with it.",
-    "help.score":"Score: every tile is worth 10 points. Cascades multiply the points. Consecutive successful swaps give a 🔥 combo bonus — the streak ends when the card disappears or a swap fails.",
+    "help.score":"Score: every tile is worth 10 points. Cascades multiply the points. Consecutive successful swaps give a combo bonus — the streak ends when the card disappears or a swap fails.",
     "help.moves":"Swaps: a row only counts when all three forms are in it. Otherwise everything slides back silently.",
     "help.form":"Shape = tense form",
     "help.l.sg":"rounded = past sing.","help.l.pl":"square = past plur.","help.l.pp":"cut = past participle",
     "help.color":"Colour = verb: all forms of one verb share the same (subtle) colour. Reading matters more than looking.",
-    "help.stuck":"Stuck? Tap 💡 for a hint — or wait a moment and one appears automatically. In level mode a learning card with audio appears after every combo.",
+    "help.stuck":"Stuck? Tap the hint button — or wait a moment and one appears automatically. In level mode a learning card with audio appears after every combo.",
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
   },
@@ -792,8 +860,15 @@ function applySettings(){
   document.body.classList.toggle("dark",!!S.dark);
   document.body.classList.toggle("no-color",!S.colorHint);
   document.body.classList.toggle("no-shape",!S.shapeHint);
+  document.body.classList.toggle("theme-grug",(S.theme||"grug")==="grug");
   applyI18n();
 }
+
+/* 手绘 SVG 图标(色块偏移+墨线描边,link-match v1.9#5 同款):替代 ⭐🔥⏱🎯 */
+const ICO_STAR=`<svg class="hico" viewBox="0 0 24 24"><path d="M6.2 8.4 11.4 7 16 5.6 19.6 9 18 14 14.8 18.4 9.2 17.6 5.4 13.2Z" fill="#e3b52e" transform="translate(1.3,1.5)"/><path d="M5.4 7.8 10.8 6.4 15.6 5 19.2 8.6 17.6 13.8 14.4 18.2 8.8 17.4 4.8 12.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_FLAME=`<svg class="hico" viewBox="0 0 24 24"><path d="M8.4 4.8C10.4 7.2 14.8 9.2 16 12.4 17.4 16 15.2 19.8 11.6 20 8 20.2 5.2 17.6 5.6 14 5.9 11.2 7.6 8 8.4 4.8Z" fill="#e8734a" transform="translate(1.2,1.2)"/><path d="M7.8 4.2C9.8 6.8 14.4 8.8 15.6 12.2 17 15.9 14.7 19.4 11.3 19.6 7.9 19.8 5.1 17.2 5.5 13.7 5.8 10.9 7 7.5 7.8 4.2Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_CLOCK=`<svg class="hico" viewBox="0 0 24 24"><circle cx="12.4" cy="12.6" r="8.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12.2 7.6 12.4 12.4 16 14.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>`;
+const ICO_TARGET=`<svg class="hico" viewBox="0 0 24 24"><circle cx="13" cy="11.4" r="8" fill="#54b8a5" transform="translate(1.2,1.4)" opacity=".85"/><circle cx="12" cy="10.6" r="7.4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="10.6" r="3.4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="10.6" r="1" fill="currentColor"/></svg>`;
 
 /* ================= 语音(Web Speech API) ================= */
 let nlVoice=null;
@@ -1265,9 +1340,10 @@ function wordOf(t){ return VERBS[t.v][["sg","pl","pp"][t.f]]; }
 
 const measureCanvas=document.createElement("canvas");
 function computeLevelFont(){
-  // 用 canvas 实测本关最长词的渲染宽度,统一字号保证任何词都完整显示
+  // 用 canvas 实测本关最长词的渲染宽度,统一字号保证任何词都完整显示;Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
-  ctx.font='700 100px -apple-system, "Segoe UI", system-ui, sans-serif';
+  const hand=(save.settings.theme||"grug")==="grug";
+  ctx.font=`${hand?500:700} 100px ${hand?'"Chalkboard SE","Comic Sans MS",cursive':'-apple-system, "Segoe UI", system-ui, sans-serif'}`;
   const cellW=boardEl.clientWidth/COLS;
   const usable=cellW*0.92-6;                 // face 宽度减内边距
   let maxW=1;
@@ -1276,6 +1352,7 @@ function computeLevelFont(){
     for(const w of [V.sg,V.pl,V.pp]) maxW=Math.max(maxW, ctx.measureText(w).width);
   }
   levelFont=Math.max(9,Math.min(22, 100*usable/maxW));
+  if(hand) levelFont*=0.93;                  // 手写体 x 高大,再收一档防溢出(link-match v1.9#2)
 }
 function applyFontToAll(){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
@@ -1297,20 +1374,25 @@ function makeTileEl(t,r,c){
   placeTile(t,r,c,true);
   return el;
 }
+// Grug 主题:词块确定性歪斜(按格位 ±1.8°),与 translate 合并进同一 transform,不与动画属性冲突
+function tileRot(r,c){
+  return (save.settings.theme||"grug")==="grug" ? ` rotate(${(((r*7+c)%5)-2)*0.9}deg)` : "";
+}
 function placeTile(t,r,c,instant=false){
   t.r=r; t.c=c;
   if(t.el){ t.el.dataset.r=r; t.el.dataset.c=c;
     if(instant) t.el.style.transition="none";
-    t.el.style.transform=`translate(${c*100}%, ${r*100}%)`;
+    t.el.style.transform=`translate(${c*100}%, ${r*100}%)${tileRot(r,c)}`;
     if(instant){ void t.el.offsetWidth; t.el.style.transition=""; }
   }
 }
 
 function pickRefillTile(nbrVerb){
-  const act=level.verbs;
+  // level 可能为 null(如结算弹窗后的兜底自愈),回退到 A1 头三个词
+  const act=(level&&level.verbs&&level.verbs.length)?level.verbs:[0,1,2];
   const cnt={};
   for(let r=0;r<ROWS;r++)for(let cc=0;cc<COLS;cc++){const t=board[r][cc]; if(t) cnt[t.v*3+t.f]=(cnt[t.v*3+t.f]||0)+1;}
-  const per=COLS*ROWS/(act.length*3);
+  const per=COLS*ROWS/Math.max(1,act.length*3);
   const opts=[];
   for(const v of act)for(let f=0;f<3;f++){
     let w=Math.max(.2, per-(cnt[v*3+f]||0)+.6);
@@ -1496,11 +1578,11 @@ function updateHUD(){
   document.getElementById("goalTag").style.display=isLevels?"":"none";
   document.getElementById("timerTag").style.display=(mode==='daily')?"":"none";
   if(isLevels){
-    document.getElementById("goalTxt").textContent=`🎯 ${collectedRun.size}/${level.goal}`;
+    document.getElementById("goalTxt").innerHTML=`${ICO_TARGET} ${collectedRun.size}/${level.goal}`;
     document.getElementById("goalBar").style.width=Math.round(collectedRun.size/level.goal*100)+"%";
   }
   const st=document.getElementById("scoreTag");
-  st.textContent=`⭐ ${scoreRun}`;
+  st.innerHTML=`${ICO_STAR}<b>${scoreRun}</b>`;
   if(scoreRun!==lastScoreShown){
     st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun;
     // 无尽/每日:最佳分实时记录(中途离开/刷新也不丢)
@@ -1508,7 +1590,7 @@ function updateHUD(){
     if(mode==='daily'){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
   }
   const ct=document.getElementById("comboTag");
-  if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
+  if(streak>=2){ ct.style.display=""; ct.innerHTML=`${ICO_FLAME} ×${streak}`; }
   else ct.style.display="none";
 }
 
@@ -1562,8 +1644,10 @@ async function doSwap(r1,c1,r2,c2){
   if(streak>=2){
     const bonus=25*(streak-1);
     scoreRun+=bonus;
-    popScore(0.6, COLS/2-0.5, `🔥 combo +${bonus}`, true);
+    popScore(0.6, COLS/2-0.5, `combo +${bonus}`, true);
   }
+  // 朗读关→确认音(v1.9#11):TTS 音量为 0 时,消除成功补一记上行双音
+  if(save.settings.ttsVolume<=0){ blip(523,.07,"triangle",.06); setTimeout(()=>blip(784,.09,"triangle",.06),80); }
   updateHUD();
   lastAction=Date.now();
 }
@@ -1680,7 +1764,7 @@ async function gravityRefill(){
       boardEl.appendChild(el);
       el.classList.add("spawn");
       el.style.transition="none";
-      el.style.transform=`translate(${c*100}%, -${above*100}%)`;
+      el.style.transform=`translate(${c*100}%, -${above*100}%)${tileRot(r,c)}`;
       void el.offsetWidth;
       el.style.transition="";
       placeTile(t,r,c);
@@ -1766,7 +1850,7 @@ let dailyLeft=0, dailyIv=null;
 function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } }
 function updateTimerTag(){
   const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
-  document.getElementById("timerTag").textContent=`⏱ ${m}:${s}`;
+  document.getElementById("timerTag").innerHTML=`${ICO_CLOCK} ${m}:${s}`;
 }
 function startDailyTimer(){
   dailyLeft=DAILY_SECONDS;
@@ -1794,7 +1878,7 @@ function endTimeUp(){
     level=null;
     document.getElementById("resultTitle").textContent=t("result.timeup");
     document.getElementById("resultText").innerHTML=
-      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+      `${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
     const btns=document.getElementById("resultBtns");
     btns.innerHTML="";
     const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
@@ -1828,7 +1912,7 @@ function showResult(hasNext,newBest,oldBest){
   const bestTxt=newBest?` — ${t("result.record")}`:` (${t("result.best")}: ${oldBest})`;
   document.getElementById("resultText").innerHTML=
     t("result.done").replace("{n}",goalN)+"<br>"+
-    `⭐ <b>${scoreRun}</b>${bestTxt} · ${zettenRun} ${t("result.zetten")}`;
+    `${ICO_STAR}<b>${scoreRun}</b>${bestTxt} · ${zettenRun} ${t("result.zetten")}`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
   if(hasNext){ const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next"); b.onclick=()=>{hideResult(); startLevel(LEVELS[LEVELS.findIndex(l=>l.id===finishedId)+1].id);}; btns.appendChild(b); }
@@ -2010,6 +2094,13 @@ function renderSettings(){
   document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
   seg(document.getElementById("setColor"),[[true,t("opt.on")],[false,t("opt.off")]],S.colorHint,v=>S.colorHint=(v===true||v==="true"));
   seg(document.getElementById("setShape"),[[true,t("opt.on")],[false,t("opt.off")]],S.shapeHint,v=>S.shapeHint=(v===true||v==="true"));
+  seg(document.getElementById("setTheme"),[["grug","Grug"],["papier","Papier"]],S.theme||"grug",v=>{
+    S.theme=v;
+    if(level){
+      computeLevelFont(); applyFontToAll();
+      for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; if(t) placeTile(t,r,c,true); }   // 歪斜随主题重排
+    }
+  });
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
 
@@ -2060,6 +2151,11 @@ function openBook(){
 
 /* ---- 事件绑定 ---- */
 document.getElementById("btnMenu").onclick=openMenu;
+// 菜单 ✕ / 点面板外 → 回当前游戏(仅会话存活时;首屏无对局则留在菜单)
+document.getElementById("menuClose").onclick=()=>{ if(level) document.getElementById("menuScreen").classList.remove("on"); };
+document.getElementById("menuScreen").addEventListener("click",e=>{
+  if(e.target===document.getElementById("menuScreen") && level) document.getElementById("menuScreen").classList.remove("on");
+});
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
 document.getElementById("mNew").onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLevel(LEVELS[0].id); };
