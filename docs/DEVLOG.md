@@ -1,5 +1,15 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-04 · v1.11(link-match)插画全补齐 + 暗色手绘化 + TTS 终审(明天发试玩前)
+
+- **TTS 终审定性**:探针实测——测试窗口(应用内嵌浏览器)180 个语音在列、utterance 正常入队(`speaking:true`),但**永不 onstart 也不 onerror**,连全新页面第一句、完全不 cancel 也一样 → 该窗口语音引擎本身瘫死,非页面代码问题。v1.10 的竞态修复仍有效(健康浏览器路径正确)。新增**无声诊断**:连对后 1.3s 内 utterance 未开口且仍排队 → toast 提示"此窗口无法朗读,请在 Chrome/Safari 测试"(每会话一次);QA 在瘫窗口验证 toast 正确弹出。
+- **插画 108 词全覆盖**:补 23 个 fallback 词的场景(kunnen/moeten/willen/mogen/zoeken/zwemmen/vliegen/stelen/schieten/roepen/verdwijnen/duiken/verstaan/genieten/dwingen/glijden/kruipen/bestaan/onthouden/vertrekken/verschijnen/bevriezen/stinken);新增道具 bubbleBang/bubbleShout/waves/bird/bowArrow。**顺修存量 bug**:SCENES 引用的 sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/dashedCircle/speedLines/pencilPaper 从未在 PROP 里,sceneSVG 静默跳过(约 13 个场景缺道具);`coinBehind` 裸调 `coinS` 直接 throw(bedriegen 卡片插画必炸、曾把异步 QA bot 冻死)→ 改 `PROP.coinS`。全量扫描:108 词 × 2 画风渲染零异常。
+- **k-pp 切角二次修**(用户:边缘还是有点缺角):切角处 border-radius 6/5px→0(墨线圈走直线到切点),斜条 32%→34% 长、起点 75.5%→73.5%(两端各压过接缝 ~2.5%),缺口消除。
+- **手绘暗色模式补完**(用户:下划线是纯直线?字体界面不一样):暗色此前整体回落到通用主题——现在 `--grug-ink` 双色变量(#3b332a/#d8cdb2)贯穿:face 暖色染+浅墨线圈+weight500、四个词形歪斜圆角、k-pp 斜条、**下划线换浅墨手绘 SVG 弯线**、k-inf 角点隐藏、选中虚线框。QA 截图:暗色整板手绘语言一致。
+- **原形下划线缩短**(两主题):从横跨 85% 缩到左锚 36%;Papier 通用条同步。
+- **主题改名**(仅显示名,存档值 grug/papier 不变):Grug→**Sketch/手绘**,Papier→**Post-it/便签**(nl/zh/en);顺修设置面板主题按钮硬编码标签 → 走 i18n 词典。
+- **全量可玩性回归(发试玩前)**:同步 bot(无 await,免疫后台页 setTimeout 节流)清盘 **42/42 关**零错误零卡死;无尽连清 2 盘、生存清盘→强制超时→结算入 best、每日重置后完整流程(清盘→自动发第二盘 k-pl→强制时间到→dailyDone/dailyBest 入档)。QA 环境备注:`tabs.new()` 的页 reload 后视口归零(每次 reload 后须重设);后台页截图可能是冻结旧帧,以 DOM 为准;tab.evaluate 不 await 异步 IIFE,重活用同步 IIFE + cell 层轮询。
+
 ## 2026-10-04 · v1.10(link-match)朗读修复 + 模式 HUD 二轮(用户试玩反馈七项)
 
 - **审计 v1.9 十三项**:12 项已落实;唯一未生效的是第 11 项"朗读"——调用链在(`showLearnBanner→speakPair`),但 `speechSynthesis.cancel()` 后**同步** `speak()` 被 Chrome 竞态静默吞掉(link-match 没同步 tile-match v0.86 的"延迟开口"修复),连快时每对都在 cancel→speak,故"朗读就没了"。修复:空队列不 cancel;刚 cancel 过延迟 70ms 开口;**代数令牌 speakGen** 让新横幅接管后旧链全部失效;另加 iOS/Safari 首次手势静音音节解锁 speechSynthesis。QA:speak 后 150ms 内 `speaking|pending=true`。

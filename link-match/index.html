@@ -31,6 +31,7 @@
     --line:#d9ccae;
     --accent:#b3543c;
     --dim:rgba(59,51,42,.45);
+    --grug-ink:#3b332a;
   }
   body.theme-grug:not(.dark) .face{
     background:color-mix(in srgb, hsl(var(--h) 42% 62%) 12%, #faf3e3);
@@ -38,26 +39,39 @@
     box-shadow:inset 0 0 0 2.2px #3b332a, 3px 4px 0 rgba(59,51,42,.14);
     font-weight:500;
   }
-  body.theme-grug:not(.dark) .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
-  body.theme-grug:not(.dark) .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
-  body.theme-grug:not(.dark) .tile.k-pl .face{ border-radius:4px 7px 3px 6px; }
-  body.theme-grug:not(.dark) .tile.k-pp .face{ border-radius:18px 6px 19px 5px; clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%); }
-  /* 切角的两条斜边补上墨线(块面固定 4:3,斜边角度恒为 atan(0.75)=36.87°) */
-  body.theme-grug:not(.dark) .tile.k-pp .face::before,
-  body.theme-grug:not(.dark) .tile.k-pp .face::after{
-    content:""; position:absolute; width:32%; height:2.2px; background:#3b332a;
+  body.theme-grug .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
+  body.theme-grug .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
+  body.theme-grug .tile.k-pl .face{ border-radius:4px 7px 3px 6px; }
+  body.theme-grug .tile.k-pp .face{ border-radius:18px 0 19px 0; clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%); }
+  /* 切角的两条斜边补上墨线(块面固定 4:3,斜边角度恒为 atan(0.75)=36.87°);
+     切角处圆角归零 + 斜条两端各加长 ~2.5% 压过接缝,消除小缺口(用户二轮反馈) */
+  body.theme-grug .tile.k-pp .face::before,
+  body.theme-grug .tile.k-pp .face::after{
+    content:""; position:absolute; width:34%; height:2.2px; background:var(--grug-ink);
     transform-origin:0 0; transform:rotate(36.87deg);
   }
-  body.theme-grug:not(.dark) .tile.k-pp .face::before{ left:75.5%; top:0; }
-  body.theme-grug:not(.dark) .tile.k-pp .face::after{ left:0; top:75.5%; }
+  body.theme-grug .tile.k-pp .face::before{ left:73.5%; top:0; }
+  body.theme-grug .tile.k-pp .face::after{ left:0; top:73.5%; }
   body.theme-grug:not(.dark) .tile.k-inf .face::after{
-    content:""; position:absolute; left:7%; right:5%; bottom:5%;
+    content:""; position:absolute; left:9%; width:36%; right:auto; bottom:6%;
     height:10px; border-radius:0; background:none;
     background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M1.5 6 Q28 2.4 55 4.8 T99 3.6" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
     background-size:100% 100%;
   }
-  body.theme-grug:not(.dark) .tile.k-inf .face::before{ display:none; }
-  body.theme-grug:not(.dark) .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  body.theme-grug.dark .tile.k-inf .face::after{
+    content:""; position:absolute; left:9%; width:36%; right:auto; bottom:6%;
+    height:10px; border-radius:0; background:none;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M1.5 6 Q28 2.4 55 4.8 T99 3.6" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
+    background-size:100% 100%;
+  }
+  body.theme-grug .tile.k-inf .face::before{ display:none; }
+  body.theme-grug .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  body.theme-grug.dark .face{
+    background:color-mix(in srgb, hsl(var(--h) 20% 40%) 15%, #26282e);
+    color:#e7ddc4;
+    box-shadow:inset 0 0 0 2.2px var(--grug-ink), 3px 4px 0 rgba(0,0,0,.3);
+    font-weight:500;
+  }
   body.theme-grug:not(.dark) .hud-btn{ border:2.2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); box-shadow:2px 3px 0 rgba(59,51,42,.14); }
   body.theme-grug:not(.dark) .tag{ border:2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); font-size:15px; }
   body.theme-grug:not(.dark) .goal-pill{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; background:var(--card); font-size:13.5px; }
@@ -74,6 +88,7 @@
   .theme-grug #bannerArt svg,.theme-grug #cardArt svg,.theme-grug .book-art svg{ filter:url(#grugRough); }
   body.theme-grug.dark{
     --tile-s:14%; --hot:#c9563c;
+    --grug-ink:#d8cdb2;
   }
   .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 0 0 12px color-mix(in srgb, var(--hot) 42%, transparent); }
   body.theme-grug:not(.dark) .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 3px 4px 0 rgba(59,51,42,.14); }
@@ -222,7 +237,7 @@
   .tile.k-pl .face{border-radius:6%;}
   .tile.k-pp .face{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
   .tile.k-inf .face::after{
-    content:""; position:absolute; left:8%; right:8%; bottom:6%;
+    content:""; position:absolute; left:9%; width:36%; right:auto; bottom:6%;
     height:4px; border-radius:2px; background:var(--accent);
   }
   .tile.k-inf .face::before{
@@ -756,10 +771,10 @@ const I18N={
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
-    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Grug","theme.papier":"Papier",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
     "set.voice":"Stem","set.voicetest":"Probeer",
-    "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
+    "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands","tts.blocked":"Geen geluid: dit venster ondersteunt geen spraak. Test Voorlezen in Chrome of Safari.",
     "result.title":"Koppelen gehaald!","result.done":"Alle paren gevonden.",
     "result.record":"nieuw record!","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
     "toast.shuffle":"Geen combinaties meer — geschud!","toast.nopair":"Geen paar — geschud!",
@@ -784,10 +799,10 @@ const I18N={
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
-    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手作 Grug","theme.papier":"纸面",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手绘","theme.papier":"便签",
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
     "set.voice":"朗读语音","set.voicetest":"试听",
-    "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
+    "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch","tts.blocked":"此窗口无法朗读(语音引擎不可用)——请在 Chrome/Safari 或手机上测试",
     "result.title":"连连看过关!","result.done":"全部配对完成。",
     "result.record":"新纪录!","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
     "toast.shuffle":"没有可连的了——重新洗牌!","toast.nopair":"无可连对——重新洗牌!",
@@ -812,10 +827,10 @@ const I18N={
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
-    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Grug","theme.papier":"Paper",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
     "set.voice":"Voice","set.voicetest":"Test",
-    "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
+    "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch","tts.blocked":"No speech in this window — test read-aloud in Chrome or Safari",
     "result.title":"Board cleared!","result.done":"All pairs found.",
     "result.record":"new record!","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
     "toast.shuffle":"No combos left — shuffled!","toast.nopair":"No pairs — shuffled!",
@@ -914,6 +929,12 @@ function initVoices(){
   window.speechSynthesis.onvoiceschanged=pick;
 }
 let speakGen=0;
+let ttsBlockedWarned=false;
+function warnTtsBlocked(){
+  if(ttsBlockedWarned) return;
+  ttsBlockedWarned=true;
+  toast(t("tts.blocked"));   // 语音引擎瘫(如内嵌测试窗):utterance 永远排队、不 onstart 也不 onerror
+}
 function speakPair(V,form){
   const gen=++speakGen;   // 代数令牌:新横幅接管后,旧链的延迟回调与 onend 链全部失效
   return new Promise(res=>{
@@ -923,17 +944,19 @@ function speakPair(V,form){
       const busyS=ss.speaking||ss.pending;
       if(busyS) ss.cancel();   // 空队列不要 cancel:Chrome cancel() 后同步 speak() 会被静默吞掉
       const seq=[V.inf,form];
-      let i=0;
+      let i=0, startedAny=false;
       const next=()=>{
         if(gen!==speakGen){ res(); return; }
         if(i>=seq.length){ res(); return; }
         const u=new SpeechSynthesisUtterance(seq[i++]);
         u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
         u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+        u.onstart=()=>{ startedAny=true; };
         u.onend=next; u.onerror=next;
         ss.speak(u);
       };
       if(busyS) setTimeout(next,70); else next();   // 刚 cancel 过必须延迟开口(tile-match v0.86 同款修复)
+      setTimeout(()=>{ if(gen===speakGen && !startedAny && (ss.speaking||ss.pending)) warnTtsBlocked(); },1300);
     }catch(e){ res(); }
   });
 }
@@ -1009,6 +1032,25 @@ function pencilPaper(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect 
 
 /* ---- 道具库 ---- */
 const PROP={
+  /* 别名补齐(v1.11):SCENES 曾引用 sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/
+     dashedCircle/speedLines/pencilPaper 但 PROP 缺失,sceneSVG 静默跳过导致约 13 个场景缺道具 */
+  sparkles:(c,x,y)=>sparkles(c,x,y),
+  gift:(c,x,y)=>gift(c,x,y),
+  heart:(c,x,y,s)=>heart(c,x,y,s||1),
+  ball:(c,x,y)=>ball(c,x,y),
+  apple:(c,x,y)=>apple(c,x,y),
+  pencilPaper:(c,x,y)=>pencilPaper(c,x,y),
+  dashedCircle:(c,x,y,r)=>dashedCircle(c,x,y,r||18),
+  speedLines:(c,x,y)=>speedLines(c,x,y),
+  arrowR:(c,x,y)=>arrow(c,x-14,y,x+14,y),
+  arrowL:(c,x,y)=>arrow(c,x+14,y,x-14,y),
+  arrowD:(c,x,y)=>arrow(c,x,y-14,x,y+14),
+  /* 新道具(v1.11,给 23 个 fallback 词补场景用) */
+  bubbleBang:(c,x,y)=>`<path d="M${x-15} ${y-12} h30 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-16 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="15" font-weight="800" fill="${c.acc}" font-family="inherit">!</text>`,
+  bubbleShout:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><g stroke="${c.acc}" stroke-width="2.6" stroke-linecap="round"><line x1="${x-8}" y1="${y-4}" x2="${x+8}" y2="${y-4}"/><line x1="${x-5}" y1="${y+2}" x2="${x+5}" y2="${y+2}"/></g>`,
+  waves:(c,x,y)=>`<g fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round" stroke-opacity=".8"><path d="M${x-26} ${y} q6 -6 13 0 t13 0 t13 0 t13 0"/><path d="M${x-20} ${y+8} q6 -5 12 0 t12 0 t12 0" stroke-opacity=".5"/></g>`,
+  bird:(c,x,y)=>`<path d="M${x-8} ${y} q4 -6 8 0 q4 -6 8 0" fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  bowArrow:(c,x,y)=>`<path d="M${x-10} ${y-14} a17 17 0 0 1 0 28" fill="none" stroke="${c.ink}" stroke-width="2.8" stroke-linecap="round"/><line x1="${x-10}" y1="${y-14}" x2="${x-10}" y2="${y+14}" stroke="${c.ink}" stroke-width="2.2"/><line x1="${x-12}" y1="${y}" x2="${x+16}" y2="${y}" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x+16} ${y} l-6 -3.5 v7 z" fill="${c.ink}"/>`,
   glass:(c,x,y)=>`<path d="M${x-7} ${y-12} L${x-5} ${y+8} L${x+5} ${y+8} L${x+7} ${y-12} Z" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.2"/>`,
   chair:(c,x,y)=>`<rect x="${x-11}" y="${y-18}" width="21" height="4.5" rx="2.2" fill="${c.teal}"/><rect x="${x-10}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/><rect x="${x+7}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/>`,
   rug:(c,x,y)=>`<ellipse cx="${x}" cy="${y+2}" rx="26" ry="6" fill="${c.sw?"rgba(255,201,77,.3)":"#ffd9a8"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
@@ -1065,7 +1107,7 @@ const PROP={
   stairs:(c,x,y)=>`<g fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}><rect x="${x-2}" y="${y-8}" width="14" height="8"/><rect x="${x+6}" y="${y-16}" width="14" height="8"/><rect x="${x+14}" y="${y-24}" width="14" height="8"/></g>`,
   wallBar:(c,x,y)=>`<rect x="${x+2}" y="${y-30}" width="10" height="30" rx="2" fill="${c.sw?"rgba(255,255,255,.3)":"#d8cfc0"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55"><line x1="${x-14}" y1="${y-18}" x2="${x-4}" y2="${y-18}"/></g>`,
   stinkApple:(c,x,y)=>apple(c,x,y)+`<path d="M${x+9} ${y-4} q4 -2 3 -6" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/>`,
-  coinBehind:(c,x,y)=>coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  coinBehind:(c,x,y)=>PROP.coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
   arrowsMeet:(c,x,y)=>arrow(c,x-24,y+8,x-4,y)+arrow(c,x+24,y+8,x+4,y)+sparkles(c,x,y-6),
   doorProp:(c,x,y)=>door(c,x,y),
   flagMoundP:(c,x,y)=>flagMound(c,x,y),
@@ -1165,6 +1207,30 @@ const SCENES={
   verbieden:{p:"stand",pr:[["forbidSign",80,52]]},
   verlopen:{p:"walk",pr:[["pathCurve",36,92]]},
   treffen:{p:"open",pr:[["arrowsMeet",60,46]]},
+  /* v1.11:最后 23 词补场景(消除首字母纹章 fallback) */
+  kunnen:{p:"open",pr:[["starBurst",60,28],["sparkles",86,52]]},
+  moeten:{p:"stand",pr:[["bubbleBang",84,46]]},
+  willen:{p:"reach",pr:[["heart",80,56]]},
+  mogen:{p:"stand",pr:[["doorProp",84,92],["checkCircle",58,50]]},
+  zoeken:{p:"duck",pr:[["magnifier",84,66]]},
+  zwemmen:{p:"lie",px:50,py:88,pr:[["waves",58,94]]},
+  vliegen:{p:"jump",pr:[["bird",82,40],["bird",58,30]]},
+  stelen:{p:"run",pr:[["coinBehind",80,72]]},
+  schieten:{p:"reach",pr:[["bowArrow",82,64]]},
+  roepen:{p:"open",pr:[["bubbleShout",84,42]]},
+  verdwijnen:{p:"duck",pr:[["dashedCircle",80,72,22]]},
+  duiken:{p:"jump",pr:[["waves",64,96],["arrowD",86,42]]},
+  verstaan:{p:"stand",pr:[["bubbleSay",84,46],["checkCircle",56,52]]},
+  genieten:{p:"sit",pr:[["heart",80,54],["sparkles",40,44]]},
+  dwingen:{p:"reach",pr:[["person2",88,96],["bubbleBang",62,40]]},
+  glijden:{p:"walk",pr:[["speedLines",40,86],["iceCube",84,78]]},
+  kruipen:{p:"duck",pr:[["speedLines",84,86]]},
+  bestaan:{p:"stand",pr:[["sparkles",84,48]]},
+  onthouden:{p:"stand",pr:[["bubbleThink",84,42],["ropeKnot",58,68]]},
+  vertrekken:{p:"walk",pr:[["doorProp",86,92],["arrowR",28,62]]},
+  verschijnen:{p:"duck",pr:[["sparkles",58,46],["starBurst",58,26]]},
+  bevriezen:{p:"stand",pr:[["snowflake",82,44],["iceCube",84,78]]},
+  stinken:{p:"duck",pr:[["stinkApple",82,76]]},
 };
 function genericArt(vIdx,c){
   const V=VERBS[vIdx];
@@ -2019,9 +2085,12 @@ function speakVerb(word){
       const u=new SpeechSynthesisUtterance(word);
       u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
       u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+      let startedAny=false;
+      u.onstart=()=>{ startedAny=true; };
       u.onend=()=>res(); u.onerror=()=>res();
       if(busyS) setTimeout(()=>{ if(gen===speakGen) ss.speak(u); else res(); },70);
       else ss.speak(u);
+      setTimeout(()=>{ if(gen===speakGen && !startedAny && (ss.speaking||ss.pending)) warnTtsBlocked(); },1300);
     }catch(e){ res(); }
   });
 }
@@ -2141,7 +2210,7 @@ function renderSettings(){
   document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
   const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
   document.getElementById("bannerVal").textContent=`${S.bannerMs||10} s`;
-  seg(document.getElementById("setTheme"),[["grug","Grug"],["papier","Papier"]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
+  seg(document.getElementById("setTheme"),[["grug",t("theme.grug")],["papier",t("theme.papier")]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
 
