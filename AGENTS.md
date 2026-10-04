@@ -70,6 +70,7 @@ gamified-learning/
 - **link-match v1.6(2026-10-04,试玩三连)**:关卡名编号化 **A1.1–B1.24**(lv.num)+形式标注,轮次角标取消;attemptPair **全同步非阻塞**(状态即落账、动画/收尾走 setTimeout、游玩中不置 busy)——改它必须保留残块 alive 守卫与 drawPath 按节点移除(防背靠背连对互吞);选中不再立即点亮同动词块,闲置 hintWait 后才提示(选中→peer 点亮 / 未选中→整对;=0 全关)。
 - **link-match v1.7(2026-10-04,竞品调研试点)**:试验关 **A1.1/A1.2**(`TRIAL_LEVELS`)落地 P1 连击里程碑(大字感叹+盘面波纹+和弦)/P3 交互式首教学(3 步演示,demoDone 一次)/P5 分数飞行/P6 清盘彩带;其余关卡原样供对比。**两个实现坑**:演示点击拦截必须在 busy 守卫前(演示靠 busy=true 锁闲置提示);demoClick 参数不可叫 `t`(遮蔽全局 i18n 函数 → "t is not a function"、回调不排上)。全量铺开待用户试玩定夺。
 - 已否决/搁置:原形百搭块(易混淆);四消判定(match-4,中盘供给不足,2026-10-04 用户否掉)。
+- **link-match v1.9(2026-10-04,试玩 13 项)**:HUD 语境化(短关卡名+中槽按模式切进度/倒计时/最佳分)、词块 weight500+×0.93、菜单 ✕/点外回游戏/图标翻转、分数胶囊、emoji→手绘 SVG(色块偏移+墨线)、下划线一笔、庆祝进分数槽、词行删除、盘面 **4×9=18 对**(轮数=⌈池/9⌉,42 关,迁移 lvOrder v3)、连线虚线+边中点+lit 边框、--hot 统一橙红、朗读关→确认音、插画 grugRough 滤镜(feTurbulence+displacement,零重绘手绘化)。
 - **link-match v1.8(2026-10-04)**:**Grug 手作主题**(用户从四方向效果图选定 D)——`settings.theme` 默认 "grug",Papier 可切回;CSS 在 `body.theme-grug:not(.dark)` 下覆盖(暗色变量级联在后不破坏);tile 歪斜走 applyTileRotations(inline transform,与 scale/translate 动画属性不冲突);字号测量按主题选字体(手写体更宽)。效果图:docs/mockups/aesthetics.html。
 
 ## 已踩过的坑(别再踩)

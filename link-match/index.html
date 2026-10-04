@@ -13,6 +13,7 @@
     --accent:#e8734a;
     --dim:rgba(51,65,92,.42);
     --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
+    --hot:#e06b45;
   }
   /* ============ 主题 · Grug 手作(P2;docs/mockups/aesthetics.html 方向 D) ============ */
   body.theme-grug{
@@ -20,9 +21,10 @@
     font-family:var(--hand);
   }
   body.theme-grug .tag, body.theme-grug .goal-pill, body.theme-grug .score-tag, body.theme-grug .combo-tag,
-  body.theme-grug .dock-btn, body.theme-grug .menu-btn, body.theme-grug .wchip, body.theme-grug .lv-btn,
+  body.theme-grug .dock-btn, body.theme-grug .menu-btn, body.theme-grug .lv-btn,
   body.theme-grug .btn, body.theme-grug .panel h1, body.theme-grug .panel h2{ font-family:var(--hand); }
   body.theme-grug:not(.dark){
+    --hot:#c9563c;
     --ink:#3b332a;
     --paper:#ece1c9;
     --card:#f6efdd;
@@ -34,6 +36,7 @@
     background:color-mix(in srgb, hsl(var(--h) 42% 62%) 12%, #faf3e3);
     color:#3b332a;
     box-shadow:inset 0 0 0 2.2px #3b332a, 3px 4px 0 rgba(59,51,42,.14);
+    font-weight:500;
   }
   body.theme-grug:not(.dark) .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
   body.theme-grug:not(.dark) .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
@@ -42,7 +45,7 @@
   body.theme-grug:not(.dark) .tile.k-inf .face::after{
     content:""; position:absolute; left:7%; right:5%; bottom:5%;
     height:10px; border-radius:0; background:none;
-    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 5.5 Q22 2 46 4.6 T98 3.8" stroke="%233b332a" stroke-width="2.7" fill="none" stroke-linecap="round"/><path d="M7 8.6 Q38 6.2 66 7.6 T95 6.8" stroke="%233b332a" stroke-width="1.5" fill="none" opacity=".65" stroke-linecap="round"/></svg>');
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M1.5 6 Q28 2.4 55 4.8 T99 3.6" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
     background-size:100% 100%;
   }
   body.theme-grug:not(.dark) .tile.k-inf .face::before{ display:none; }
@@ -50,17 +53,26 @@
   body.theme-grug:not(.dark) .hud-btn{ border:2.2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); box-shadow:2px 3px 0 rgba(59,51,42,.14); }
   body.theme-grug:not(.dark) .tag{ border:2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); font-size:15px; }
   body.theme-grug:not(.dark) .goal-pill{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; background:var(--card); font-size:13.5px; }
-  body.theme-grug:not(.dark) .score-tag{ border:2px solid var(--ink); border-radius:52% 48% 55% 45%/48% 52% 46% 54%; background:#e3b52e; color:#3b332a; font-size:17px; min-width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; }
+  body.theme-grug:not(.dark) .score-tag{ border:2px solid var(--ink); border-radius:16px 12px 17px 13px; background:#e3b52e; color:#3b332a; font-size:15.5px; min-width:58px; height:40px; padding:0 11px; display:inline-flex; align-items:center; justify-content:center; }
   body.theme-grug:not(.dark) .dock-btn{ border:2.2px solid var(--ink); background:var(--card); color:var(--ink); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.15); font-size:14px; }
-  body.theme-grug:not(.dark) .wchip{ border:2px solid var(--ink); background:var(--card); border-radius:12px 15px 11px 14px; font-size:12.5px; }
   body.theme-grug:not(.dark) .menu-btn{ border:2.2px solid var(--ink); background:var(--card); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.12); font-size:15.5px; }
   body.theme-grug:not(.dark) .panel{ border:2.5px solid var(--ink); box-shadow:5px 7px 0 rgba(59,51,42,.14); }
   body.theme-grug:not(.dark) .lv-btn{ border:2px solid var(--ink); border-radius:14px 11px 16px 12px; font-size:14px; }
   body.theme-grug:not(.dark) .lv-btn.done{ background:#e4e6cf; border-color:var(--ink); }
   body.theme-grug:not(.dark) .btn{ border:2.2px solid var(--ink); border-radius:14px 12px 16px 13px; }
+  .theme-grug #bannerArt svg,.theme-grug #cardArt svg,.theme-grug .book-art svg{ filter:url(#grugRough); }
   body.theme-grug.dark{
-    --tile-s:14%;
+    --tile-s:14%; --hot:#c9563c;
   }
+  .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 0 0 12px color-mix(in srgb, var(--hot) 42%, transparent); }
+  body.theme-grug:not(.dark) .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 3px 4px 0 rgba(59,51,42,.14); }
+  .score-tag.celebrate{ background:var(--hot); color:#fbf3e6; }
+  .score-tag.celebrate .hico{ display:none; }
+  .cele{ display:inline-block; font-size:13px; white-space:nowrap; animation:celeIn .45s ease; }
+  @keyframes celeIn{ 0%{ transform:translateY(15px) rotate(5deg); opacity:0; } 100%{ transform:none; opacity:1; } }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  body.theme-grug:not(.dark) .menu-btn.primary{ background:var(--hot); color:#fbf3e6; }
+  body.theme-grug:not(.dark) .btn.primary{ background:var(--hot); border-color:var(--ink); color:#fbf3e6; }
   /* ============ /主题 Grug ============ */
 
   body.dark{
@@ -98,7 +110,11 @@
   .menu-btn .ic{width:24px; height:24px;}
   .dock-btn .ic{width:22px; height:22px;}
   .hud-center{display:flex; align-items:center; gap:7px; justify-self:center;}
-  .hud-right{display:flex; align-items:center; gap:7px; justify-self:end; min-width:0;}
+  .hud-right{display:flex; align-items:center; gap:6px; justify-self:end; flex:none;}
+  .combo-tag{display:inline-flex; align-items:center; gap:4px; white-space:nowrap;}
+  .hico{width:17px; height:17px; flex:none; display:block;}
+  .score-tag .hico{width:19px; height:19px;}
+  .score-tag b{font-weight:800; margin-left:3px;}
   .tag{
     background:var(--card); border:1px solid var(--line); border-radius:12px;
     padding:7px 13px; font-size:15px; font-weight:800; white-space:nowrap;
@@ -220,22 +236,6 @@
   .tile.demo-target .face{ animation:demoPulse 1s ease infinite; }
   @keyframes demoPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(232,115,74,0); } 50%{ box-shadow:0 0 0 7px rgba(232,115,74,.4); } }
 
-  /* ---------- 盘下词行(学习条) ---------- */
-  #wordRow{
-    display:flex; flex-wrap:wrap; gap:6px; justify-content:center;
-    padding:0 4px 8px; min-height:34px;
-  }
-  .wchip{
-    display:inline-flex; align-items:baseline; gap:5px;
-    padding:5px 10px; border-radius:11px;
-    border:1px solid var(--line); background:var(--paper);
-    font-size:11.5px; font-weight:700; color:var(--ink);
-    cursor:pointer; transition:opacity .25s, border-color .25s;
-  }
-  .wchip small{ font-size:10px; font-weight:600; color:#98a1b0; }
-  .wchip.done{ opacity:.45; border-color:transparent; background:transparent; }
-  .wchip.done small{ text-decoration:line-through; }
-  @media (max-height:600px){ #wordRow{ display:none; } }
 
   /* ---------- 计时器紧急态 + 关卡档标题 ---------- */
   .tag.urgent{ color:#fff; background:#e05645; animation:urgentPulse .7s ease infinite; }
@@ -406,18 +406,20 @@
 </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="grugRough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.046" numOctaves="2" result="n" seed="7"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/></filter></svg>
 
 <div id="app">
   <header id="hud">
     <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
     <div class="hud-center">
-      <span class="tag" id="lvlTag">A1</span>
-      <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/14</span></span>
-      <span class="tag" id="timerTag" style="display:none;">⏱ 3:00</span>
+      <span class="tag" id="lvlTag">A1.2</span>
+      <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/18</span></span>
+      <span class="tag" id="timerTag" style="display:none;"></span>
+      <span class="tag" id="bestTag" style="display:none;"></span>
     </div>
     <div class="hud-right">
-      <span class="combo-tag" id="comboTag" style="display:none;">🔥 ×2</span>
-      <span class="score-tag" id="scoreTag">⭐ 0</span>
+      <span class="combo-tag" id="comboTag" style="display:none;"></span>
+      <span class="score-tag" id="scoreTag"></span>
     </div>
   </header>
 
@@ -425,8 +427,6 @@
     <div id="grid"></div>
     <svg id="pathSvg"></svg>
   </div>
-
-  <div id="wordRow"></div>
 
   <div id="dock">
     <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
@@ -447,9 +447,10 @@
 <div class="overlay on" id="menuScreen">
   <div class="panel">
     <div id="menuMain">
+      <button class="close-x" id="menuClose" style="position:absolute; top:14px; right:14px;">✕</button>
       <h1 style="margin-bottom:14px;">Koppelen</h1>
       <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
-      <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
+      <button class="menu-btn" id="mContinue"><svg class="ic" style="transform:scaleY(-1);" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
       <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
       <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
@@ -690,14 +691,14 @@ const LINK_TYPES=["sg","pl","pp"];
 const LINK_LEVELS=[];
 const LV_ROUNDS=[];
 TIERS.forEach((t,ti)=>{
-  const R=Math.ceil(t.pool.length/7);      // 轮数=覆盖全池所需;每关 7 词
+  const R=Math.ceil(t.pool.length/9);      // 轮数=覆盖全池所需;每关 9 词×2 对=18 对      // 轮数=覆盖全池所需;每关 7 词
   LV_ROUNDS.push(R);
   let num=0;
   LINK_TYPES.forEach((ty,fi)=>{            // 形式分组:先单数过去式各轮,再复数,最后分词(用户试玩反馈 #1/#3)
     for(let round=0;round<R;round++){
       const start=((fi*R)+round)*7 % t.pool.length;
       const verbs=[];
-      for(let k=0;k<7;k++) verbs.push(t.pool[(start+k)%t.pool.length]);
+      for(let k=0;k<9;k++) verbs.push(t.pool[(start+k)%t.pool.length]);
       LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:t.band, type:ty, num:++num, verbs});
     }
   });
@@ -719,19 +720,19 @@ const I18N={
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands",
-    "result.title":"Koppelen gehaald! 🎉","result.done":"Alle 14 paren gevonden.",
-    "result.record":"nieuw record! 🏆","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
+    "result.title":"Koppelen gehaald!","result.done":"Alle paren gevonden.",
+    "result.record":"nieuw record!","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
     "toast.shuffle":"Geen combinaties meer — geschud!","toast.nopair":"Geen paar — geschud!",
     "book.title":"Verzameling","book.locked":"Nog niet gekoppeld",
     "book.lockedsub":"Koppel dit werkwoord om het te verzamelen.","book.view":"Tik om te bekijken",
     "help.title":"Speluitleg",
     "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
-    "help.goal":"Doel: vind alle 14 paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
-    "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een 🔥-combinatiebonus.",
+    "help.goal":"Doel: vind alle paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
+    "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een combinatiebonus.",
     "help.rules":"Levels heten A1.1, A1.2, …: binnen elke band komen eerst alle enkelvoud-rondes, daarna de meervoud-rondes en tot slot het voltooid deelwoord.",
     "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
-    "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
-    "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij! 🎉",
+    "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
+    "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
     "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
     "card.tip":"Tik voor de betekenis",
   },
@@ -747,19 +748,19 @@ const I18N={
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
-    "result.title":"连连看过关! 🎉","result.done":"全部 14 对配对完成。",
-    "result.record":"新纪录! 🏆","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
+    "result.title":"连连看过关!","result.done":"全部配对完成。",
+    "result.record":"新纪录!","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
     "toast.shuffle":"没有可连的了——重新洗牌!","toast.nopair":"无可连对——重新洗牌!",
     "book.title":"词典图鉴","book.locked":"尚未配对",
     "book.lockedsub":"配对这个动词来收集它。","book.view":"点击查看",
     "help.title":"玩法介绍",
     "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
-    "help.goal":"目标:找出全部 14 对配对。卡住时棋盘会自动重新洗牌。",
-    "help.score":"计分:每对 +15 分;快速连续配对有 🔥 连击加成。",
+    "help.goal":"目标:找出全部配对。卡住时棋盘会自动重新洗牌。",
+    "help.score":"计分:每对 +15 分;快速连续配对有连击加成。",
     "help.rules":"关卡名为 A1.1、A1.2……每档先练完所有单数轮,再复数轮,最后过去分词轮。",
     "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。",
-    "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
-    "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了! 🎉",
+    "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
+    "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
     "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
     "card.tip":"点击查看释义",
   },
@@ -775,19 +776,19 @@ const I18N={
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
-    "result.title":"Board cleared! 🎉","result.done":"All 14 pairs found.",
-    "result.record":"new record! 🏆","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
+    "result.title":"Board cleared!","result.done":"All pairs found.",
+    "result.record":"new record!","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
     "toast.shuffle":"No combos left — shuffled!","toast.nopair":"No pairs — shuffled!",
     "book.title":"Collection","book.locked":"Not paired yet",
     "book.lockedsub":"Pair this verb to collect it.","book.view":"Tap to view",
     "help.title":"How to play",
     "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
-    "help.goal":"Goal: find all 14 pairs before you get stuck. If you do get stuck, the board reshuffles.",
-    "help.score":"Score: 15 points per pair. Quick consecutive pairs give a 🔥 combo bonus.",
+    "help.goal":"Goal: find all pairs before you get stuck. If you do get stuck, the board reshuffles.",
+    "help.score":"Score: 15 points per pair. Quick consecutive pairs give a combo bonus.",
     "help.rules":"Levels are named A1.1, A1.2, …: within each band all singular rounds come first, then the plural rounds, then the past participle.",
     "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day).",
-    "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
-    "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn! 🎉",
+    "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
+    "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
     "card.tip":"Tap for the meaning",
   },
@@ -804,19 +805,25 @@ try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
 }catch(e){}
-// v1.5 关卡重排迁移:旧序(档,轮,形式)→新序(档,形式,轮),done/best 按映射精确搬家,进度不丢
-if(save.lvOrder!=="v2" && LINK_LEVELS.length>18){
-  const BASE=[0]; for(let i=1;i<LV_ROUNDS.length;i++) BASE.push(BASE[i-1]+LV_ROUNDS[i-1]*3);
-  const map=k=>{
+// 关卡布局迁移:v1(18 关)→ v2(51 关,7 词)→ v3(42 关,9 词/18 对);done/best 按映射搬家,超出新轮次的记录丢弃
+if(save.lvOrder!=="v3"){
+  const R2=[3,6,8], B2=[0,9,27];                      // v2:每档轮数与档基址(7 词/关时代)
+  const R3=LV_ROUNDS, B3=[0]; for(let i=1;i<R3.length;i++) B3.push(B3[i-1]+R3[i-1]*3);
+  const map=k=>{                                       // v2 索引 → v3 索引(新方案无此轮返回 -1)
     const i=+String(k).slice(1);
-    if(isNaN(i)||i>=18) return i;
-    const b=Math.floor(i/6), w=i%6, r=Math.floor(w/3), f=w%3;
-    return BASE[b]+f*LV_ROUNDS[b]+r;
+    if(isNaN(i)||i>=51) return i>=0?i:-1;
+    let b=0; while(b<2 && i>=B2[b+1]) b++;
+    const w=i-B2[b], f=Math.floor(w/R2[b]), r=w%R2[b];
+    if(f>2||r>=R3[b]) return -1;
+    return B3[b]+f*R3[b]+r;
   };
-  const nd={}, nb={};
-  for(const k in save.done){ if(save.done[k]&&/^L\d+$/.test(k)) nd["L"+map(k)]=true; }
-  for(const k in save.best){ if(/^L\d+$/.test(k)) nb["L"+map(k)]=save.best[k]; else nb[k]=save.best[k]; }
-  save.done=nd; save.best=nb; save.lvOrder="v2";
+  if(save.lvOrder==="v2"||(save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k)))){
+    const nd={}, nb={};
+    for(const k in save.done){ if(save.done[k]&&/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nd["L"+m2]=true; } }
+    for(const k in save.best){ if(/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nb["L"+m2]=save.best[k]; } else nb[k]=save.best[k]; }
+    save.done=nd; save.best=nb;
+  }
+  save.lvOrder="v3";
 }
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
 
@@ -1139,7 +1146,7 @@ function artSVG(vIdx,style){
 }
 
 /* ================= 连连看引擎 ================= */
-const COLS=4, ROWS=7;
+const COLS=4, ROWS=9;
 const RING=16;                       // 外圈连线带宽(px)
 const PAIR_POINTS=15, CLEAR_BONUS=100;
 const BANNER_DEFAULT_S=10;               // 横幅秒数默认值(=连击窗口,可在设置调 5-30s)
@@ -1163,8 +1170,8 @@ const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
-  const hud=document.getElementById("hud"), dock=document.getElementById("dock"), wr=document.getElementById("wordRow");
-  const usedH=hud.offsetHeight + dock.offsetHeight + (wr?wr.offsetHeight:0) + 30;
+  const hud=document.getElementById("hud"), dock=document.getElementById("dock");
+  const usedH=hud.offsetHeight + dock.offsetHeight + 30;
   const availH=Math.max(240, window.innerHeight - usedH) - RING*2;   // 网格可用高(扣外圈)
   const th=Math.min(availH/ROWS, (window.innerWidth*0.94 - RING*2)/COLS*0.75);
   const tw=th*4/3;
@@ -1176,7 +1183,6 @@ function syncSize(){
   wrapEl.style.height=(gridH+RING*2)+"px";
   document.getElementById("hud").style.width=(gridW+RING*2)+"px";
   document.getElementById("dock").style.width=(gridW+RING*2)+"px";
-  document.getElementById("wordRow").style.width=(gridW+RING*2)+"px";
   // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块;Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
   const hand=(save.settings.theme||"grug")==="grug";
@@ -1188,6 +1194,7 @@ function syncSize(){
     maxW=Math.max(maxW, ctx.measureText(V.inf).width, ctx.measureText(V[t.f]||V.sg).width);
   }
   levelFont=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/maxW));
+  if((save.settings.theme||"grug")==="grug") levelFont*=0.93;
   for(const t of tiles){ if(t.el){ t.el.firstChild.style.fontSize=levelFont+"px"; positionTile(t); } }
 }
 const measureCanvas=document.createElement("canvas");
@@ -1421,7 +1428,6 @@ async function startLink(idx){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
   applyTileRotations();
-  renderWordRow(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type})));
   syncSize();
   pairsLeft=PAIR_TOTAL;
   updateHUD();
@@ -1429,7 +1435,7 @@ async function startLink(idx){
   lastAction=Date.now();
   maybeStartDemo();
 }
-function displayId(lv){ return `${lv.band}.${lv.num} · ${t(SHORT_KEY[lv.type])}`; }
+function displayId(lv){ return `${lv.band}.${lv.num}`; }
 const PAIR_TOTAL=ROWS*COLS/2;
 let pairsLeft=PAIR_TOTAL;
 
@@ -1474,28 +1480,14 @@ function sampleModeVerbs(pool,n,r){   // 取 n 个 {v,f}:同一盘内变位词�
   while(picks.length<n){ const vi=pool[guard++%pool.length]; picks.push({v:vi,f:MODE_FORMS[guard%3]}); }  // 极端兜底(收词过少)
   return picks;
 }
-// 盘下词行:本盘 7 词的原形→变位(被动复习;点击朗读;配对消除后划线变淡)
-function renderWordRow(picks){
-  const row=document.getElementById("wordRow");
-  row.innerHTML="";
-  picks.forEach((p,pi)=>{
-    const V=VERBS[p.v];
-    const b=document.createElement("button");
-    b.className="wchip";
-    b.innerHTML=`<i style="background:hsl(${V.hue} 62% 62%)"></i>${V.inf}<small>${V[p.f]}</small>`;
-    b.onclick=()=>speakPair(V, V[p.f]);
-    row.appendChild(b);
-  });
-}
 function dealModeBoard(){
-  const picks=sampleModeVerbs(collectedPool(),7,mode==="daily"?modeRng:Math.random);
+  const picks=sampleModeVerbs(collectedPool(),9,mode==="daily"?modeRng:Math.random);
   clearSel(); clearHint();
   board=buildPairsFrom(picks);
   tiles=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
   buildBoardDOM();
   applyTileRotations();
-  renderWordRow(picks);
   syncSize();   // 按新盘词长校字号
   pairsLeft=PAIR_TOTAL;
   updateHUD();
@@ -1535,7 +1527,7 @@ function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } 
 function updateTimerTag(){
   const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
   const el=document.getElementById("timerTag");
-  el.style.display=""; el.textContent=`⏱ ${m}:${s}`;
+  el.style.display=""; el.innerHTML=`${ICO_CLOCK}<b>${m}:${s}</b>`;
 }
 function startDailyTimer(){
   dailyLeft=DAILY_SECONDS;
@@ -1561,7 +1553,7 @@ function endTimeUp(){
     updateHUD();   // curLevel 已空:隐藏计时器
     document.getElementById("resultTitle").textContent=t("result.timeup");
     document.getElementById("resultText").innerHTML=
-      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+      `${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
     const btns=document.getElementById("resultBtns");
     btns.innerHTML="";
     const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
@@ -1581,7 +1573,7 @@ function updateSurvivalTag(){
   const el=document.getElementById("timerTag");
   if(!survivalDeadline) return;
   const s=Math.max(0, Math.ceil((survivalDeadline-Date.now())/1000));
-  el.textContent=`⏱ ${s}`;
+  el.innerHTML=`${ICO_CLOCK}<b>${s}</b>`;
   el.classList.toggle("urgent", s<=5);
 }
 function startSurvival(){
@@ -1616,7 +1608,7 @@ function endSurvival(){
     updateHUD();
     document.getElementById("resultTitle").textContent=t("result.timeup");
     document.getElementById("resultText").innerHTML=
-      `⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+      `${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
     const btns=document.getElementById("resultBtns");
     btns.innerHTML="";
     const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
@@ -1659,16 +1651,16 @@ function attemptPair(a,b){
   a.alive=false; b.alive=false;
   board[a.r][a.c]=null; board[b.r][b.c]=null;   // 立即腾格:后续配对即刻可判
   pairsLeft--;
-  a.el.classList.add("flash"); b.el.classList.add("flash");
+  a.el.classList.add("flash","lit"); b.el.classList.add("flash","lit");
   popScore(pts,streak,b.r+1,b.c+1);
   if(trial()){   // 试点:里程碑庆祝 + 分数飞向计分器
-    milestone(streak,b.r+1,b.c+1);
+    milestone(streak);
     flyScore(b.el,"+"+pts);
   }
-  for(const x of [a,b]){ const cw=document.getElementById("wordRow").children[x.chip]; if(cw) cw.classList.add("done"); }
   if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
   updateHUD();
   showLearnBanner(a.v, formWord);
+  if(save.settings.ttsVolume<=0){ setTimeout(()=>{ blip(660,.09,"sine",.06); setTimeout(()=>blip(990,.12,"sine",.05),90); },160); }   // 关朗读:连对确认音
   setTimeout(()=>{ a.el.classList.add("gone"); b.el.classList.add("gone"); },170);
   setTimeout(()=>{ a.el.remove(); b.el.remove(); },470);
   if(pairsLeft<=0){
@@ -1691,31 +1683,23 @@ function attemptPair(a,b){
 function drawPath(path){
   const svg=document.getElementById("pathSvg");
   svg.setAttribute("viewBox",`0 0 ${wrapEl.clientWidth} ${wrapEl.clientHeight}`);
-  const ptsStr=path.map(([r,c])=>cellCenter(r,c).map(n=>Math.round(n)).join(",")).join(" ");
-  const col=getComputedStyle(document.body).getPropertyValue("--accent").trim()||"#e8734a";
-  // 底层辉光 + 主线描入(transition 驱动,比 SMIL 可靠)
+  const hot=getComputedStyle(document.body).getPropertyValue("--hot").trim()||"#e06b45";
+  // 端点取两块朝向路径一侧的「边中点」(用户反馈:不连中心)
+  const edge=(pt,nxt)=>{
+    const [x,y]=cellCenter(pt[0],pt[1]);
+    const dx=nxt[0]-pt[0], dy=nxt[1]-pt[1];
+    if(Math.abs(dx)>=Math.abs(dy)) return [x+Math.sign(dx)*layout.tw/2, y];
+    return [x, y+Math.sign(dy)*layout.th/2];
+  };
+  const p0=edge(path[0],path[1]);
+  const p1=edge(path[path.length-1],path[path.length-2]);
+  const ptsStr=[p0,...path.slice(1,-1).map(([r,c])=>cellCenter(r,c)),p1]
+    .map(([x,y])=>`${Math.round(x)},${Math.round(y)}`).join(" ");
   svg.innerHTML=
-    `<polyline points="${ptsStr}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>`+
-    `<polyline points="${ptsStr}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const main=svg.querySelectorAll("polyline")[1];
-  let L=0; try{ L=main.getTotalLength(); }catch(e){}
-  if(L>0){
-    main.style.strokeDasharray=L;
-    main.style.strokeDashoffset=L;
-    void main.getBoundingClientRect();   // 强制布局,确保 transition 从偏移态出发
-    main.style.transition="stroke-dashoffset .24s ease-out";
-    main.style.strokeDashoffset="0";
-  }
-  // 两端粒子 + 扩散环;只移除自己这批节点(快速连对时互不干扰)
-  const nodes=[];
-  for(const [r,c] of [path[0], path[path.length-1]]){
-    const [x,y]=cellCenter(r,c);
-    svg.insertAdjacentHTML("beforeend",
-      `<circle class="ring" cx="${Math.round(x)}" cy="${Math.round(y)}" r="10" fill="none" stroke="${col}" stroke-width="3"/>`+
-      `<circle class="spark" cx="${Math.round(x)}" cy="${Math.round(y)}" r="7" fill="${col}"/>`);
-  }
-  nodes.push(...svg.querySelectorAll("polyline,circle"));
-  setTimeout(()=>{ nodes.forEach(n=>n.remove()); },560);
+    `<polyline points="${ptsStr}" fill="none" stroke="${hot}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`+
+    `<polyline points="${ptsStr}" fill="none" stroke="${hot}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 8"/>`;
+  for(const el of [window.__litA,window.__litB]) {}
+  setTimeout(()=>{ svg.innerHTML=""; },560);
 }
 // 得分弹字:在消除块位置升起 "+pts ×streak"
 function popScore(pts,streak,tr,tc){
@@ -1746,16 +1730,15 @@ function comboWord(streak){   // P1 里程碑:×3/×5/×8,之后每 +4 再庆祝
   if(streak>=12 && (streak-12)%4===0) return "combo.m12";
   return null;
 }
-function milestone(streak,tr,tc){
+let celeTimer=null;
+function milestone(streak){
   const word=comboWord(streak);
   if(!word) return;
-  const [x,y]=cellCenter(tr,tc);
-  const el=document.createElement("div");
-  el.className="score-pop big";
-  el.textContent=t(word);
-  el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
-  wrapEl.appendChild(el);
-  setTimeout(()=>el.remove(),1050);
+  const st=document.getElementById("scoreTag");
+  st.classList.add("celebrate");
+  st.innerHTML=`<span class="cele">${t(word)}</span>`;
+  clearTimeout(celeTimer);
+  celeTimer=setTimeout(()=>{ st.classList.remove("celebrate"); updateHUD(); },1300);
   wrapEl.classList.remove("ripple"); void wrapEl.offsetWidth; wrapEl.classList.add("ripple");
   [523,659,784,1047].forEach((f,i)=>setTimeout(()=>blip(f,.1,"triangle",.08),i*60));
 }
@@ -1812,22 +1795,35 @@ function showLearnBanner(v,formWord){
   bannerTimer=setTimeout(hideBanner,(save.settings.bannerMs||BANNER_DEFAULT_S)*1000);
   speakPair(V,formWord);
 }
+/* ---- 手绘图标(色块与线条重叠,替代 emoji) ---- */
+const ICO_STAR=`<svg class="hico" viewBox="0 0 24 24"><path d="M6.2 8.4 11.4 7 16 5.6 19.6 9 18 14 14.8 18.4 9.2 17.6 5.4 13.2Z" fill="#e3b52e" transform="translate(1.3,1.5)"/><path d="M5.4 7.8 10.8 6.4 15.6 5 19.2 8.6 17.6 13.8 14.4 18.2 8.8 17.4 4.8 12.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_FLAME=`<svg class="hico" viewBox="0 0 24 24"><path d="M8.4 4.8C10.4 7.2 14.8 9.2 16 12.4 17.4 16 15.2 19.8 11.6 20 8 20.2 5.2 17.6 5.6 14 5.9 11.2 7.6 8 8.4 4.8Z" fill="#e8734a" transform="translate(1.2,1.2)"/><path d="M7.8 4.2C9.8 6.8 14.4 8.8 15.6 12.2 17 15.9 14.7 19.4 11.3 19.6 7.9 19.8 5.1 17.2 5.5 13.7 5.8 10.9 7 7.5 7.8 4.2Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_CLOCK=`<svg class="hico" viewBox="0 0 24 24"><circle cx="12.4" cy="12.6" r="8.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12.2 7.6 12.4 12.4 16 14.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>`;
+
 function updateHUD(){
-  document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
-  document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
+  const inLevel=!!curLevel;
+  const showGoal=inLevel&&(mode==="levels"||mode==="daily");
+  const goalEl=document.getElementById("goalTag");
+  goalEl.style.display=showGoal?"":"none";
+  if(showGoal){
+    document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
+    document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
+  }
   const tt=document.getElementById("timerTag");
-  tt.style.display=((mode==="daily"||mode==="survival")&&curLevel)?"":"none";
+  tt.style.display=(inLevel&&mode==="survival")?"":"none";
   if(tt.style.display==="none") tt.classList.remove("urgent");
   const st=document.getElementById("scoreTag");
-  st.textContent=`⭐ ${scoreRun}`;
   if(scoreRun!==lastScoreShown){
     st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump"); lastScoreShown=scoreRun;
-    // 无尽/每日:最佳分实时入库(中途离开/刷新不丢)
     if(mode==="endless" && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
     if(mode==="daily"){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
   }
+  const bt=document.getElementById("bestTag");
+  bt.style.display=(inLevel&&mode==="endless")?"":"none";
+  if(inLevel&&mode==="endless") bt.innerHTML=`${ICO_STAR}<b>${save.best["Oneindig"]||0}</b>`;
+  if(!st.classList.contains("celebrate")) st.innerHTML=`${ICO_STAR}<b>${scoreRun}</b>`;
   const ct=document.getElementById("comboTag");
-  if(streak>=2){ ct.style.display=""; ct.textContent=`🔥 ×${streak}`; }
+  if(streak>=2){ ct.style.display=""; ct.innerHTML=`${ICO_FLAME}<b>×${streak}</b>`; }
   else ct.style.display="none";
 }
 
@@ -1956,11 +1952,11 @@ function finishLevel(){
   curLevel=null;
   document.getElementById("resultTitle").textContent=t("result.title");
   document.getElementById("resultText").innerHTML=
-    t("result.done")+"<br>"+`⭐ <b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    t("result.done")+"<br>"+`${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
   const btns=document.getElementById("resultBtns");
   btns.innerHTML="";
   if(idx<LINK_LEVELS.length-1){
-    const b=document.createElement("button"); b.className="btn"; b.textContent=t("btn.next");
+    const b=document.createElement("button"); b.className="btn primary"; b.textContent=t("btn.next");
     b.onclick=()=>{ hideResult(); startLink(idx+1); };
     btns.appendChild(b);
   }
@@ -2136,6 +2132,10 @@ setInterval(()=>{
 
 /* ================= 事件绑定 ================= */
 document.getElementById("btnMenu").onclick=openMenu;
+document.getElementById("menuClose").onclick=()=>{ if(curLevel) document.getElementById("menuScreen").classList.remove("on"); };
+document.getElementById("menuScreen").addEventListener("click",e=>{
+  if(e.target===document.getElementById("menuScreen") && curLevel){ document.getElementById("menuScreen").classList.remove("on"); }
+});
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
 document.getElementById("mDaily").onclick=()=>{
