@@ -71,6 +71,7 @@
   }
   .tile.spawn{transition:transform .22s cubic-bezier(.3,1.2,.5,1);}
   .face{
+    position:relative;
     width:92%; height:90%; margin:4% 4%;
     display:flex; align-items:center; justify-content:center;
     background:hsl(var(--h) var(--tile-s) var(--tile-l));
@@ -83,6 +84,10 @@
   }
   /* 形状=变位类型(淡提示):胶囊=原形,圆角=单数过去,直角=复数过去,切角=分词 */
   .tile.f-inf .face{border-radius:999px; padding:0 9px;}
+  .tile.f-inf .face::after{          /* 原形标记:粗下划线(与 link-match 同视觉语言) */
+    content:""; position:absolute; left:12%; right:12%; bottom:7%;
+    height:4px; border-radius:2px; background:var(--accent);
+  }
   .tile.f-pl .face{border-radius:6%;}
   .tile.f-pp .face{
     border-radius:0;
@@ -167,9 +172,10 @@
   .menu-btn:active{transform:scale(.97);}
   .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
   .menu-btn.locked{opacity:.45;}
-  .lv-row{display:flex; gap:8px; margin:8px 0;}
+  .lv-row{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0;}
+  .band-h{width:100%; font-size:12px; font-weight:800; color:#98a1b0; margin:8px 0 0; letter-spacing:.6px;}
   .lv-btn{
-    flex:1; padding:12px 0; border:1px solid var(--line); border-radius:14px;
+    flex:0 1 calc(25% - 8px); min-width:64px; padding:12px 0; border:1px solid var(--line); border-radius:14px;
     background:var(--card); color:var(--ink); font-size:15px; font-weight:800;
   }
   .lv-btn.done{border-color:rgba(84,184,165,.6); color:#3a8f7c;}
@@ -287,28 +293,118 @@
 
 <script>
 "use strict";
-/* ================= 数据(拷贝自 tile-match,A1 档) ================= */
+/* ================= 数据(A1–B2 共 99 词:A1 15 + A2 30 + B1 42 + B2 12;A1/A2/B1 承 tile-match,B2 新增) ================= */
 const VERBS=[
-  {inf:"zijn",    sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",   hue:215},
-  {inf:"hebben",  sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",   hue:12},
-  {inf:"gaan",    sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",   hue:275},
-  {inf:"komen",   sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",   hue:160},
-  {inf:"zien",    sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见", hue:48},
-  {inf:"geven",   sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",   hue:330},
-  {inf:"nemen",   sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",   hue:65},
-  {inf:"lopen",   sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",   hue:130},
-  {inf:"eten",    sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",   hue:356},
-  {inf:"drinken", sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝",   hue:190},
-  {inf:"zitten",  sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐",   hue:250},
-  {inf:"lezen",   sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读",   hue:300},
+  {inf:"zijn",     sg:"was",      pl:"waren",     pp:"geweest",     en:"to be",       zh:"是",    hue:215, lv:1},
+  {inf:"hebben",   sg:"had",      pl:"hadden",    pp:"gehad",       en:"to have",     zh:"有",    hue:12,  lv:1},
+  {inf:"gaan",     sg:"ging",     pl:"gingen",    pp:"gegaan",      en:"to go",       zh:"去",    hue:275, lv:1},
+  {inf:"komen",    sg:"kwam",     pl:"kwamen",    pp:"gekomen",     en:"to come",     zh:"来",    hue:160, lv:1},
+  {inf:"zien",     sg:"zag",      pl:"zagen",     pp:"gezien",      en:"to see",      zh:"看见",  hue:48,  lv:1},
+  {inf:"geven",    sg:"gaf",      pl:"gaven",     pp:"gegeven",     en:"to give",     zh:"给",    hue:330, lv:1},
+  {inf:"nemen",    sg:"nam",      pl:"namen",     pp:"genomen",     en:"to take",     zh:"拿",    hue:65,  lv:1},
+  {inf:"lopen",    sg:"liep",     pl:"liepen",    pp:"gelopen",     en:"to walk",     zh:"走",    hue:130, lv:1},
+  {inf:"eten",     sg:"at",       pl:"aten",      pp:"gegeten",     en:"to eat",      zh:"吃",    hue:356, lv:1},
+  {inf:"drinken",  sg:"dronk",    pl:"dronken",   pp:"gedronken",   en:"to drink",    zh:"喝",    hue:190, lv:1},
+  {inf:"zitten",   sg:"zat",      pl:"zaten",     pp:"gezeten",     en:"to sit",      zh:"坐",    hue:250, lv:1},
+  {inf:"liggen",   sg:"lag",      pl:"lagen",     pp:"gelegen",     en:"to lie",      zh:"躺",    hue:300, lv:1},
+  {inf:"staan",    sg:"stond",    pl:"stonden",   pp:"gestaan",     en:"to stand",    zh:"站",    hue:100, lv:1},
+  {inf:"lezen",    sg:"las",      pl:"lazen",     pp:"gelezen",     en:"to read",     zh:"读",    hue:20,  lv:1},
+  {inf:"spreken",  sg:"sprak",    pl:"spraken",   pp:"gesproken",   en:"to speak",    zh:"说",    hue:225, lv:1},
+  {inf:"blijven",  sg:"bleef",    pl:"bleven",    pp:"gebleven",    en:"to stay",     zh:"停留",  hue:95,  lv:2},
+  {inf:"schrijven",sg:"schreef",  pl:"schreven",  pp:"geschreven",  en:"to write",    zh:"写",    hue:155, lv:2},
+  {inf:"slapen",   sg:"sliep",    pl:"sliepen",   pp:"geslapen",    en:"to sleep",    zh:"睡觉",  hue:40,  lv:2},
+  {inf:"doen",     sg:"deed",     pl:"deden",     pp:"gedaan",      en:"to do",       zh:"做",    hue:265, lv:2},
+  {inf:"weten",    sg:"wist",     pl:"wisten",    pp:"geweten",     en:"to know",     zh:"知道",  hue:115, lv:2},
+  {inf:"zeggen",   sg:"zei",      pl:"zeiden",    pp:"gezegd",      en:"to say",      zh:"说(话)",hue:340, lv:2},
+  {inf:"houden",   sg:"hield",    pl:"hielden",   pp:"gehouden",    en:"to hold",     zh:"拿住",  hue:75,  lv:2},
+  {inf:"kiezen",   sg:"koos",     pl:"kozen",     pp:"gekozen",     en:"to choose",   zh:"选择",  hue:205, lv:2},
+  {inf:"beginnen", sg:"begon",    pl:"begonnen",  pp:"begonnen",    en:"to begin",    zh:"开始",  hue:25,  lv:2},
+  {inf:"begrijpen",sg:"begreep",  pl:"begrepen",  pp:"begrepen",    en:"to understand",zh:"理解", hue:290, lv:2},
+  {inf:"brengen",  sg:"bracht",   pl:"brachten",  pp:"gebracht",    en:"to bring",    zh:"带来",  hue:60,  lv:2},
+  {inf:"denken",   sg:"dacht",    pl:"dachten",   pp:"gedacht",     en:"to think",    zh:"想",    hue:180, lv:2},
+  {inf:"vinden",   sg:"vond",     pl:"vonden",    pp:"gevonden",    en:"to find",     zh:"找到",  hue:355, lv:2},
+  {inf:"helpen",   sg:"hielp",    pl:"hielpen",   pp:"geholpen",    en:"to help",     zh:"帮助",  hue:230, lv:2},
+  {inf:"kopen",    sg:"kocht",    pl:"kochten",   pp:"gekocht",     en:"to buy",      zh:"买",    hue:105, lv:2},
+  {inf:"krijgen",  sg:"kreeg",    pl:"kregen",    pp:"gekregen",    en:"to get",      zh:"得到",  hue:30,  lv:2},
+  {inf:"vragen",   sg:"vroeg",    pl:"vroegen",   pp:"gevraagd",    en:"to ask",      zh:"问",    hue:255, lv:2},
+  {inf:"wassen",   sg:"waste",    pl:"wasten",    pp:"gewassen",    en:"to wash",     zh:"洗",    hue:125, lv:2},
+  {inf:"dragen",   sg:"droeg",    pl:"droegen",   pp:"gedragen",    en:"to carry",    zh:"携带",  hue:10,  lv:2},
+  {inf:"verliezen",sg:"verloor",  pl:"verloren",  pp:"verloren",    en:"to lose",     zh:"失去",  hue:210, lv:2},
+  {inf:"winnen",   sg:"won",      pl:"wonnen",    pp:"gewonnen",    en:"to win",      zh:"赢得",  hue:335, lv:2},
+  {inf:"hangen",   sg:"hing",     pl:"hingen",    pp:"gehangen",    en:"to hang",     zh:"挂",    hue:85,  lv:2},
+  {inf:"sterven",  sg:"stierf",   pl:"stierven",  pp:"gestorven",   en:"to die",      zh:"死亡",  hue:305, lv:2},
+  {inf:"vergeten", sg:"vergat",   pl:"vergaten",  pp:"vergeten",    en:"to forget",   zh:"忘记",  hue:50,  lv:2},
+  {inf:"bieden",   sg:"bood",     pl:"boden",     pp:"geboden",     en:"to offer",    zh:"提供",  hue:245, lv:2},
+  {inf:"trekken",  sg:"trok",     pl:"trokken",   pp:"getrokken",   en:"to pull",     zh:"拉",    hue:145, lv:2},
+  {inf:"zingen",   sg:"zong",     pl:"zongen",    pp:"gezongen",    en:"to sing",     zh:"唱",    hue:360, lv:2},
+  {inf:"vallen",   sg:"viel",     pl:"vielen",    pp:"gevallen",    en:"to fall",     zh:"落下",  hue:70,  lv:2},
+  {inf:"sluiten",  sg:"sloot",    pl:"sloten",    pp:"gesloten",    en:"to close",    zh:"关闭",  hue:195, lv:2},
+  {inf:"rijden",   sg:"reed",     pl:"reden",     pp:"gereden",     en:"to ride",     zh:"骑/开", hue:15,  lv:2},
+  {inf:"zwijgen",  sg:"zweeg",    pl:"zwegen",    pp:"gezwegen",    en:"to keep silent",zh:"沉默", hue:280, lv:3},
+  {inf:"wijzen",   sg:"wees",     pl:"wezen",     pp:"gewezen",     en:"to point",    zh:"指",    hue:120, lv:3},
+  {inf:"werpen",   sg:"wierp",    pl:"wierpen",   pp:"geworpen",    en:"to throw",    zh:"投掷",  hue:45,  lv:3},
+  {inf:"gelden",   sg:"gold",     pl:"golden",    pp:"gegolden",    en:"to be valid", zh:"有效",  hue:220, lv:3},
+  {inf:"smelten",  sg:"smolt",    pl:"smolten",   pp:"gesmolten",   en:"to melt",     zh:"融化",  hue:90,  lv:3},
+  {inf:"zwellen",  sg:"zwol",     pl:"zwollen",   pp:"gezwollen",   en:"to swell",    zh:"膨胀",  hue:350, lv:3},
+  {inf:"binden",   sg:"bond",     pl:"bonden",    pp:"gebonden",    en:"to bind",     zh:"绑",    hue:65,  lv:3},
+  {inf:"zenden",   sg:"zond",     pl:"zonden",    pp:"gezonden",    en:"to send",     zh:"发送",  hue:240, lv:3},
+  {inf:"bijten",   sg:"beet",     pl:"beten",     pp:"gebeten",     en:"to bite",     zh:"咬",    hue:110, lv:3},
+  {inf:"gieten",   sg:"goot",     pl:"goten",     pp:"gegoten",     en:"to pour",     zh:"倒",    hue:35,  lv:3},
+  {inf:"wringen",  sg:"wrong",    pl:"wrongen",   pp:"gewrongen",   en:"to wring",    zh:"拧",    hue:200, lv:3},
+  {inf:"zuigen",   sg:"zoog",     pl:"zogen",     pp:"gezogen",     en:"to suck",     zh:"吸",    hue:300, lv:3},
+  {inf:"krimpen",  sg:"kromp",    pl:"krompen",   pp:"gekrompen",   en:"to shrink",   zh:"收缩",  hue:80,  lv:3},
+  {inf:"springen", sg:"sprong",   pl:"sprongen",  pp:"gesprongen",  en:"to jump",     zh:"跳",    hue:165, lv:3},
+  {inf:"klinken",  sg:"klonk",    pl:"klonken",   pp:"geklonken",   en:"to sound",    zh:"响",    hue:325, lv:3},
+  {inf:"zinken",   sg:"zonk",     pl:"zonken",    pp:"gezonken",    en:"to sink",     zh:"下沉",  hue:55,  lv:3},
+  {inf:"lijden",   sg:"leed",     pl:"leden",     pp:"geleden",     en:"to suffer",   zh:"遭受",  hue:130, lv:3},
+  {inf:"scheppen", sg:"schiep",   pl:"schiepen",  pp:"geschapen",   en:"to create",   zh:"创造",  hue:25,  lv:3},
+  {inf:"heffen",   sg:"hief",     pl:"hieven",    pp:"geheven",     en:"to lift",     zh:"举起",  hue:285, lv:3},
+  {inf:"vriezen",  sg:"vroor",    pl:"vroren",    pp:"gevroren",    en:"to freeze",   zh:"结冰",  hue:175, lv:3},
+  {inf:"schrikken",sg:"schrok",   pl:"schrokken", pp:"geschrokken", en:"to startle",  zh:"受惊",  hue:100, lv:3},
+  {inf:"vechten",  sg:"vocht",    pl:"vochten",   pp:"gevochten",   en:"to fight",    zh:"战斗",  hue:235, lv:3},
+  {inf:"prijzen",  sg:"prees",    pl:"prezen",    pp:"geprezen",    en:"to praise",   zh:"称赞",  hue:40,  lv:3},
+  {inf:"genezen",  sg:"genas",    pl:"genazen",   pp:"genezen",     en:"to heal",     zh:"治愈",  hue:320, lv:3},
+  {inf:"wegen",    sg:"woog",     pl:"wogen",     pp:"gewogen",     en:"to weigh",    zh:"称重",  hue:150, lv:3},
+  {inf:"treden",   sg:"trad",     pl:"traden",    pp:"getreden",    en:"to step",     zh:"踏",    hue:5,   lv:3},
+  {inf:"schenden", sg:"schond",   pl:"schonden",  pp:"geschonden",  en:"to violate",  zh:"侵犯",  hue:215, lv:3},
+  {inf:"besluiten",sg:"besloot",  pl:"besloten",  pp:"besloten",    en:"to decide",   zh:"决定",  hue:330, lv:3},
+  {inf:"bedriegen",sg:"bedroog",  pl:"bedrogen",  pp:"bedrogen",    en:"to deceive",  zh:"欺骗",  hue:95,  lv:3},
+  {inf:"bederven", sg:"bedierf",  pl:"bedierven", pp:"bedorven",    en:"to spoil",    zh:"损坏",  hue:185, lv:3},
+  {inf:"bevelen",  sg:"beval",    pl:"bevalen",   pp:"bevolen",     en:"to order",    zh:"命令",  hue:88,  lv:3},
+  {inf:"ontbreken",sg:"ontbrak",  pl:"ontbraken", pp:"ontbroken",   en:"to be missing",zh:"缺少", hue:60,  lv:3},
+  {inf:"beschrijven",sg:"beschreef",pl:"beschreven",pp:"beschreven", en:"to describe", zh:"描写",  hue:250, lv:3},
+  {inf:"vermijden",sg:"vermeed",  pl:"vermeden",  pp:"vermeden",    en:"to avoid",    zh:"避免",  hue:20,  lv:3},
+  {inf:"wijken",   sg:"week",     pl:"weken",     pp:"geweken",     en:"to give way", zh:"退让",  hue:305, lv:3},
+  {inf:"schuiven", sg:"schoof",   pl:"schoven",   pp:"geschoven",   en:"to shift",    zh:"推",    hue:140, lv:3},
+  {inf:"klimmen",  sg:"klom",     pl:"klommen",   pp:"geklommen",   en:"to climb",    zh:"爬",    hue:75,  lv:3},
+  {inf:"dringen",  sg:"drong",    pl:"drongen",   pp:"gedrongen",   en:"to push",     zh:"挤",    hue:225, lv:3},
+  {inf:"verbieden",sg:"verbood",  pl:"verboden",  pp:"verboden",    en:"to forbid",   zh:"禁止",  hue:355, lv:3},
+  {inf:"verlopen", sg:"verliep",  pl:"verliepen", pp:"verlopen",    en:"to proceed",  zh:"进行",  hue:115, lv:3},
+  {inf:"treffen",  sg:"trof",     pl:"troffen",   pp:"getroffen",   en:"to meet",     zh:"遇到",  hue:170, lv:3},
+  {inf:"buigen",   sg:"boog",     pl:"bogen",     pp:"gebogen",     en:"to bend",     zh:"弯曲",  hue:45,  lv:3},
+  {inf:"bergen",   sg:"borg",     pl:"borgen",    pp:"geborgen",    en:"to salvage",  zh:"打捞",  hue:205, lv:4},
+  {inf:"spinnen",  sg:"spon",     pl:"sponnen",   pp:"gesponnen",   en:"to spin",     zh:"纺线",  hue:255, lv:4},
+  {inf:"rijzen",   sg:"rees",     pl:"rezen",     pp:"gerezen",     en:"to rise",     zh:"升起",  hue:160, lv:4},
+  {inf:"gelijken", sg:"geleek",   pl:"geleken",   pp:"geleken",     en:"to resemble", zh:"酷似",  hue:25,  lv:4},
+  {inf:"bezwijken",sg:"bezweek",  pl:"bezweken",  pp:"bezweken",    en:"to succumb",  zh:"倒下",  hue:290, lv:4},
+  {inf:"vlechten", sg:"vlocht",   pl:"vlochten",  pp:"gevlochten",  en:"to plait",    zh:"编织",  hue:55,  lv:4},
+  {inf:"mijden",   sg:"meed",     pl:"meden",     pp:"gemeden",     en:"to avoid",    zh:"回避",  hue:345, lv:4},
+  {inf:"doorzien", sg:"doorzag",  pl:"doorzagen", pp:"doorzien",    en:"to see through",zh:"看穿", hue:235, lv:4},
+  {inf:"overzien", sg:"overzag",  pl:"overzagen", pp:"overzien",    en:"to oversee",  zh:"总览",  hue:145, lv:4},
+  {inf:"bezingen", sg:"bezong",   pl:"bezongen",  pp:"bezongen",    en:"to celebrate in song",zh:"歌颂", hue:15, lv:4},
+  {inf:"verslinden",sg:"verslond",pl:"verslonden",pp:"verslonden",  en:"to devour",   zh:"吞噬",  hue:315, lv:4},
+  {inf:"delven",   sg:"dolf",     pl:"dolven",    pp:"gedolven",    en:"to delve",    zh:"采掘",  hue:75,  lv:4},
 ];
-const LEVELS=[
-  {id:"A1.1", verbs:[0,1,2], goal:3},
-  {id:"A1.2", verbs:[3,4,5], goal:3},
-  {id:"A1.3", verbs:[6,7,8], goal:3},
-];
+/* 分关:每档词池按 3 词一切;A1 5 关 / A2 10 关 / B1 14 关 / B2 4 关 = 33 关 */
+const BANDS=["A1","A2","B1","B2"];
+const LEVELS=[];
+BANDS.forEach((band,bi)=>{
+  const pool=[];
+  VERBS.forEach((V,i)=>{ if(V.lv===bi+1) pool.push(i); });
+  for(let k=0;k<pool.length;k+=3) LEVELS.push({id:band+"."+(k/3+1), verbs:pool.slice(k,k+3), goal:3});
+});
 const FORMS=["inf","sg","pl","pp"];
-const COLS=6, ROWS=6;
+const COLS=5, ROWS=7;   // 35 格:比 6×6 少一列 → 词块更大(用户反馈"桌盘小一点、块大一点")
 const HUE_PALETTE=[215,12,275,160,48,330];
 const IDLE_HINT_MS=12000;
 
@@ -489,7 +585,7 @@ function fillBoard(){
     let t=null;
     for(let tries=0;tries<40;tries++){
       const cand=randTileAt(r,c);
-      if(!createsTriple(cand,r,c)){ t=cand; break; }
+      if(!createsQuad(cand,r,c)){ t=cand; break; }
     }
     if(!t){
       const act=level.verbs;
@@ -502,22 +598,28 @@ function fillBoard(){
 }
 function randTileAt(r,c){
   const act=level.verbs;
-  let v;
+  let v, f=Math.floor(Math.random()*4);
   const left=c>0?board[r][c-1]:null, up=r>0?board[r-1][c]:null;
-  if((left||up)&&Math.random()<0.62){          // 聚类偏置:同动词词块更容易相邻 → 四连更可达成
-    const src=(left&&up)?(Math.random()<.5?left:up):(left||up);
-    v=src.v;
+  const nb=(left&&up)?(Math.random()<.5?left:up):(left||up);
+  if(nb&&Math.random()<0.62){          // 聚类偏置:同动词词块更容易相邻
+    v=nb.v;
+    if(nb.f===f) f=(f+1+Math.floor(Math.random()*3))%4;   // 同动词相邻错开形式:四形齐更容易凑出
   }else{
     v=act[Math.floor(Math.random()*act.length)];
   }
-  return {v,f:Math.floor(Math.random()*4)};
+  return {v,f};
 }
-function createsTriple(t,r,c){
-  const L1=c>0?board[r][c-1]:null, L2=c>1?board[r][c-2]:null;
-  if(L1&&L2&&L1.v===t.v&&L2.v===t.v) return true;
-  const U1=r>0?board[r-1][c]:null, U2=r>1?board[r-2][c]:null;
-  if(U1&&U2&&U1.v===t.v&&U2.v===t.v) return true;
-  return false;
+// 布盘只禁「同动词 4 连」;3 连是"差一块"的好局面,允许(三消版禁 3 连,四消判定不同)
+function createsQuad(t,r,c){
+  const same=(rr,cc)=>{ const x=board[rr]&&board[rr][cc]; return x&&x.v===t.v; };
+  let n=1;
+  for(let cc=c-1;cc>=0&&same(r,cc);cc--) n++;
+  for(let cc=c+1;cc<COLS&&same(r,cc);cc++) n++;
+  if(n>=4) return true;
+  n=1;
+  for(let rr=r-1;rr>=0&&same(rr,c);rr--) n++;
+  for(let rr=r+1;rr<ROWS&&same(rr,c);rr++) n++;
+  return n>=4;
 }
 
 /* ================= 判定:≥4 连同动词,且四种形式齐全 ================= */
@@ -579,20 +681,23 @@ function countMoves(){
   }
   return n;
 }
-// 兜底:手工埋「差一块就成线」布局
+// 兜底:手工埋两个「差一块就成线」布局(四连版:行尾缺一块 + 列头缺一块)
 function forceTwoNearMiss(){
   fillBoard();
   const [V1,V2,V3]=level.verbs;
-  const junk=(notV,notF)=>{
+  const junk=(notF)=>{
     let t;
     do{ t={v:V3,f:Math.floor(Math.random()*4)}; }
-    while(t.v===notV&&t.f===notF);
+    while(t.f===notF);
     return t;
   };
-  board[0][0]={v:V1,f:0}; board[0][1]={v:V1,f:1}; board[0][2]={v:V1,f:2}; board[0][3]=junk(V1,3); board[1][3]={v:V1,f:3};
-  board[ROWS-1][COLS-1]={v:V2,f:0}; board[ROWS-1][COLS-2]={v:V2,f:1}; board[ROWS-1][COLS-3]={v:V2,f:2};
-  board[ROWS-2][COLS-3]={v:V2,f:3}; board[ROWS-2][COLS-2]=junk(V2,3);
-  if(scan(board).length) forceTwoNearMiss();
+  // 行近局:(0,3) 换入 V1-f3 → 首行四形齐
+  board[0][0]={v:V1,f:0}; board[0][1]={v:V1,f:1}; board[0][2]={v:V1,f:2};
+  board[0][3]=junk(3); board[1][3]={v:V1,f:3};
+  // 列近局:第 4 列 5-6 行已齐 f2 f1 f0,(3,4) 换入 V2-f3 → 列四形齐
+  board[ROWS-1][COLS-1]={v:V2,f:0}; board[ROWS-2][COLS-1]={v:V2,f:1}; board[ROWS-3][COLS-1]={v:V2,f:2};
+  board[ROWS-4][COLS-1]=junk(3); board[ROWS-4][COLS-2]={v:V2,f:3};
+  if(scan(board).length) forceTwoNearMiss();   // 若兜底块意外直接成线,重来
 }
 function buildBoardDOM(){
   boardEl.innerHTML="";
@@ -920,7 +1025,15 @@ function openMenu(){
   stopSpeech(); hideBanner();
   const row=document.getElementById("lvRow");
   row.innerHTML="";
+  let lastBand="";
   LEVELS.forEach((lv,i)=>{
+    const band=lv.id.split(".")[0];
+    if(band!==lastBand){                       // 分档目录:A1 / A2 / B1 / B2 小节
+      lastBand=band;
+      const h=document.createElement("div");
+      h.className="band-h"; h.textContent=band;
+      row.appendChild(h);
+    }
     const b=document.createElement("button");
     b.className="lv-btn"+((i+1)>save.unlocked?" locked":"")+(save.done[lv.id]?" done":"");
     b.textContent=lv.id;
