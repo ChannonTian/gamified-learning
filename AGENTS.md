@@ -70,6 +70,7 @@ gamified-learning/
 - **link-match v1.6(2026-10-04,试玩三连)**:关卡名编号化 **A1.1–B1.24**(lv.num)+形式标注,轮次角标取消;attemptPair **全同步非阻塞**(状态即落账、动画/收尾走 setTimeout、游玩中不置 busy)——改它必须保留残块 alive 守卫与 drawPath 按节点移除(防背靠背连对互吞);选中不再立即点亮同动词块,闲置 hintWait 后才提示(选中→peer 点亮 / 未选中→整对;=0 全关)。
 - **link-match v1.7(2026-10-04,竞品调研试点)**:试验关 **A1.1/A1.2**(`TRIAL_LEVELS`)落地 P1 连击里程碑(大字感叹+盘面波纹+和弦)/P3 交互式首教学(3 步演示,demoDone 一次)/P5 分数飞行/P6 清盘彩带;其余关卡原样供对比。**两个实现坑**:演示点击拦截必须在 busy 守卫前(演示靠 busy=true 锁闲置提示);demoClick 参数不可叫 `t`(遮蔽全局 i18n 函数 → "t is not a function"、回调不排上)。全量铺开待用户试玩定夺。
 - 已否决/搁置:原形百搭块(易混淆);四消判定(match-4,中盘供给不足,2026-10-04 用户否掉)。
+- **link-match v1.10(2026-10-04,二轮反馈七项)**:朗读修复(空队列不 cancel、cancel 后 70ms 延迟开口、speakGen 代数令牌、iOS 首手势静音解锁——v1.9 起朗读被 Chrome cancel→speak 竞态吞掉,用户报"还是没有");模式 HUD 重排(模式下隐藏 lvlTag,body.mode-hud 紧凑档,修倒计时换行);模式分数条 `.score-bar`(开局捕获 best 为右端目标、得分填充、record 态;levels 仍分数胶囊);**一屏一词型**(sampleModeVerbs 整盘单一形式、换盘不重复、modeFormState 各 start* 重置保每日种子确定);k-pp 切角补斜边(face 恒 4:3 → 斜边恒 36.87°,::before/::after 墨条);syncSize 逐块测字(长词不再拖小全板);.hico inline-block(修结算图标独占一行);横幅 collapseBanner(手动点掉只收词面不断连击,自然到期仍清)。
 - **link-match v1.9(2026-10-04,试玩 13 项)**:HUD 语境化(短关卡名+中槽按模式切进度/倒计时/最佳分)、词块 weight500+×0.93、菜单 ✕/点外回游戏/图标翻转、分数胶囊、emoji→手绘 SVG(色块偏移+墨线)、下划线一笔、庆祝进分数槽、词行删除、盘面 **4×9=18 对**(轮数=⌈池/9⌉,42 关,迁移 lvOrder v3)、连线虚线+边中点+lit 边框、--hot 统一橙红、朗读关→确认音、插画 grugRough 滤镜(feTurbulence+displacement,零重绘手绘化)。
 - **link-match v1.8(2026-10-04)**:**Grug 手作主题**(用户从四方向效果图选定 D)——`settings.theme` 默认 "grug",Papier 可切回;CSS 在 `body.theme-grug:not(.dark)` 下覆盖(暗色变量级联在后不破坏);tile 歪斜走 applyTileRotations(inline transform,与 scale/translate 动画属性不冲突);字号测量按主题选字体(手写体更宽)。效果图:docs/mockups/aesthetics.html。
 - **tile-match v0.9(2026-10-04,一次性解冻做美术,功能仍冻结)**:移植 link-match v1.8/v1.9 风格——Grug 主题(Thema 设置,Grug 默认/Papier 切回)+ 字号按主题手写字体测量 ×0.93/字重500 + emoji 全清换手绘 SVG(ICO_STAR/FLAME/CLOCK/TARGET)+ 分数真胶囊(**渐变字会吞 SVG 描边**,两主题都改实底)+ grugRough 滤镜 + --hot + 菜单 ✕/点外 + TTS=0 确认音;**与 link-match 实现差异:三消词块移动走 transform translate,歪斜必须合并进同一 transform(tileRot),不能独立 rotate**;hint 开关作用域到主题圆角/色染(no-shape/no-color);顺修弹窗后兜底自愈 pickRefillTile 读 level.verbs 崩(加空回退)。
@@ -80,6 +81,7 @@ gamified-learning/
 - **link-match 路径坐标约定(v1.2 坑)**:`findPathOcc(occ, r1, c1, r2, c2)` 收 **0 基棋盘坐标**,内部自己 +1 转外圈;调用方**禁止再 +1**(v1.1 双重偏移 → 有路判不能连/假提示/连线画偏一格,QA bot 因相邻对在偏移系也可连而漏测)。折线回溯的根父指针(dir=-1)处要显式 push 起点 A。改引擎必跑 `node link-match/test/path-engine.test.mjs`(异构参照实现对照+折线合法性+全消链路)。
 - **drawPath 端点方向判定也是 [r,c](v1.9 坑,用户发现)**:`edge()` 里列差才是水平、行差才是垂直(`dx=nxt[1]-pt[1]`),轴序颠倒 → 端点从错误一侧出边、连线出现斜线段。复测办法:连对后导出 `#pathSvg polyline` points,断言相邻点至少共一轴(diag=false)。
 - **异步链路异常会卡死 busy**:await 链外层 try/finally 复位 busy,全局错误捕获(window.__errors)留痕;showResult/updateHUD 等「先置空后使用」的次序错误用 NLM3.errors() 排查。
+- **IAB QA 三坑(2026-10-04)**:①`browser.tabs.new()` 建的页 **reload 后视口归零**(innerWidth=0 → syncSize 算出负 tw、字号砸到 7.9px 地板),每次 reload 后必须重设 390×844 并手动 `syncSize()`;②后台/冻结页的**截图可能是旧帧**(DOM 已变、画面没刷),布局断言以 evaluate 读 DOM 为准,截图前 `void body.offsetWidth` 强制重流;③tab 句柄的 `evaluate` **不 await 异步 IIFE**(返回 Promise 序列化成 {}),载荷一律同步 IIFE 返回 `JSON.stringify(...)`;异步步骤放在 cell 层 await。
 
 - 补牌生成的 tile 必须 `boardEl.appendChild`(曾导致棋盘隐形减员)。
 - 首次解锁判断用全局 `save.collected`,不是本局 `collectedRun`。

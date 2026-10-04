@@ -1,5 +1,17 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-04 · v1.10(link-match)朗读修复 + 模式 HUD 二轮(用户试玩反馈七项)
+
+- **审计 v1.9 十三项**:12 项已落实;唯一未生效的是第 11 项"朗读"——调用链在(`showLearnBanner→speakPair`),但 `speechSynthesis.cancel()` 后**同步** `speak()` 被 Chrome 竞态静默吞掉(link-match 没同步 tile-match v0.86 的"延迟开口"修复),连快时每对都在 cancel→speak,故"朗读就没了"。修复:空队列不 cancel;刚 cancel 过延迟 70ms 开口;**代数令牌 speakGen** 让新横幅接管后旧链全部失效;另加 iOS/Safari 首次手势静音音节解锁 speechSynthesis。QA:speak 后 150ms 内 `speaking|pending=true`。
+- **模式 HUD 重排(修"倒计时被迫换行")**:每日中槽原有 lvlTag+进度胶囊+计时三胶囊,390px 必挤爆。模式(无尽/每日/生存)下隐藏 lvlTag(模式自明),无尽中槽清空(最佳分移入分数条目标位);`body.mode-hud` 紧凑档(胶囊收边、分数条 min-width 88)。QA:四模式在 390px 连击激活时 HUD 全部单行(hudH 56)。
+- **模式分数条(新规)**:levels 保持 ⭐分数胶囊;模式改 `.score-bar`——开局捕获个人最佳为**目标固定在右端**(endless=Oneindig/daily=当日/survival=Survival),得分从左**填充进度条**,超越目标进 record 态(目标字转橙红)。里程碑庆祝对两种分数框都兼容。
+- **一屏一词型**:`sampleModeVerbs` 整盘只取一种形式(sg/pl/pp),清盘换型不与上一盘重复;modeFormState 在各 start* 重置,**每日挑战保持种子确定性**。help.modes 三语言补一句。QA:连抓多盘形式唯一。
+- **k-pp 切角"缺角"修复**:切角 clip-path 把 grug 墨线圈一起裁掉;块面恒 4:3 → 斜边角恒 36.87°,用 face::before/::after 两根 2.2px 墨条补描(75.5% 起位、32% 长)。QA:2x 特写视觉确认轮廓完整。
+- **逐块字号**:`syncSize` 从"最长词定全板字号"改为**逐块实测**(长词单独缩,短词保住可读字号);QA 同板 5 档字号 17.3–18.6px。地板 8.5×grug0.93=7.9 下限不变。
+- **结算图标对齐**:v1.9 把 emoji 换 `.hico` 时 `display:block`,在结算文本里独占一行(用户:"分数图标去哪了");改 `inline-block + vertical-align:-3px`,计时/最佳/结算全处对齐。QA:结算 "🪙 15 · beste: 800" 同行。
+- **横幅手动点掉不断连击**:`bannerEl.onclick` 由 hideBanner 改 **collapseBanner**——卡片下滑只剩底部 3px 倒计时条(`translateY(calc(100% - 13px))`),连击窗口与朗读继续;自然到期仍清连击。QA:点掉后 streak 保持、下对重连自动展开、3s 到期 streak 归零。
+- QA 存档已清;引擎回归全绿;console 零错误。QA 环境坑:tabs.new() 的页 **reload 后视口归零**(每次 reload 后须重设 390×844),后台页截图可能是冻结旧帧(以 DOM 为准)。
+
 ## 2026-10-04 · v0.9(tile-match)Grug 手作主题 + 连连看 v1.8/v1.9 风格移植(用户:照连连看的改法升级三消美术)
 
 - **Grug 主题系统**(承 link-match v1.8,方向 D):设置新增 `Thema`(Grug **默认** / Papier 原版);`body.theme-grug:not(.dark)` 覆盖暖纸变量、词块纸染 12%+墨线描边+错位硬阴影+weight500、三形式各异手绘圆角(sg 波浪圆角/pl 紧角/pp 切角)、选中虚线圈、HUD/按钮/面板墨线歪斜圆角;`body.theme-grug.dark` 只降饱和,暗色变量级联在后不破坏。**与连连看的实现差异**:三消词块移动走 transform translate,歪斜必须合并进同一 transform(placeTile/tileRot,随重力自动更新),不能用独立 rotate。主题切换时即时重排歪斜+重算字号。
