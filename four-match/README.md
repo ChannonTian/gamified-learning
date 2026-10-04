@@ -1,5 +1,7 @@
 # four-match · Sterke werkwoorden match-4(原型)
 
+> ⚠️ **2026-10-04 试玩否决,路线暂时搁置**:盘面上四连太难自然拼出,频繁死局重排;玩法回归三消(tile-match)。原型保留供参考,不再迭代(复盘见 docs/DEVLOG.md)。
+
 tile-match 的四消对照分支,独立单文件产品(零依赖,与 tile-match/link-match 解耦)。
 
 ## 玩法
