@@ -21,7 +21,7 @@
 - ~~每日挑战 / 无尽模式~~ → **已上线(v1.3)**。~~生存模式~~ → **已上线(v1.5)**。
 - **竞品调研得出的提升项(2026-10-04,详见 docs/RESEARCH-competitors.md,待拍板)**:
   - P1 连击里程碑庆祝(×3/×5/×8 递进动效+和弦)——对标 Candy Crush 连锁升级
-  - P2 主题皮肤系统(纸/黑板/暮色 3 套起步,收集词数解锁)——对标 Zen Match 皮肤/主题
+  - P2 主题皮肤系统(纸/黑板/暮色 3 套起步,收集词数解锁)——对标 Zen Match 皮肤/主题;**美术方向效果图已出:docs/mockups/aesthetics.html(包豪斯风格派 / LeWitt·KAMI 折纸 / Mini Metro 深色光 / grug 手作),方向待用户选定**
   - P3 交互式首教学(3 步演示替代文字帮助)——借鉴 Royal Match 无教程哲学
   - P4 进度仪式感(档位毕业页、图鉴完成度、每日连续天数展示)——Wordscapes 式
   - P5 分数流动画(得分飞向计分器)+ P6 清盘终章分层动效 + Android 触觉(navigator.vibrate)
