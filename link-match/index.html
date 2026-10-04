@@ -158,6 +158,18 @@
     animation:popRise .8s ease-out forwards; white-space:nowrap;
   }
   @keyframes popRise{ 0%{ translate:0 6px; opacity:0; scale:.7; } 18%{ opacity:1; scale:1.08; } 100%{ translate:0 -26px; opacity:0; scale:1; } }
+  .score-pop.big{ font-size:22px; animation:popRiseBig 1s ease-out forwards; color:#e05645; }
+  @keyframes popRiseBig{ 0%{ translate:0 10px; opacity:0; scale:.5; } 15%{ opacity:1; scale:1.25; } 70%{ opacity:1; scale:1; } 100%{ translate:0 -34px; opacity:0; } }
+
+  /* ---- 竞品调研试点(P1/P3/P5/P6):里程碑波纹 / 分数飞行 / 彩带 / 交互演示 ---- */
+  #boardWrap.ripple{ animation:boardRipple .55s ease; }
+  @keyframes boardRipple{ 0%{ box-shadow:0 6px 24px rgba(51,65,92,.06); } 40%{ box-shadow:0 0 0 12px rgba(232,115,74,.22), 0 6px 32px rgba(232,115,74,.3); } 100%{ box-shadow:0 6px 24px rgba(51,65,92,.06); } }
+  .score-fly{ position:fixed; z-index:60; font-weight:800; font-size:15px; color:var(--accent); pointer-events:none; text-shadow:0 1px 0 rgba(255,255,255,.6); transition:transform .6s cubic-bezier(.45,-0.15,.75,.35), opacity .6s ease-in; }
+  .confetti{ position:absolute; width:8px; height:13px; border-radius:2px; z-index:9; pointer-events:none; animation:confettiFall 1.4s ease-in forwards; }
+  @keyframes confettiFall{ 0%{ transform:translate(0,0) rotate(0); opacity:1; } 100%{ transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; } }
+  #demoBar{ position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:9; background:var(--accent); color:#fff; font-size:12.5px; font-weight:800; padding:7px 15px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.18); pointer-events:none; white-space:nowrap; max-width:94%; overflow:hidden; text-overflow:ellipsis; }
+  .tile.demo-target .face{ animation:demoPulse 1s ease infinite; }
+  @keyframes demoPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(232,115,74,0); } 50%{ box-shadow:0 0 0 7px rgba(232,115,74,.4); } }
 
   /* ---------- 盘下词行(学习条) ---------- */
   #wordRow{
@@ -666,6 +678,8 @@ const I18N={
     "help.rules":"Levels heten A1.1, A1.2, …: binnen elke band komen eerst alle enkelvoud-rondes, daarna de meervoud-rondes en tot slot het voltooid deelwoord.",
     "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag).",
     "help.stuck":"Vastgelopen? Tik op 💡 — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
+    "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij! 🎉",
+    "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
     "card.tip":"Tik voor de betekenis",
   },
   zh:{
@@ -692,6 +706,8 @@ const I18N={
     "help.rules":"关卡名为 A1.1、A1.2……每档先练完所有单数轮,再复数轮,最后过去分词轮。",
     "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。",
     "help.stuck":"卡住了?点 💡 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
+    "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了! 🎉",
+    "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
     "card.tip":"点击查看释义",
   },
   en:{
@@ -718,6 +734,8 @@ const I18N={
     "help.rules":"Levels are named A1.1, A1.2, …: within each band all singular rounds come first, then the plural rounds, then the past participle.",
     "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day).",
     "help.stuck":"Stuck? Tap 💡 — or wait a moment. The edges around the board are part of the play field.",
+    "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn! 🎉",
+    "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
     "card.tip":"Tap for the meaning",
   },
 };
@@ -1345,6 +1363,7 @@ async function startLink(idx){
   updateHUD();
   busy=false;
   lastAction=Date.now();
+  maybeStartDemo();
 }
 function displayId(lv){ return `${lv.band}.${lv.num} · ${t(SHORT_KEY[lv.type])}`; }
 const PAIR_TOTAL=ROWS*COLS/2;
@@ -1577,6 +1596,10 @@ function attemptPair(a,b){
   pairsLeft--;
   a.el.classList.add("flash"); b.el.classList.add("flash");
   popScore(pts,streak,b.r+1,b.c+1);
+  if(trial()){   // 试点:里程碑庆祝 + 分数飞向计分器
+    milestone(streak,b.r+1,b.c+1);
+    flyScore(b.el,"+"+pts);
+  }
   for(const x of [a,b]){ const cw=document.getElementById("wordRow").children[x.chip]; if(cw) cw.classList.add("done"); }
   if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
   updateHUD();
@@ -1586,6 +1609,7 @@ function attemptPair(a,b){
   if(pairsLeft<=0){
     scoreRun+=CLEAR_BONUS;
     updateHUD();
+    if(trial()){ confetti(); [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>blip(f,.12,"triangle",.07),i*70)); }   // 试点:清盘终章
     setTimeout(()=>{
       if(mode==="levels"){ if(curLevel) finishLevel(); }
       else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
@@ -1645,6 +1669,58 @@ function successJingle(streak){
   blip(base,.07,"triangle",.09);
   setTimeout(()=>blip(base*1.335,.09,"triangle",.07),70);
   if(streak>=3) setTimeout(()=>blip(base*1.782,.12,"triangle",.06),150);
+}
+
+/* ---- 竞品调研试点(docs/RESEARCH-competitors.md P1/P3/P5/P6;只在试验关 A1.1/A1.2 生效) ---- */
+const TRIAL_LEVELS=new Set(["L0","L1"]);
+const trial=()=> mode==="levels" && curLevel && TRIAL_LEVELS.has(curLevel.id);
+function comboWord(streak){   // P1 里程碑:×3/×5/×8,之后每 +4 再庆祝
+  if(streak===3) return "combo.m3";
+  if(streak===5) return "combo.m5";
+  if(streak===8) return "combo.m8";
+  if(streak>=12 && (streak-12)%4===0) return "combo.m12";
+  return null;
+}
+function milestone(streak,tr,tc){
+  const word=comboWord(streak);
+  if(!word) return;
+  const [x,y]=cellCenter(tr,tc);
+  const el=document.createElement("div");
+  el.className="score-pop big";
+  el.textContent=t(word);
+  el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
+  wrapEl.appendChild(el);
+  setTimeout(()=>el.remove(),1050);
+  wrapEl.classList.remove("ripple"); void wrapEl.offsetWidth; wrapEl.classList.add("ripple");
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>blip(f,.1,"triangle",.08),i*60));
+}
+function flyScore(fromEl,text){   // P5:分数从消除处飞向计分器(资源流向,Royal Match 式)
+  try{
+    const from=fromEl.getBoundingClientRect();
+    const to=document.getElementById("scoreTag").getBoundingClientRect();
+    const el=document.createElement("div");
+    el.className="score-fly"; el.textContent=text;
+    el.style.left=(from.left+from.width/2)+"px"; el.style.top=(from.top+from.height/2)+"px";
+    document.body.appendChild(el);
+    void el.offsetWidth;   // 强制重流,保证 transition 从原位出发(勿用 rAF)
+    const dx=(to.left+to.width/2)-(from.left+from.width/2), dy=(to.top+to.height/2)-(from.top+from.height/2);
+    el.style.transform=`translate(${dx}px,${dy}px) scale(.45)`;
+    el.style.opacity="0";
+    setTimeout(()=>el.remove(),680);
+  }catch(e){}
+}
+function confetti(){   // P6:清盘终章彩带
+  for(let i=0;i<26;i++){
+    const el=document.createElement("div");
+    el.className="confetti";
+    el.style.left="50%"; el.style.top="28%";
+    el.style.background=`hsl(${Math.floor(Math.random()*360)} 70% 60%)`;
+    el.style.setProperty("--dx",(Math.random()*wrapEl.clientWidth-wrapEl.clientWidth/2)+"px");
+    el.style.setProperty("--dy",(wrapEl.clientHeight*.6+Math.random()*90)+"px");
+    el.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    wrapEl.appendChild(el);
+    setTimeout(()=>el.remove(),1500);
+  }
 }
 
 /* ---- 横幅(所有模式,10s=连击窗口) ---- */
@@ -1713,11 +1789,13 @@ function toast(msg){
 
 /* ---- 选择/配对输入 ---- */
 boardEl.addEventListener("click",e=>{
-  if(busy||!curLevel) return;
+  if(!curLevel) return;
   const el=e.target.closest(".tile");
   if(!el) return;
   const t=el._t;
   if(!t||!t.alive) return;   // 消除动画中的残块不可再选
+  if(demo){ demoClick(t); return; }   // 首教演示接管输入(须在 busy 守卫前:演示期间 busy=true)
+  if(busy) return;
   lastAction=Date.now();
   if(!selected){
     selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04);   // 选中即点亮已移除:等 hintWait 再提示(用户反馈 #3)
@@ -1732,12 +1810,61 @@ function clearSel(){
   if(selected){ selected.el.classList.remove("sel"); selected=null; }
   boardEl.querySelectorAll(".peer").forEach(el=>el.classList.remove("peer"));
 }
+
+/* ---- 交互式首教学(P3):首次进 A1.1 时 3 步演示,只出现一次;点对推进,点错抖目标 ---- */
+let demo=null;
+function maybeStartDemo(){
+  if(save.demoDone || mode!=="levels" || !curLevel || curLevel.id!=="L0") return;
+  let pair=null;
+  for(const vi of curLevel.verbs){
+    const inf=tiles.find(t=>t.alive&&t.v===vi&&t.k==="inf");
+    const form=tiles.find(t=>t.alive&&t.v===vi&&t.k==="form");
+    if(inf&&form&&findPathOcc(occNow(),inf.r,inf.c,form.r,form.c)){ pair=[inf,form]; break; }
+  }
+  if(!pair) return;
+  demo={step:1, inf:pair[0], form:pair[1], bar:null};
+  busy=true;   // 演示期间接管输入
+  const bar=document.createElement("div");
+  bar.id="demoBar";
+  bar.textContent=t("demo.step1");
+  wrapEl.appendChild(bar);
+  demo.bar=bar;
+  demo.inf.el.classList.add("demo-target");
+}
+function demoClick(tile){   // 注意:参数不可叫 t,会遮蔽全局 i18n 函数 t()
+  if(demo.step===1){
+    if(tile===demo.inf){
+      demo.inf.el.classList.remove("demo-target"); demo.form.el.classList.add("demo-target");
+      demo.step=2; demo.bar.textContent=t("demo.step2"); blip(480,.05,"sine",.05);
+    }else wiggle(demo.inf);
+  }else if(demo.step===2){
+    if(tile===demo.form){
+      demo.form.el.classList.remove("demo-target");
+      demo.step=3; demo.bar.textContent=t("demo.step3"); blip(560,.06,"sine",.05);
+      setTimeout(()=>{
+        busy=false;
+        attemptPair(demo.inf,demo.form);   // 连线自己画出来
+        if(demo.bar){ demo.bar.remove(); }
+        demo=null;
+        save.demoDone=true; persist();
+        setTimeout(()=>toast(t("demo.go")),650);
+      },500);
+    }else wiggle(demo.form);
+  }
+}
+function wiggle(t){
+  t.el.classList.add("shake"); blip(180,.06,"sine",.04);
+  setTimeout(()=>t.el.classList.remove("shake"),320);
+}
 </script>
 <script>
 "use strict";
 /* ================= i18n ================= */
 let board=[];                        // 由引擎脚本赋值
-function abandonSession(){ stopSpeech(); hideBanner(); }
+function abandonSession(){
+  stopSpeech(); hideBanner();
+  if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); }   // 弃局时撤演示
+}
 function speakVerb(word){
   return new Promise(res=>{
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
@@ -2005,6 +2132,7 @@ window.NLM3={
   settings:()=>({...save.settings}),
   forceTimeUp:()=>{ dailyLeft=1; },
   forceSurvivalEnd:()=>{ if(survivalDeadline) survivalDeadline=Date.now()-1; },
+  skipDemo:()=>{ if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); busy=false; save.demoDone=true; persist(); } },
   save:()=>save,
 };
 
