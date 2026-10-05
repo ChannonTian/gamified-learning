@@ -55,17 +55,22 @@
   body.theme-grug:not(.dark) .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:10px; border-radius:0; background:none;
-    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M1.5 6 Q28 2.4 55 4.8 T99 3.6" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
     background-size:100% 100%;
   }
   body.theme-grug.dark .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:10px; border-radius:0; background:none;
-    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M1.5 6 Q28 2.4 55 4.8 T99 3.6" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
     background-size:100% 100%;
   }
   body.theme-grug .tile.k-inf .face::before{ display:none; }
   body.theme-grug .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  /* 切角块的选中外框:outline 会被 clip-path 裁掉(用户截图),改随形 drop-shadow 光晕 */
+  body.theme-grug .tile.sel.k-pp .face{
+    outline:none;
+    filter:drop-shadow(0 0 2.5px var(--accent)) drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent));
+  }
   body.theme-grug.dark .face{
     background:color-mix(in srgb, hsl(var(--h) 20% 40%) 15%, #26282e);
     color:#e7ddc4;
@@ -300,10 +305,15 @@
   /* ---------- 底部操作坞 + 教学横幅 ---------- */
   #dock{
     position:relative;
-    display:flex; gap:12px; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
     margin-top:10px;
     padding:2px 14px calc(24px + env(safe-area-inset-bottom));
   }
+  .dock-row{ display:flex; gap:12px; justify-content:center; }
+  /* 横幅槽位:闯关模式固定高度——按钮固定下移,横幅+倒计时条位置不变;挑战模式保持覆盖式 */
+  #bannerSlot{ position:static; height:0; width:100%; }
+  body.in-levels #bannerSlot{ position:relative; height:56px; }
+  body.in-levels #learnBanner.collapsed{ transform:none !important; top:auto; height:13px; }
   .dock-btn{
     display:flex; align-items:center; gap:8px;
     border:1px solid var(--line); background:var(--card); color:var(--ink);
@@ -327,13 +337,23 @@
   #bannerArt, .b-main, #bannerGloss{ transition:opacity .18s ease; }
   #bannerArt{width:46px; height:46px; flex:none;}
   .b-main{flex:1; min-width:0;}
-  .b-main b{font-size:23px; font-weight:800; line-height:1.1;}
-  #bannerForm{font-size:18px; font-weight:700; color:hsl(var(--h) 45% 40%); margin-top:2px;}
+  /* 四形态词卡:原形/单过去/复过去/分词;当前词型加粗高亮,其余浅灰;原形同字号+下划线 */
+  #bannerForms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:1px 9px; font-size:15px; font-weight:700; line-height:1.3; }
+  #bannerForms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
+  #bannerForms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
+  body.theme-grug.dark #bannerForms .bf.on{ color:hsl(var(--h) 45% 66%); }
   #bannerGloss{
     margin-left:auto; flex:none; max-width:34%;
     font-size:12.5px; line-height:1.35; text-align:right;
     color:var(--ink); opacity:.6;
   }
+  /* 卡片/横幅里的原形下划线:与磁贴同一款手绘弧线(Papier 主题用色条) */
+  .swu{
+    display:inline-block; padding-bottom:3px;
+    background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>') left bottom/100% 6px no-repeat;
+  }
+  body.theme-grug.dark .swu{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>'); }
+  body:not(.theme-grug) .swu{ background:none; border-bottom:2.5px solid var(--accent); padding-bottom:1px; }
   .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
   .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
   #learnBanner.show .b-progress i{animation:bprog var(--bdur,10s) linear forwards;}
@@ -388,8 +408,9 @@
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
   #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
-  #cardInf{font-size:32px; font-weight:800;}
-  #cardForms{font-size:13px; color:#8b93a3; margin-top:6px;}
+  #cardInf{display:none;}
+  #cardForms{ display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:2px 10px; font-size:15px; font-weight:700; margin-top:12px; }
+  #cardForms .cf{ color:var(--ink); white-space:nowrap; }
   #cardGloss{
     margin-top:12px; padding:10px 12px; border-radius:12px;
     background:var(--paper); font-size:14px; color:var(--ink); display:none;
@@ -484,16 +505,19 @@
   </div>
 
   <div id="dock">
-    <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
-    <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
+    <div id="bannerSlot">
     <div id="learnBanner">
       <svg id="bannerArt" viewBox="0 0 120 120"></svg>
       <div class="b-main">
-        <b id="bannerInf"></b>
-        <div id="bannerForm"></div>
+        <div id="bannerForms"></div>
       </div>
       <div id="bannerGloss"></div>
       <div class="b-progress"><i></i></div>
+    </div>
+    </div>
+    <div class="dock-row">
+      <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
+      <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
     </div>
   </div>
 </div>
@@ -505,7 +529,7 @@
       <button class="close-x" id="menuClose" style="position:absolute; top:14px; right:14px;">✕</button>
       <h1 style="margin-bottom:14px;">Koppelen</h1>
       <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
-      <button class="menu-btn" id="mContinue"><svg class="ic" style="transform:scaleY(-1);" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
+      <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9 12H19M15 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
       <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
       <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
@@ -854,7 +878,7 @@ function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.
 
 /* ================= 存档 ================= */
 const SAVE_KEY="linkmatch.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:12, bannerMs:10, theme:"grug", dark:false};
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:15, bannerMs:15, theme:"grug", dark:false};
 let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -880,6 +904,9 @@ if(save.lvOrder!=="v3"){
   }
   save.lvOrder="v3";
 }
+// 设置默认值迁移:v1.12 及之前横幅默认 10s、提示等待 12s → 统一 15s(用户自定义值保留)
+if(save.settings.bannerMs===10) save.settings.bannerMs=15;
+if(save.settings.hintWait===12) save.settings.hintWait=15;
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
 
 function applySettings(){
@@ -1260,7 +1287,7 @@ function artSVG(vIdx,style){
 const COLS=4; let ROWS=9;   // 闯关盘 4×5=20 格(9 词×1 对+2 随机缺口,零重复);三模式 4×9=36 格(9 词×2 对)
 const RING=16;                       // 外圈连线带宽(px)
 const PAIR_POINTS=15, CLEAR_BONUS=100;
-const BANNER_DEFAULT_S=10;               // 横幅秒数默认值(=连击窗口,可在设置调 5-30s)
+const BANNER_DEFAULT_S=15;               // 横幅秒数默认值(=连击窗口,与提示等待统一 15s,可在设置调 5-30s)
 const IDLE_HINT_MS_DEFAULT=12000;
 
 const boardEl=document.getElementById("grid");
@@ -1523,6 +1550,7 @@ async function startLink(idx){
   if(!lv) return;
   abandonSession();
   mode="levels";
+  document.body.classList.add("in-levels");   // 闯关:横幅固定槽位
   stopDailyTimer();
   document.getElementById("timerTag").style.display="none";
   curLevel=lv;
@@ -1597,6 +1625,7 @@ function sampleModeVerbs(pool,n,r){   // 一屏只一种词型搭配(用户反�
 }
 function dealModeBoard(){
   ROWS=9;   // 挑战模式恢复 4×9=36 格盘(9 词×2 对,允许同屏重复)
+  document.body.classList.remove("in-levels");
   const picks=sampleModeVerbs(collectedPool(),9,mode==="daily"?modeRng:Math.random);
   clearSel(); clearHint();
   board=buildPairsFrom(picks, 2, 0);
@@ -1779,7 +1808,7 @@ function attemptPair(a,b){
   }
   if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
   updateHUD();
-  showLearnBanner(a.v, formWord);
+  showLearnBanner(a.v, formWord, a.f);   // 高亮本盘词型
   if(save.settings.ttsVolume<=0){ setTimeout(()=>{ blip(660,.09,"sine",.06); setTimeout(()=>blip(990,.12,"sine",.05),90); },160); }   // 关朗读:连对确认音
   setTimeout(()=>{ a.el.classList.add("gone"); b.el.classList.add("gone"); },170);
   setTimeout(()=>{ a.el.remove(); b.el.remove(); },470);
@@ -1904,13 +1933,14 @@ function collapseBanner(){
   if(!bannerEl.classList.contains("show")) return;
   bannerEl.classList.add("collapsed");   // 手动点掉:只收词面,连击窗口与倒计时条继续(用户反馈);朗读不打断
 }
-function showLearnBanner(v,formWord){
+function showLearnBanner(v,formWord,activeF){
   clearTimeout(bannerTimer);
   const V=VERBS[v];
   bannerVerb=v;
   document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
-  document.getElementById("bannerInf").textContent=V.inf;
-  document.getElementById("bannerForm").textContent="— "+formWord;
+  document.getElementById("bannerForms").innerHTML=
+    [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]]
+      .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   document.getElementById("bannerGloss").textContent=glossOf(V);
   bannerEl.style.setProperty("--h",V.hue);
   bannerEl.classList.remove("show");
@@ -2210,7 +2240,7 @@ function renderSettings(){
   const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;
   document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
   const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
-  document.getElementById("bannerVal").textContent=`${S.bannerMs||10} s`;
+  document.getElementById("bannerVal").textContent=`${S.bannerMs||15} s`;
   seg(document.getElementById("setTheme"),[["grug",t("theme.grug")],["papier",t("theme.papier")]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
 }
@@ -2257,8 +2287,10 @@ function showCard(vi){
     cardResolve=res;
     const V=VERBS[vi];
     document.getElementById("cardArt").innerHTML=artSVG(vi,save.style);
-    document.getElementById("cardInf").textContent=V.inf;
-    document.getElementById("cardForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
+    document.getElementById("cardInf").innerHTML="";
+    document.getElementById("cardForms").innerHTML=
+      [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]]
+        .map(([k,w])=>`<span class="cf${k==="inf"?" swu":""}">${w}</span>`).join("");
     document.getElementById("cardGloss").textContent=glossOf(V);
     document.getElementById("cardTip").textContent=t("card.tip");
     document.getElementById("cardModal").classList.remove("gloss-open");
