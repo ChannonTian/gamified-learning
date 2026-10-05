@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Koppelen · demo NIG I–IV</title>
+<style>
+  :root{
+    --ink:#33415c;
+    --paper:#f7f5f0;
+    --card:#ffffff;
+    --line:#e4dfd4;
+    --accent:#e8734a;
+    --dim:rgba(51,65,92,.42);
+    --tile-s:42%; --tile-l:92%; --tile-ink:28%; --tile-edge:80%;
+    --hot:#e06b45;
+  }
+  /* ============ 主题 · Grug 手作(P2;docs/mockups/aesthetics.html 方向 D) ============ */
+  body.theme-grug{
+    --hand:"Chalkboard SE","Comic Sans MS","Marker Felt","Segoe Print",cursive;
+    font-family:var(--hand);
+  }
+  body.theme-grug .tag, body.theme-grug .goal-pill, body.theme-grug .score-tag, body.theme-grug .score-bar, body.theme-grug .combo-tag,
+  body.theme-grug .dock-btn, body.theme-grug .menu-btn, body.theme-grug .lv-btn,
+  body.theme-grug .btn, body.theme-grug .panel h1, body.theme-grug .panel h2{ font-family:var(--hand); }
+  body.theme-grug:not(.dark){
+    --hot:#c9563c;
+    --ink:#3b332a;
+    --paper:#ece1c9;
+    --card:#f6efdd;
+    --line:#d9ccae;
+    --accent:#b3543c;
+    --dim:rgba(59,51,42,.45);
+    --grug-ink:#3b332a;
+  }
+  body.theme-grug:not(.dark) .face{
+    background:color-mix(in srgb, hsl(var(--h) 42% 62%) 12%, #faf3e3);
+    color:#3b332a;
+    box-shadow:inset 0 0 0 2.2px #3b332a, 3px 4px 0 rgba(59,51,42,.14);
+    font-weight:500;
+  }
+  body.theme-grug .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
+  body.theme-grug .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
+  body.theme-grug .tile.k-pl .face{ border-radius:4px 7px 3px 6px; }
+  body.theme-grug .tile.k-pp .face{ border-radius:18px 0 19px 0; clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%); }
+  /* 切角的两条斜边补上墨线(块面固定 4:3,斜边角度恒为 atan(0.75)=36.87°);
+     切角处圆角归零 + 斜条两端各加长 ~2.5% 压过接缝,消除小缺口(用户二轮反馈) */
+  body.theme-grug .tile.k-pp .face::before,
+  body.theme-grug .tile.k-pp .face::after{
+    content:""; position:absolute; width:34%; height:2.2px; background:var(--grug-ink);
+    transform-origin:0 0; transform:rotate(36.87deg);
+  }
+  body.theme-grug .tile.k-pp .face::before{ left:73.5%; top:0; }
+  body.theme-grug .tile.k-pp .face::after{ left:0; top:73.5%; }
+  body.theme-grug:not(.dark) .tile.k-inf .face::after{
+    content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
+    height:10px; border-radius:0; background:none;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
+    background-size:100% 100%;
+  }
+  body.theme-grug.dark .tile.k-inf .face::after{
+    content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
+    height:10px; border-radius:0; background:none;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>');
+    background-size:100% 100%;
+  }
+  body.theme-grug .tile.k-inf .face::before{ display:none; }
+  body.theme-grug .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
+  /* 切角块的选中外框:outline 会被 clip-path 裁掉(用户截图),改随形 drop-shadow 光晕 */
+  body.theme-grug .tile.sel.k-pp .face{
+    outline:none;
+    filter:drop-shadow(0 0 2.5px var(--accent)) drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent));
+  }
+  body.theme-grug.dark .face{
+    background:color-mix(in srgb, hsl(var(--h) 20% 40%) 15%, #26282e);
+    color:#e7ddc4;
+    box-shadow:inset 0 0 0 2.2px var(--grug-ink), 3px 4px 0 rgba(0,0,0,.3);
+    font-weight:500;
+  }
+  body.theme-grug:not(.dark) .hud-btn{ border:2.2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); box-shadow:2px 3px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .tag{ border:2px solid var(--ink); border-radius:13px 16px 12px 17px; background:var(--card); font-size:15px; }
+  body.theme-grug:not(.dark) .goal-pill{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; background:var(--card); font-size:13.5px; }
+  body.theme-grug:not(.dark) .score-tag{ border:2px solid var(--ink); border-radius:16px 12px 17px 13px; background:#e3b52e; color:#3b332a; font-size:15.5px; min-width:58px; height:40px; padding:0 11px; display:inline-flex; align-items:center; justify-content:center; }
+  body.theme-grug:not(.dark) .score-bar{ border:2px solid var(--ink); border-radius:15px 12px 17px 13px; background:var(--card); height:40px; }
+  body.theme-grug:not(.dark) .score-bar .sb-goal{ color:#8a6d3b; }
+  body.theme-grug:not(.dark) .score-bar.record .sb-goal{ color:#b3543c; }
+  body.theme-grug:not(.dark) .dock-btn{ border:2.2px solid var(--ink); background:var(--card); color:var(--ink); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.15); font-size:14px; }
+  body.theme-grug:not(.dark) .menu-btn{ border:2.2px solid var(--ink); background:var(--card); border-radius:15px 12px 17px 13px; box-shadow:2.5px 3.5px 0 rgba(59,51,42,.12); font-size:15.5px; }
+  body.theme-grug:not(.dark) .panel{ border:2.5px solid var(--ink); box-shadow:5px 7px 0 rgba(59,51,42,.14); }
+  body.theme-grug:not(.dark) .lv-btn{ border:2px solid var(--ink); border-radius:14px 11px 16px 12px; font-size:14px; }
+  body.theme-grug:not(.dark) .lv-btn.done{ background:#e4e6cf; border-color:var(--ink); }
+  body.theme-grug:not(.dark) .btn{ border:2.2px solid var(--ink); border-radius:14px 12px 16px 13px; }
+  .theme-grug #bannerArt svg,.theme-grug #cardArt svg,.theme-grug .book-art svg{ filter:url(#grugRough); }
+  body.theme-grug.dark{
+    --tile-s:14%; --hot:#c9563c;
+    --grug-ink:#d8cdb2;
+  }
+  .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 0 0 12px color-mix(in srgb, var(--hot) 42%, transparent); }
+  body.theme-grug:not(.dark) .tile.lit .face{ box-shadow:inset 0 0 0 2.8px var(--hot), 3px 4px 0 rgba(59,51,42,.14); }
+  .score-tag.celebrate, .score-bar.celebrate{ background:var(--hot); color:#fbf3e6; }
+  .score-tag.celebrate .hico, .score-bar.celebrate .hico,
+  .score-bar.celebrate i, .score-bar.celebrate .sb-goal{ display:none; }
+  .cele{ display:inline-block; font-size:13px; white-space:nowrap; animation:celeIn .45s ease; }
+  @keyframes celeIn{ 0%{ transform:translateY(15px) rotate(5deg); opacity:0; } 100%{ transform:none; opacity:1; } }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  body.theme-grug:not(.dark) .menu-btn.primary{ background:var(--hot); color:#fbf3e6; }
+  body.theme-grug:not(.dark) .btn.primary{ background:var(--hot); border-color:var(--ink); color:#fbf3e6; }
+  /* ============ /主题 Grug ============ */
+
+  body.dark{
+    --ink:#dfe5f0;
+    --paper:#222834;
+    --card:#2b3342;
+    --line:#3d4757;
+    --dim:rgba(10,14,22,.55);
+    --tile-s:30%; --tile-l:26%; --tile-ink:84%; --tile-edge:15%;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    background:var(--paper); color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    user-select:none; -webkit-user-select:none;
+    overflow:hidden;
+  }
+  button{font-family:inherit; cursor:pointer;}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:10px 2px 8px;
+  }
+  .hud-btn{justify-self:start;}
+  .hud-btn{
+    width:46px; height:46px; border-radius:14px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hud-btn:active{transform:scale(.94);}
+  .ic{width:25px; height:25px; flex:none; display:block;}
+  .menu-btn .ic{width:24px; height:24px;}
+  .dock-btn .ic{width:22px; height:22px;}
+  .hud-center{display:flex; align-items:center; gap:7px; justify-self:center;}
+  .hud-right{display:flex; align-items:center; gap:6px; justify-self:end; flex:none;}
+  .combo-tag{display:inline-flex; align-items:center; gap:4px; white-space:nowrap;}
+  .hico{width:17px; height:17px; flex:none; display:inline-block; vertical-align:-3px; margin-right:1px;}
+  .score-tag .hico{width:19px; height:19px;}
+  .score-tag b{font-weight:800; margin-left:3px;}
+  .tag{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:7px 13px; font-size:15px; font-weight:800; white-space:nowrap;
+  }
+  .goal-pill{
+    position:relative; overflow:hidden; min-width:96px;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; font-size:14px; font-weight:800; text-align:center;
+  }
+  .goal-pill i{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, hsl(150 55% 65% / .5), hsl(150 60% 48% / .8));
+    transition:width .45s cubic-bezier(.3,1.2,.5,1);
+  }
+  .goal-pill span{position:relative;}
+  .score-tag{
+    font-size:20px; font-weight:800; letter-spacing:.3px; line-height:1;
+    padding:3px 6px;
+    background:linear-gradient(135deg,#f5b942,#e8734a);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .score-tag.bump{animation:scoreBump .32s ease;}
+  /* 模式分数条:个人最佳=目标在右端,得分逐步填充(用户反馈) */
+  .score-bar{
+    position:relative; overflow:hidden; min-width:118px; height:34px;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:space-between; gap:6px;
+    padding:0 11px;
+  }
+  .score-bar i{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg,#f5b942,#e8734a); opacity:.8;
+    transition:width .45s cubic-bezier(.3,1.2,.5,1);
+  }
+  .score-bar b{ position:relative; font-size:15px; letter-spacing:.3px; }
+  .score-bar .sb-goal{ position:relative; display:inline-flex; align-items:center; gap:3px; font-size:12px; opacity:.72; white-space:nowrap; }
+  .score-bar.record i{ opacity:1; }
+  .score-bar.record .sb-goal{ opacity:1; font-weight:800; color:#b3543c; }
+  .score-bar.bump{animation:scoreBump .32s ease;}
+  @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
+  .combo-tag{
+    background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
+    padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
+    animation:comboPop .25s ease, comboGlow 1.6s ease-in-out infinite;
+  }
+  @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
+  @keyframes comboGlow{ 0%,100%{box-shadow:0 0 8px rgba(232,85,74,.35);} 50%{box-shadow:0 0 18px rgba(232,85,74,.6);} }
+  @media (max-width:430px){
+    .hud-btn{width:40px; height:40px;}
+    .ic{width:22px; height:22px;}
+    .tag{padding:6px 10px; font-size:13.5px;}
+    .goal-pill{padding:6px 10px; font-size:13px; min-width:84px;}
+    .score-tag{font-size:17px;}
+    .score-bar{min-width:104px; height:30px; padding:0 9px;}
+    .score-bar b{font-size:13.5px;}
+    .score-bar .sb-goal{font-size:11px;}
+  /* 模式 HUD 紧凑档:中槽多胶囊 + 右侧条 + 连击在 390px 内必须单行 */
+  body.mode-hud .goal-pill{min-width:0; padding:6px 9px;}
+  body.mode-hud .tag{padding:6px 9px;}
+  body.mode-hud .score-bar{min-width:88px;}
+    .combo-tag{padding:5px 11px; font-size:13px;}
+    #hud{padding-top:8px; gap:6px;}
+  }
+
+  /* ---------- Board:4×7 网格 + 外圈连线带 ---------- */
+  #boardWrap{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    margin:2px 0 10px;
+    box-shadow:0 6px 24px rgba(51,65,92,.06);
+  }
+  #grid{ position:absolute; }
+  #pathSvg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6; }
+  .tile{
+    position:absolute; left:0; top:0;
+    transition:transform .18s ease, opacity .25s;
+    will-change:transform;
+  }
+  .face{
+    width:90%; height:90%; margin:5%;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:hsl(var(--h) var(--tile-s) var(--tile-l));
+    color:hsl(var(--h) 45% var(--tile-ink));
+    box-shadow:inset 0 -3px 0 hsl(var(--h) var(--tile-s) var(--tile-edge));
+    font-weight:700; line-height:1.05; text-align:center;
+    overflow:hidden; padding:0 2px;
+    border-radius:18%;
+    transition:filter .15s, scale .15s;
+  }
+  .tile.k-pl .face{border-radius:6%;}
+  .tile.k-pp .face{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+  .tile.k-inf .face::after{
+    content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
+    height:4px; border-radius:2px; background:var(--accent);
+  }
+  .tile.k-inf .face::before{
+    content:""; position:absolute; top:6%; right:8%;
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
+  }
+  .tile.sel .face{
+    scale:1.07;
+    filter:drop-shadow(0 0 5px hsl(var(--h) 55% 45%));
+  }
+  .tile.peer .face{ filter:drop-shadow(0 0 2.5px hsl(var(--h) 45% 55%)); }
+  .tile.hint .face{animation:hintPulse 1.1s ease-in-out 3;}
+  @keyframes hintPulse{
+    0%,100%{filter:none; scale:1;}
+    50%{filter:drop-shadow(0 0 7px hsl(var(--h) 60% 50%)); scale:1.08;}
+  }
+  .tile.gone{z-index:5;}
+  .tile.gone .face{animation:goneAnim .28s ease forwards;}
+  @keyframes goneAnim{ to{ scale:1.35; opacity:0; } }
+  .tile.shake .face{animation:shakeX .3s ease;}
+  @keyframes shakeX{ 0%,100%{translate:0;} 25%{translate:-4px 0;} 75%{translate:4px 0;} }
+
+  /* ---------- 手感加强:闪亮 + 粒子 + 得分弹字 ---------- */
+  .tile.flash .face{ animation:flashAnim .18s ease; }
+  @keyframes flashAnim{ 0%{ filter:brightness(1.28) saturate(1.3); } 100%{ filter:brightness(1); } }
+  #pathSvg .spark{ animation:sparkAnim .5s ease-out forwards; transform-box:fill-box; transform-origin:center; }
+  @keyframes sparkAnim{ 0%{ scale:.3; opacity:.95; } 100%{ scale:2.8; opacity:0; } }
+  #pathSvg .ring{ animation:ringAnim .55s ease-out forwards; transform-box:fill-box; transform-origin:center; }
+  @keyframes ringAnim{ 0%{ scale:.4; opacity:.7; } 100%{ scale:3.2; opacity:0; } }
+  .score-pop{
+    position:absolute; z-index:8; pointer-events:none;
+    font-weight:800; font-size:15px; color:var(--accent);
+    text-shadow:0 1px 0 rgba(255,255,255,.6);
+    animation:popRise .8s ease-out forwards; white-space:nowrap;
+  }
+  @keyframes popRise{ 0%{ translate:0 6px; opacity:0; scale:.7; } 18%{ opacity:1; scale:1.08; } 100%{ translate:0 -26px; opacity:0; scale:1; } }
+  .score-pop.big{ font-size:22px; animation:popRiseBig 1s ease-out forwards; color:#e05645; }
+  @keyframes popRiseBig{ 0%{ translate:0 10px; opacity:0; scale:.5; } 15%{ opacity:1; scale:1.25; } 70%{ opacity:1; scale:1; } 100%{ translate:0 -34px; opacity:0; } }
+
+  /* ---- 竞品调研试点(P1/P3/P5/P6):里程碑波纹 / 分数飞行 / 彩带 / 交互演示 ---- */
+  #boardWrap.ripple{ animation:boardRipple .55s ease; }
+  @keyframes boardRipple{ 0%{ box-shadow:0 6px 24px rgba(51,65,92,.06); } 40%{ box-shadow:0 0 0 12px rgba(232,115,74,.22), 0 6px 32px rgba(232,115,74,.3); } 100%{ box-shadow:0 6px 24px rgba(51,65,92,.06); } }
+  .score-fly{ position:fixed; z-index:60; font-weight:800; font-size:15px; color:var(--accent); pointer-events:none; text-shadow:0 1px 0 rgba(255,255,255,.6); transition:transform .6s cubic-bezier(.45,-0.15,.75,.35), opacity .6s ease-in; }
+  .confetti{ position:absolute; width:8px; height:13px; border-radius:2px; z-index:9; pointer-events:none; animation:confettiFall 1.4s ease-in forwards; }
+  @keyframes confettiFall{ 0%{ transform:translate(0,0) rotate(0); opacity:1; } 100%{ transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; } }
+  #demoBar{ position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:9; background:var(--accent); color:#fff; font-size:12.5px; font-weight:800; padding:7px 15px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.18); pointer-events:none; white-space:nowrap; max-width:94%; overflow:hidden; text-overflow:ellipsis; }
+  .tile.demo-target .face{ animation:demoPulse 1s ease infinite; }
+  @keyframes demoPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(232,115,74,0); } 50%{ box-shadow:0 0 0 7px rgba(232,115,74,.4); } }
+
+
+  /* ---------- 计时器紧急态 + 关卡档标题 ---------- */
+  .tag.urgent{ color:#fff; background:#e05645; animation:urgentPulse .7s ease infinite; }
+  @keyframes urgentPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(224,86,69,.5);} 50%{ box-shadow:0 0 0 5px rgba(224,86,69,0);} }
+  .band-head{
+    grid-column:1/-1;
+    font-size:11px; font-weight:800; letter-spacing:.12em;
+    color:#98a1b0; margin:10px 2px 6px;
+  }
+
+  /* ---------- 底部操作坞 + 教学横幅 ---------- */
+  #dock{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    margin-top:10px;
+    padding:2px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+  .dock-row{ display:flex; gap:12px; justify-content:center; }
+  /* 横幅槽位:闯关模式固定高度——按钮固定下移,横幅+倒计时条位置不变;挑战模式保持覆盖式 */
+  #bannerSlot{ position:static; height:0; width:100%; }
+  body.in-levels #bannerSlot{ position:relative; height:56px; }
+  body.in-levels #learnBanner.collapsed{ transform:none !important; top:auto; height:13px; }
+  .dock-btn{
+    display:flex; align-items:center; gap:8px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:14px; padding:12px 20px; font-size:15px; font-weight:700;
+    box-shadow:0 2px 8px rgba(51,65,92,.06);
+  }
+  .dock-btn:active{transform:scale(.95);}
+  #learnBanner{
+    position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px rgba(20,30,50,.28);
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; cursor:pointer; overflow:hidden;
+    opacity:0; visibility:hidden; transform:translateY(16px);
+    transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s, top .3s cubic-bezier(.3,1.2,.5,1), height .3s cubic-bezier(.3,1.2,.5,1);
+  }
+  #learnBanner.show{opacity:1; visibility:visible; transform:none;}
+  /* 手动点掉:卡片下滑只剩底部倒计时条;连击窗口继续走(用户反馈) */
+  #learnBanner.collapsed{ transform:translateY(calc(100% - 13px)) !important; cursor:default; }
+  #learnBanner.collapsed #bannerArt, #learnBanner.collapsed .b-main, #learnBanner.collapsed #bannerGloss{ opacity:0; }
+  #bannerArt, .b-main, #bannerGloss{ transition:opacity .18s ease; }
+  #bannerArt{width:46px; height:46px; flex:none;}
+  .b-main{flex:1; min-width:0;}
+  /* 四形态词卡:原形/单过去/复过去/分词;当前词型加粗高亮,其余浅灰;原形同字号+下划线 */
+  #bannerForms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:1px 9px; font-size:15px; font-weight:700; line-height:1.3; }
+  #bannerForms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
+  #bannerForms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
+  body.theme-grug.dark #bannerForms .bf.on{ color:hsl(var(--h) 45% 66%); }
+  #bannerGloss{
+    margin-left:auto; flex:none; max-width:34%;
+    font-size:12.5px; line-height:1.35; text-align:right;
+    color:var(--ink); opacity:.6;
+  }
+  /* 卡片/横幅里的原形下划线:与磁贴同一款手绘弧线(Papier 主题用色条) */
+  .swu{
+    display:inline-block; padding-bottom:3px;
+    background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>') left bottom/100% 6px no-repeat;
+  }
+  body.theme-grug.dark .swu{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>'); }
+  body:not(.theme-grug) .swu{ background:none; border-bottom:2.5px solid var(--accent); padding-bottom:1px; }
+  .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
+  .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
+  #learnBanner.show .b-progress i{animation:bprog var(--bdur,10s) linear forwards;}
+  @keyframes bprog{ from{width:100%;} to{width:0;} }
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:50;
+    background:var(--dim);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .22s;
+  }
+  .overlay.on{opacity:1; pointer-events:auto;}
+  .panel{
+    background:var(--card); border-radius:20px;
+    padding:22px 22px 20px; width:min(88vw,380px);
+    box-shadow:0 18px 50px rgba(20,30,50,.25);
+    position:relative; max-height:86vh; overflow:auto;
+  }
+  .panel h1{margin:0 0 4px; font-size:22px;}
+  .panel h2{margin:0 0 10px; font-size:17px;}
+  .panel p{font-size:13px; line-height:1.65; color:#5a6577; margin:8px 0;}
+  body.dark .panel p{color:#a8b2c4;}
+  .close-x{
+    position:absolute; top:10px; right:10px; width:30px; height:30px;
+    border:none; background:none; font-size:18px; color:#98a1b0;
+  }
+  .menu-btn{
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:13px 16px; margin:9px 0;
+    border-radius:14px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink);
+    font-size:15.5px; font-weight:700; text-align:left;
+  }
+  .menu-btn:active{transform:scale(.97);}
+  .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .menu-btn.ghost{background:var(--paper);}
+  .menu-btn .m-label{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .menu-btn small{font-size:10.5px; font-weight:600; color:#8b93a3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .menu-btn.locked{opacity:.5;}
+  .lv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:14px 0 6px;}
+  .lv-btn{
+    border:1px solid var(--line); background:var(--paper); border-radius:14px;
+    padding:12px 6px; text-align:center; color:var(--ink); font-weight:800; font-size:13px;
+    position:relative;
+  }
+  .lv-btn small{display:block; color:#8b93a3; font-size:10px; font-weight:600; margin-top:3px;}
+  .lv-btn .lv-round{position:absolute; top:5px; right:8px; font-size:9px; font-weight:700; color:#98a1b0;}
+  .lv-btn.locked{opacity:.4; pointer-events:none;}
+  .lv-btn.done{border-color:#bcd9c8; background:#eef7f1;}
+  body.dark .lv-btn.done{background:#243529; border-color:#2f4a3a;}
+  #cardModal{z-index:70;}
+  #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
+  #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
+  #cardInf{display:none;}
+  #cardForms{ display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:2px 10px; font-size:15px; font-weight:700; margin-top:12px; }
+  #cardForms .cf{ color:var(--ink); white-space:nowrap; }
+  #cardGloss{
+    margin-top:12px; padding:10px 12px; border-radius:12px;
+    background:var(--paper); font-size:14px; color:var(--ink); display:none;
+  }
+  #cardModal.gloss-open #cardGloss{display:block;}
+  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
+  #resultModal .panel{text-align:center;}
+  .btn{
+    display:inline-block; border:none; border-radius:12px;
+    padding:11px 20px; font-size:14px; font-weight:700; margin:6px 4px 0;
+    background:var(--accent); color:#fff;
+  }
+  .btn.ghost{background:var(--paper); color:var(--ink); border:1px solid var(--line);}
+  .btn:active{transform:scale(.96);}
+  .set-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0; border-bottom:1px dashed var(--line); font-size:13.5px;
+  }
+  .set-row:last-child{border-bottom:none;}
+  .set-row>label{font-weight:700;}
+  .seg{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+  .seg button{
+    padding:7px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;
+  }
+  .seg button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .set-row input[type=range]{width:140px; accent-color:var(--accent);}
+  .book-group{
+    display:flex; align-items:center; width:100%; text-align:left;
+    background:none; border:none; color:var(--ink);
+    font-size:13px; font-weight:800; margin:14px 0 2px; padding:4px 2px;
+  }
+  .book-group i{font-style:normal; margin-right:6px; color:#98a1b0;}
+  .book-sub{font-size:11px; color:#98a1b0; margin:8px 0 2px; font-weight:700;}
+  .book-row{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 6px; border-bottom:1px dashed var(--line);
+  }
+  .book-row.viewable{cursor:pointer; border-radius:10px;}
+  .book-row.viewable:active{background:var(--paper);}
+  .book-art{width:44px; height:44px; flex:none;}
+  .book-art.empty{
+    border-radius:12px; background:var(--paper); border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; color:#b6bdc9; font-size:16px;
+  }
+  .book-main b{font-size:15px;}
+  .book-main small{display:block; color:#8b93a3; font-size:11.5px; margin-top:2px;}
+  .book-tag{margin-left:auto; font-size:11px; color:#8b93a3; flex:none; text-align:right; line-height:1.5;}
+  .book-count{
+    display:inline-block; background:var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#5a6577;
+  }
+  #toast{
+    position:fixed; left:50%; bottom:9vh; transform:translateX(-50%) translateY(8px);
+    background:rgba(51,65,92,.88); color:#fff; font-size:13px;
+    padding:8px 16px; border-radius:20px; opacity:0; transition:.25s; z-index:80;
+    pointer-events:none; white-space:nowrap; max-width:92vw;
+  }
+  #toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
+  .rule-legend{display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;}
+  .rule-legend .leg{color:#5a6577; font-size:12px; display:flex; align-items:center; gap:5px;}
+  .rule-legend .leg i{
+    width:15px; height:12px; display:inline-block; background:#dfe6f2;
+    box-shadow:inset 0 -2px 0 #c3cfe4; border-radius:18%;
+  }
+  body.dark .rule-legend .leg i{background:#3a465a; box-shadow:inset 0 -2px 0 #2c3648;}
+  .rule-legend .leg i.s-pl{border-radius:6%;}
+  .rule-legend .leg i.s-pp{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="grugRough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.046" numOctaves="2" result="n" seed="7"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/></filter></svg>
+
+<div id="app">
+  <header id="hud">
+    <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
+    <div class="hud-center">
+      <span class="tag" id="lvlTag">A1.2</span>
+      <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/18</span></span>
+      <span class="tag" id="timerTag" style="display:none;"></span>
+      <span class="tag" id="bestTag" style="display:none;"></span>
+    </div>
+    <div class="hud-right">
+      <span class="combo-tag" id="comboTag" style="display:none;"></span>
+      <span class="score-tag" id="scoreTag"></span>
+    </div>
+  </header>
+
+  <div id="boardWrap">
+    <div id="grid"></div>
+    <svg id="pathSvg"></svg>
+  </div>
+
+  <div id="dock">
+    <div id="bannerSlot">
+    <div id="learnBanner">
+      <svg id="bannerArt" viewBox="0 0 120 120"></svg>
+      <div class="b-main">
+        <div id="bannerForms"></div>
+      </div>
+      <div id="bannerGloss"></div>
+      <div class="b-progress"><i></i></div>
+    </div>
+    </div>
+    <div class="dock-row">
+      <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
+      <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Hoofdmenu -->
+<div class="overlay on" id="menuScreen">
+  <div class="panel">
+    <div id="menuMain">
+      <button class="close-x" id="menuClose" style="position:absolute; top:14px; right:14px;">✕</button>
+      <h1 style="margin-bottom:14px;">Koppelen · demo</h1>
+      <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
+      <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9 12H19M15 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
+      <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
+      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
+      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
+      <button class="menu-btn" id="mSurvival"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M6.8 12h2.6l1.4-3.2 2.4 6.4 1.4-3.2h2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="m-label"><span data-i18n="menu.survival">Overleven</span><small id="mSurvivalSub"></small></span></button>
+      <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
+      <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
+    </div>
+    <div id="menuLevels" style="display:none;">
+      <h2><button class="back-btn" id="mBack" style="border:none;background:none;color:var(--ink);font-size:20px;margin-left:-8px;cursor:pointer;">←</button><span data-i18n="menu.levels">Levels</span></h2>
+      <div class="lv-grid" id="lvGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Instellingen -->
+<div class="overlay" id="settingsModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="set.title">Instellingen</h2>
+    <div class="set-row">
+      <label data-i18n="set.style">Illustratiestijl</label>
+      <div class="seg" id="setStyle"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.lang">Taal</label>
+      <div class="seg" id="setLang"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.sound">Geluid</label>
+      <input type="range" id="setVolume" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.tts">Voorlezen</label>
+      <input type="range" id="setTts" min="0" max="100" step="5">
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.voice">Stem</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="voiceName" style="font-size:11.5px; color:#8b93a3; max-width:150px; text-align:right; line-height:1.35;"></span>
+        <button id="btnVoiceTest" style="display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:700;"><svg class="ic" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span data-i18n="set.voicetest">Probeer</span></button>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.hintwait">Hint wachttijd</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setHintWait" min="0" max="30" step="1">
+        <span id="hintWaitVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.banner">Bannerduur</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="setBanner" min="5" max="30" step="1">
+        <span id="bannerVal" style="font-size:12px; font-weight:700; width:38px; text-align:right;"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.theme">Thema</label>
+      <div class="seg" id="setTheme"></div>
+    </div>
+    <div class="set-row">
+      <label data-i18n="set.dark">Donkere modus</label>
+      <div class="seg" id="setDark"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Koppelkaart -->
+<div class="overlay" id="cardModal">
+  <div class="panel" id="cardPanel">
+    <button class="close-x" id="cardClose">✕</button>
+    <svg id="cardArt" viewBox="0 0 120 120"></svg>
+    <div id="cardInf"></div>
+    <div id="cardForms"></div>
+    <div id="cardGloss"></div>
+    <div id="cardTip"></div>
+  </div>
+</div>
+
+<!-- Resultaat -->
+<div class="overlay" id="resultModal">
+  <div class="panel">
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+    <div id="resultBtns"></div>
+  </div>
+</div>
+
+<!-- Verzameling -->
+<div class="overlay" id="bookDrawer">
+  <div class="panel">
+    <h2 data-i18n="book.title">Verzameling</h2>
+    <div id="bookList"></div>
+  </div>
+</div>
+
+<!-- Speluitleg -->
+<div class="overlay" id="helpModal">
+  <div class="panel">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="help.title">Speluitleg</h2>
+    <p data-i18n="help.p1"></p>
+    <p data-i18n="help.goal"></p>
+    <p data-i18n="help.score"></p>
+    <p data-i18n="help.rules"></p>
+    <p data-i18n="help.modes"></p>
+    <p data-i18n="help.stuck"></p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+window.__errs=[]; window.addEventListener("error",e=>{(window.__errs=window.__errs||[]).push(e.message+" @"+e.lineno);});
+"use strict";
+/* ================= 数据:85 词(与 tile-match 同源,改动需两边同步) ================= */
+const VERBS=[
+  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215},
+  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12},
+  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275},
+  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65},
+  {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356},
+  {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250},
+  {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300},
+  {inf:"drinken",  sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝"},
+  {inf:"zitten",   sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐"},
+  {inf:"liggen",   sg:"lag",     pl:"lagen",    pp:"gelegen",    en:"to lie",   zh:"躺"},
+  {inf:"staan",    sg:"stond",   pl:"stonden",  pp:"gestaan",    en:"to stand", zh:"站"},
+  {inf:"lezen",    sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读"},
+  {inf:"spreken",  sg:"sprak",   pl:"spraken",  pp:"gesproken",  en:"to speak", zh:"说"},
+  {inf:"doen",     sg:"deed",    pl:"deden",    pp:"gedaan",     en:"to do",    zh:"做"},
+  {inf:"weten",    sg:"wist",    pl:"wisten",   pp:"geweten",    en:"to know",  zh:"知道"},
+  {inf:"zeggen",   sg:"zei",     pl:"zeiden",   pp:"gezegd",     en:"to say",   zh:"说(话)"},
+  {inf:"houden",   sg:"hield",   pl:"hielden",  pp:"gehouden",   en:"to hold",  zh:"拿住"},
+  {inf:"kiezen",   sg:"koos",    pl:"kozen",    pp:"gekozen",    en:"to choose",zh:"选择"},
+  {inf:"beginnen", sg:"begon",   pl:"begonnen", pp:"begonnen",   en:"to begin", zh:"开始"},
+  {inf:"begrijpen",sg:"begreep", pl:"begrepen", pp:"begrepen",   en:"to understand", zh:"理解"},
+  {inf:"brengen",  sg:"bracht",  pl:"brachten", pp:"gebracht",   en:"to bring", zh:"带来"},
+  {inf:"denken",   sg:"dacht",   pl:"dachten",  pp:"gedacht",    en:"to think", zh:"想"},
+  {inf:"vinden",   sg:"vond",    pl:"vonden",   pp:"gevonden",   en:"to find",  zh:"找到"},
+  {inf:"helpen",   sg:"hielp",   pl:"hielpen",  pp:"geholpen",   en:"to help",  zh:"帮助"},
+  {inf:"kopen",    sg:"kocht",   pl:"kochten",  pp:"gekocht",    en:"to buy",   zh:"买"},
+  {inf:"krijgen",  sg:"kreeg",   pl:"kregen",   pp:"gekregen",   en:"to get",   zh:"得到"},
+  {inf:"vragen",   sg:"vroeg",   pl:"vroegen",  pp:"gevraagd",   en:"to ask",   zh:"问"},
+  {inf:"wassen",   sg:"waste",   pl:"wasten",   pp:"gewassen",   en:"to wash",  zh:"洗"},
+  {inf:"dragen",   sg:"droeg",   pl:"droegen",  pp:"gedragen",   en:"to carry", zh:"携带"},
+  {inf:"verliezen",sg:"verloor", pl:"verloren", pp:"verloren",   en:"to lose",  zh:"失去"},
+  {inf:"winnen",   sg:"won",     pl:"wonnen",   pp:"gewonnen",   en:"to win",   zh:"赢得"},
+  {inf:"hangen",   sg:"hing",    pl:"hingen",   pp:"gehangen",   en:"to hang",  zh:"挂"},
+  {inf:"sterven",  sg:"stierf",  pl:"stierven", pp:"gestorven",  en:"to die",   zh:"死亡"},
+  {inf:"vergeten", sg:"vergat",  pl:"vergaten", pp:"vergeten",   en:"to forget",zh:"忘记"},
+  {inf:"bieden",   sg:"bood",    pl:"boden",    pp:"geboden",    en:"to offer", zh:"提供"},
+  {inf:"trekken",  sg:"trok",    pl:"trokken",  pp:"getrokken",  en:"to pull",  zh:"拉"},
+  {inf:"zingen",   sg:"zong",    pl:"zongen",   pp:"gezongen",   en:"to sing",  zh:"唱"},
+  {inf:"vallen",   sg:"viel",    pl:"vielen",   pp:"gevallen",   en:"to fall",  zh:"落下"},
+  {inf:"sluiten",  sg:"sloot",   pl:"sloten",   pp:"gesloten",   en:"to close", zh:"关闭"},
+  {inf:"rijden",   sg:"reed",    pl:"reden",    pp:"gereden",    en:"to ride",  zh:"骑/开"},
+  {inf:"zwijgen",  sg:"zweg",    pl:"zwegen",   pp:"gezwegen",   en:"to keep silent", zh:"沉默"},
+  {inf:"wijzen",   sg:"wees",    pl:"wezen",    pp:"gewezen",    en:"to point", zh:"指"},
+  {inf:"werpen",   sg:"wierp",   pl:"wierpen",  pp:"geworpen",   en:"to throw", zh:"投掷"},
+  {inf:"gelden",   sg:"gold",    pl:"golden",   pp:"gegolden",   en:"to be valid", zh:"有效"},
+  {inf:"smelten",  sg:"smolt",   pl:"smolten",  pp:"gesmolten",  en:"to melt",  zh:"融化"},
+  {inf:"zwellen",  sg:"zwol",    pl:"zwollen",  pp:"gezwollen",  en:"to swell", zh:"膨胀"},
+  {inf:"binden",   sg:"bond",    pl:"bonden",   pp:"gebonden",   en:"to bind",  zh:"绑"},
+  {inf:"zenden",   sg:"zond",    pl:"zonden",   pp:"gezonden",   en:"to send",  zh:"发送"},
+  {inf:"bijten",   sg:"beet",    pl:"beten",    pp:"gebeten",    en:"to bite",  zh:"咬"},
+  {inf:"gieten",   sg:"goot",    pl:"goten",    pp:"gegoten",    en:"to pour",  zh:"倒"},
+  {inf:"wringen",  sg:"wrong",   pl:"wrongen",  pp:"gewrongen",  en:"to wring", zh:"拧"},
+  {inf:"zuigen",   sg:"zoog",    pl:"zogen",    pp:"gezogen",    en:"to suck",  zh:"吸"},
+  {inf:"krimpen",  sg:"kromp",   pl:"krompen",  pp:"gekrompen",  en:"to shrink",zh:"收缩"},
+  {inf:"springen", sg:"sprong",  pl:"sprongen", pp:"gesprongen", en:"to jump",  zh:"跳"},
+  {inf:"klinken",  sg:"klonk",   pl:"klonken",  pp:"geklonken",  en:"to sound", zh:"响"},
+  {inf:"zinken",   sg:"zonk",    pl:"zonken",   pp:"gezonken",   en:"to sink",  zh:"下沉"},
+  {inf:"lijden",   sg:"leed",    pl:"leden",    pp:"geleden",    en:"to suffer",zh:"遭受"},
+  {inf:"scheppen", sg:"schiep",  pl:"schiepen", pp:"geschapen",  en:"to create",zh:"创造"},
+  {inf:"heffen",   sg:"hief",    pl:"hieven",   pp:"geheven",    en:"to lift",  zh:"举起"},
+  {inf:"vriezen",  sg:"vroor",   pl:"vroren",   pp:"gevroren",   en:"to freeze",zh:"结冰"},
+  {inf:"schrikken",sg:"schrok",  pl:"schrokken",pp:"geschrokken",en:"to startle",zh:"受惊"},
+  {inf:"vechten",  sg:"vocht",   pl:"vochten",  pp:"gevochten",  en:"to fight", zh:"战斗"},
+  {inf:"prijzen",  sg:"prees",   pl:"prezen",   pp:"geprezen",   en:"to praise",zh:"称赞"},
+  {inf:"genezen",  sg:"genas",   pl:"genazen",  pp:"genezen",    en:"to heal",  zh:"治愈"},
+  {inf:"wegen",    sg:"woog",    pl:"wogen",    pp:"gewogen",    en:"to weigh", zh:"称重"},
+  {inf:"treden",   sg:"trad",    pl:"traden",   pp:"getreden",   en:"to step",  zh:"踏"},
+  {inf:"schenden", sg:"schond",  pl:"schonden", pp:"geschonden", en:"to violate",zh:"侵犯"},
+  {inf:"besluiten",sg:"besloot", pl:"besloten", pp:"besloten",   en:"to decide",zh:"决定"},
+  {inf:"bedriegen",sg:"bedroog", pl:"bedrogen", pp:"bedrogen",   en:"to deceive",zh:"欺骗"},
+  {inf:"bederven", sg:"bedierf", pl:"bedierven",pp:"bedorven",   en:"to spoil", zh:"损坏"},
+  {inf:"ontbreken",sg:"ontbrak", pl:"ontbraken",pp:"ontbroken",  en:"to be missing",zh:"缺少"},
+  {inf:"beschrijven",sg:"beschreef",pl:"beschreven",pp:"beschreven",en:"to describe",zh:"描写"},
+  {inf:"vermijden",sg:"vermeed", pl:"vermeden", pp:"vermeden",   en:"to avoid", zh:"避免"},
+  {inf:"wijken",   sg:"week",    pl:"weken",    pp:"geweken",    en:"to give way",zh:"退让"},
+  {inf:"schuiven", sg:"schoof",  pl:"schoven",  pp:"geschoven",  en:"to shift", zh:"推"},
+  {inf:"klimmen",  sg:"klom",    pl:"klommen",  pp:"geklommen",  en:"to climb", zh:"爬"},
+  {inf:"dringen",  sg:"drong",   pl:"drongen",  pp:"gedrongen",  en:"to push",  zh:"挤"},
+  {inf:"verbieden",sg:"verbood", pl:"verboden", pp:"verboden",   en:"to forbid",zh:"禁止"},
+  {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen",   en:"to proceed",zh:"进行"},
+  {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen",  en:"to meet",  zh:"遇到"},
+  {inf:"kunnen",   sg:"kon",     pl:"konden",   pp:"gekund",     en:"can; to be able",  zh:"能;会"},
+  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoet",     en:"must; to have to", zh:"必须;得"},
+  {inf:"willen",   sg:"wilde",   pl:"wilden",   pp:"gewild",     en:"to want",  zh:"想要"},
+  {inf:"mogen",    sg:"mocht",   pl:"mochten",  pp:"gemogen",    en:"may; to be allowed",  zh:"可以;被允许"},
+  {inf:"zoeken",   sg:"zocht",   pl:"zochten",  pp:"gezocht",    en:"to look for",  zh:"找;寻找"},
+  {inf:"zwemmen",  sg:"zwam",    pl:"zwammen",  pp:"gezwommen",  en:"to swim",  zh:"游泳"},
+  {inf:"vliegen",  sg:"vloog",   pl:"vlogen",   pp:"gevlogen",   en:"to fly",   zh:"飞;乘飞机"},
+  {inf:"stelen",   sg:"stal",    pl:"stolen",   pp:"gestolen",   en:"to steal", zh:"偷"},
+  {inf:"schieten", sg:"schoot",  pl:"schoten",  pp:"geschoten",  en:"to shoot", zh:"射;射击"},
+  {inf:"roepen",   sg:"riep",    pl:"riepen",   pp:"geroepen",   en:"to call; to shout",  zh:"喊;叫"},
+  {inf:"verdwijnen", sg:"verdween", pl:"verdwenen", pp:"verdwenen", en:"to disappear",  zh:"消失"},
+  {inf:"duiken",   sg:"dook",    pl:"doken",    pp:"gedoken",    en:"to dive",  zh:"潜水;跳入"},
+  {inf:"verstaan", sg:"verstond", pl:"verstonden", pp:"verstaan", en:"to understand",  zh:"听懂;理解"},
+  {inf:"genieten", sg:"genoot",  pl:"genoten",  pp:"genoten",    en:"to enjoy", zh:"享受"},
+  {inf:"dwingen",  sg:"dwong",   pl:"dwongen",  pp:"gedwongen",  en:"to force", zh:"强迫;迫使"},
+  {inf:"glijden",  sg:"gleed",   pl:"gleden",   pp:"gegleden",   en:"to slide; to glide",  zh:"滑;滑动"},
+  {inf:"kruipen",  sg:"kroop",   pl:"kropen",   pp:"gekropen",   en:"to crawl", zh:"爬;匍匐"},
+  {inf:"bestaan",  sg:"bestond", pl:"bestonden", pp:"bestaan",   en:"to exist", zh:"存在"},
+  {inf:"onthouden", sg:"onthield", pl:"onthielden", pp:"onthouden", en:"to remember",  zh:"记住"},
+  {inf:"vertrekken", sg:"vertrok", pl:"vertrokken", pp:"vertrokken", en:"to depart",  zh:"出发;离开"},
+  {inf:"verschijnen", sg:"verscheen", pl:"verschenen", pp:"verschenen", en:"to appear",  zh:"出现"},
+  {inf:"bevriezen", sg:"bevroor", pl:"bevroren", pp:"bevroren",   en:"to freeze (solid)",  zh:"结冰;冻结"},
+  {inf:"stinken",  sg:"stonk",   pl:"stonken",  pp:"gestonken",  en:"to stink", zh:"发臭"},
+  /* demo 新增(NIG 词表里有、主库没有的 7 词;形式取自 Taalhuis 词表原文) */
+  {inf:"kijken",   sg:"keek",    pl:"keken",    pp:"gekeken",    en:"to look",  zh:"看"},
+  {inf:"worden",   sg:"werd",    pl:"werden",   pp:"geworden",   en:"to become", zh:"变成;成为"},
+  {inf:"liegen",   sg:"loog",    pl:"logen",    pp:"gelogen",    en:"to lie (tell an untruth)", zh:"说谎"},
+  {inf:"zullen",   sg:"zou",     pl:"zouden",   pp:null,         en:"to will; shall", zh:"将会;将要"},
+  {inf:"drijven",  sg:"dreef",   pl:"dreven",   pp:"gedreven",   en:"to float", zh:"漂;浮"},
+  {inf:"lachen",   sg:"lachte",  pl:"lachten",  pp:"gelachen",   en:"to laugh", zh:"笑"},
+  {inf:"laten",    sg:"liet",    pl:"lieten",   pp:"gelaten",    en:"to let; allow", zh:"让;允许"},
+];
+VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
+
+/* ===== link-match-demo:仅使用 Taalhuis 词表 NIG I–IV(50 词,顺序即词表顺序) ===== */
+const DEMO_POOL=["doen","drinken","eten","gaan","geven","hebben","helpen","kijken","komen","krijgen","vragen","zijn",
+ "beginnen","blijven","kopen","liggen","lopen","rijden","staan","weten","worden","zeggen","zien","zitten",
+ "begrijpen","kunnen","lezen","liegen","moeten","mogen","schrijven","spreken","vinden","willen","zoeken","zullen",
+ "binden","brengen","denken","dragen","drijven","houden","kiezen","lachen","laten","nemen","sluiten","treffen","vechten","vergeten"];
+const VIDX={}; VERBS.forEach((v,i)=>{ VIDX[v.inf]=i; });
+const LINK_TYPES=["sg","pl","pp"];
+const LINK_LEVELS=[];
+const LV_ROUNDS=[];
+function chunkEven(n,maxN){ const r=Math.ceil(n/maxN), base=Math.floor(n/r), extra=n-base*r; return Array.from({length:r},(_,i)=>base+(i<extra?1:0)); }   // 50→[9,9,8,8,8,8];49→[9,8,8,8,8,8]
+LINK_TYPES.forEach((ty,fi)=>{
+  const pool=DEMO_POOL.map(n=>VIDX[n]).filter(vi=>fi!==2||VERBS[vi].pp);   // 分词轮排除无 pp 的词(zullen,词表注明不存在)
+  const sizes=chunkEven(pool.length,9);
+  LV_ROUNDS.push(sizes.length);
+  let off=0;                                                               // 每个词每种形式恰好出现一关(顺序切片,不回绕)
+  sizes.forEach(sz=>{
+    const verbs=pool.slice(off,off+sz); off+=sz;
+    LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"demo", type:ty, num:LINK_LEVELS.length+1, verbs});
+  });
+});
+const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
+const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
+
+/* ================= i18n ================= */
+const I18N={
+  nl:{
+    "menu.back":"Terug naar spel","menu.continue":"Volgend level","menu.levels":"Levels",
+    "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.survival":"Overleven","menu.survivalnew":"Elke koppel binnen de tijd!","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
+    "mode.endless":"Oneindig","mode.daily":"Dagelijks","mode.survival":"Overleven","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
+    "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
+    "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
+    "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
+    "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
+    "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Sketch","theme.papier":"Post-it",
+    "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
+    "set.voice":"Stem","set.voicetest":"Probeer",
+    "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands","tts.blocked":"Geen geluid: dit venster ondersteunt geen spraak. Test Voorlezen in Chrome of Safari.",
+    "result.title":"Koppelen gehaald!","result.done":"Alle paren gevonden.",
+    "result.record":"nieuw record!","result.best":"beste","btn.again":"Opnieuw","btn.menu":"Menu","btn.next":"Volgend level →",
+    "toast.shuffle":"Geen combinaties meer — geschud!","toast.nopair":"Geen paar — geschud!",
+    "book.title":"Verzameling","book.locked":"Nog niet gekoppeld",
+    "book.lockedsub":"Koppel dit werkwoord om het te verzamelen.","book.view":"Tik om te bekijken",
+    "help.title":"Speluitleg",
+    "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
+    "help.goal":"Doel: vind alle paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
+    "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een combinatiebonus.",
+    "help.rules":"Niveaus 1–18 (Taalhuis-lijstjes NIG I–IV): eerst alle enkelvoud-rondes, dan meervoud, dan voltooid deelwoord. Zullen heeft geen voltooid deelwoord.",
+    "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag). Elk bord oefent één werkwoordsvorm.",
+    "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
+    "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
+    "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
+    "card.tip":"Tik voor de betekenis",
+  },
+  zh:{
+    "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
+    "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.survival":"生存模式","menu.survivalnew":"每次消除之间限时,超时即结束","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
+    "mode.endless":"无尽模式","mode.daily":"每日挑战","mode.survival":"生存","result.timeup":"时间到!","result.today":"今日",
+    "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
+    "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
+    "short.sg":"单数","short.pl":"复数","short.pp":"分词",
+    "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
+    "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手绘","theme.papier":"便签",
+    "set.dark":"深色模式","opt.off":"关","opt.on":"开",
+    "set.voice":"朗读语音","set.voicetest":"试听",
+    "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch","tts.blocked":"此窗口无法朗读(语音引擎不可用)——请在 Chrome/Safari 或手机上测试",
+    "result.title":"连连看过关!","result.done":"全部配对完成。",
+    "result.record":"新纪录!","result.best":"最佳","btn.again":"再来一次","btn.menu":"回菜单","btn.next":"下一关 →",
+    "toast.shuffle":"没有可连的了——重新洗牌!","toast.nopair":"无可连对——重新洗牌!",
+    "book.title":"词典图鉴","book.locked":"尚未配对",
+    "book.lockedsub":"配对这个动词来收集它。","book.view":"点击查看",
+    "help.title":"玩法介绍",
+    "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
+    "help.goal":"目标:找出全部配对。卡住时棋盘会自动重新洗牌。",
+    "help.score":"计分:每对 +15 分;快速连续配对有连击加成。",
+    "help.rules":"关卡 1–18(基于 Taalhuis NIG I–IV 词表):先全部单数过去式轮,再复数轮,最后过去分词轮。zullen 没有过去分词。",
+    "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。每一盘只练一种词型,清盘后换下一型。",
+    "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
+    "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
+    "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
+    "card.tip":"点击查看释义",
+  },
+  en:{
+    "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
+    "menu.daily":"Daily challenge","menu.endless":"Endless","menu.survival":"Survival","menu.survivalnew":"Beat the clock between pairs","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
+    "mode.endless":"Endless","mode.daily":"Daily","mode.survival":"Survival","result.timeup":"Time's up!","result.today":"Today",
+    "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
+    "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
+    "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
+    "set.title":"Settings","set.style":"Art style","set.lang":"Language",
+    "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Sketch","theme.papier":"Post-it",
+    "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
+    "set.voice":"Voice","set.voicetest":"Test",
+    "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch","tts.blocked":"No speech in this window — test read-aloud in Chrome or Safari",
+    "result.title":"Board cleared!","result.done":"All pairs found.",
+    "result.record":"new record!","result.best":"best","btn.again":"Retry","btn.menu":"Menu","btn.next":"Next level →",
+    "toast.shuffle":"No combos left — shuffled!","toast.nopair":"No pairs — shuffled!",
+    "book.title":"Collection","book.locked":"Not paired yet",
+    "book.lockedsub":"Pair this verb to collect it.","book.view":"Tap to view",
+    "help.title":"How to play",
+    "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
+    "help.goal":"Goal: find all pairs before you get stuck. If you do get stuck, the board reshuffles.",
+    "help.score":"Score: 15 points per pair. Quick consecutive pairs give a combo bonus.",
+    "help.rules":"Levels 1–18 (from the Taalhuis NIG I–IV lists): all singular rounds first, then plural, then past participle. Zullen has no past participle.",
+    "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day). Each board practises one verb form; clear it to switch.",
+    "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
+    "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
+    "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
+    "card.tip":"Tap for the meaning",
+  },
+};
+function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
+function glossOf(V){ return save.settings.uiLang==="zh" ? V.zh : V.en; }
+function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); }); }
+
+/* ================= 存档 ================= */
+const SAVE_KEY="linkmatchdemo.v1";   // demo 独立存档
+const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:15, bannerMs:15, theme:"grug", dark:false};
+let save={lUnlocked:1, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
+try{
+  const s=JSON.parse(localStorage.getItem(SAVE_KEY));
+  if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
+}catch(e){}
+// 关卡布局迁移:v1(18 关)→ v2(51 关,7 词)→ v3(42 关,9 词/18 对);done/best 按映射搬家,超出新轮次的记录丢弃
+if(save.lvOrder!=="v3"){
+  const R2=[3,6,8], B2=[0,9,27];                      // v2:每档轮数与档基址(7 词/关时代)
+  const R3=LV_ROUNDS, B3=[0]; for(let i=1;i<R3.length;i++) B3.push(B3[i-1]+R3[i-1]*3);
+  const map=k=>{                                       // v2 索引 → v3 索引(新方案无此轮返回 -1)
+    const i=+String(k).slice(1);
+    if(isNaN(i)||i>=51) return i>=0?i:-1;
+    let b=0; while(b<2 && i>=B2[b+1]) b++;
+    const w=i-B2[b], f=Math.floor(w/R2[b]), r=w%R2[b];
+    if(f>2||r>=R3[b]) return -1;
+    return B3[b]+f*R3[b]+r;
+  };
+  if(save.lvOrder==="v2"||(save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k)))){
+    const nd={}, nb={};
+    for(const k in save.done){ if(save.done[k]&&/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nd["L"+m2]=true; } }
+    for(const k in save.best){ if(/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nb["L"+m2]=save.best[k]; } else nb[k]=save.best[k]; }
+    save.done=nd; save.best=nb;
+  }
+  save.lvOrder="v3";
+}
+// 设置默认值迁移:v1.12 及之前横幅默认 10s、提示等待 12s → 统一 15s(用户自定义值保留)
+if(save.settings.bannerMs===10) save.settings.bannerMs=15;
+if(save.settings.hintWait===12) save.settings.hintWait=15;
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+
+function applySettings(){
+  const S=save.settings;
+  document.body.classList.toggle("dark",!!S.dark);
+  document.body.classList.toggle("theme-grug",(S.theme||"grug")==="grug");
+  applyI18n();
+}
+/* Grug 主题:词块手作歪斜(确定性角度,随 r,c 变化) */
+function applyTileRotations(){
+  const g=(save.settings.theme||"grug")==="grug";
+  for(const t of tiles){
+    if(!t.el) continue;
+    t.el.style.transform=g?`rotate(${((t.r*7+t.c)%5-2)*0.9}deg)`:"";
+  }
+}
+
+/* ================= 音效/语音 ================= */
+let actx=null;
+function blip(freq,dur=.08,type="sine",gain=.12){
+  const vol=(save.settings?save.settings.volume:70)/100;
+  if(vol<=0) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(gain*vol,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);
+    o.connect(g).connect(actx.destination);
+    o.start(); o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+let nlVoice=null;
+function updateVoiceName(){
+  const el=document.getElementById("voiceName");
+  if(el) el.textContent = nlVoice ? nlVoice.name : t("set.novoice");
+}
+function initVoices(){
+  if(!("speechSynthesis" in window)) return;
+  const pick=()=>{
+    const vs=window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v=>(v.lang||"").toLowerCase().replace("_","-")==="nl-nl")
+           || vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl")) || null;
+    updateVoiceName();
+  };
+  pick();
+  window.speechSynthesis.onvoiceschanged=pick;
+}
+let speakGen=0;
+let ttsBlockedWarned=false;
+function warnTtsBlocked(){
+  if(ttsBlockedWarned) return;
+  ttsBlockedWarned=true;
+  toast(t("tts.blocked"));   // 语音引擎瘫(如内嵌测试窗):utterance 永远排队、不 onstart 也不 onerror
+}
+function speakPair(V,form){
+  const gen=++speakGen;   // 代数令牌:新横幅接管后,旧链的延迟回调与 onend 链全部失效
+  return new Promise(res=>{
+    if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
+    try{
+      const ss=window.speechSynthesis;
+      const busyS=ss.speaking||ss.pending;
+      if(busyS) ss.cancel();   // 空队列不要 cancel:Chrome cancel() 后同步 speak() 会被静默吞掉
+      const seq=[V.inf,form];
+      let i=0, startedAny=false;
+      const next=()=>{
+        if(gen!==speakGen){ res(); return; }
+        if(i>=seq.length){ res(); return; }
+        const u=new SpeechSynthesisUtterance(seq[i++]);
+        u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+        u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+        u.onstart=()=>{ startedAny=true; };
+        u.onend=next; u.onerror=next;
+        ss.speak(u);
+      };
+      if(busyS) setTimeout(next,70); else next();   // 刚 cancel 过必须延迟开口(tile-match v0.86 同款修复)
+      setTimeout(()=>{ if(gen===speakGen && !startedAny && (ss.speaking||ss.pending)) warnTtsBlocked(); },1300);
+    }catch(e){ res(); }
+  });
+}
+function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
+
+/* ================= SVG 插画(与 tile-match 同源) ================= */
+function ctxOf(style){
+  const dark=document.body.classList.contains("dark");
+  return style==="B"
+    ? {ink: dark?"#cfd8e3":"#3a4750", sw:4, body:"none", acc:"rgba(255,150,100,.25)", teal:"rgba(84,184,165,.25)", white:"rgba(255,255,255,.45)"}
+    : {ink: dark?"#e8edf5":"#39424e", sw:0, body: dark?"#ff9d7a":"#ff8a66", acc:"#ffc94d", teal:"#54b8a5", white:"#ffffff"};
+}
+function limb(ctx,pts){
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+  return `<path d="${d}" fill="none" stroke="${ctx.ink}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+function person(ctx,pose,x,y,flip=false){
+  const flipG=flip?` transform="translate(${2*x},0) scale(-1,1)"`:"";
+  let s="";
+  const head=(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="8.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>${ctx.sw?"":`<circle cx="${cx-2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/><circle cx="${cx+2.6}" cy="${cy}" r="1.2" fill="${ctx.ink}"/>`}`;
+  if(pose==="sit"){
+    s+=head(x,y-38);
+    s+=limb(ctx,[[x,y-29.5],[x,y-14]]);
+    s+=limb(ctx,[[x,y-14],[x+9,y-11],[x+11,y]]);
+    s+=limb(ctx,[[x,y-14],[x+6,y-9],[x+7,y]]);
+    s+=limb(ctx,[[x,y-24],[x+8,y-17]]);
+    s+=limb(ctx,[[x,y-24],[x-6,y-16]]);
+    return `<g${flipG}>${s}</g>`;
+  }
+  if(pose==="lie"){
+    s+=limb(ctx,[[x-14,y-30],[x-26,y-27]])
+      +limb(ctx,[[x-6,y-31],[x-20,y-24]])
+      +`<rect x="${x-24}" y="${y-40}" width="34" height="13" rx="6.5" fill="${ctx.body}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="${ctx.sw}"`:""}/>`
+      +head(x+18,y-34);
+    return `<g${flipG}>${s}</g>`;
+  }
+  const lean=pose==="run"?3:0;
+  s+=head(x+lean,y-38);
+  s+=limb(ctx,[[x+lean,y-29.5],[x,y-12]]);
+  const legEnds={
+    stand:[[-6,0],[6,0]], open:[[-6,0],[6,0]],
+    walk:[[-9,0],[8,-1]], run:[[-10,-1],[9,0]],
+    hold:[[-5,0],[6,0]],  reach:[[-5,0],[6,0]],
+  }[pose]||[[-6,0],[6,0]];
+  s+=limb(ctx,[[x,y-12],[x+legEnds[0][0],y+legEnds[0][1]]]);
+  s+=limb(ctx,[[x,y-12],[x+legEnds[1][0],y+legEnds[1][1]]]);
+  const armEnds={
+    stand:[[-8,-14],[8,-14]], open:[[-13,-33],[13,-33]],
+    walk:[[-9,-18],[9,-15]],  run:[[-9,-20],[13,-24]],
+    hold:[[10,-20],[12,-16]], reach:[[16,-24],[-7,-15]],
+  }[pose]||[[-8,-14],[8,-14]];
+  for(const e of armEnds) s+=limb(ctx,[[x+lean,y-26],[x+e[0],y+e[1]]]);
+  return `<g${flipG}>${s}</g>`;
+}
+function bgCircle(ctx,hue){
+  return `<circle cx="60" cy="60" r="52" fill="hsl(${hue} 45% 55% / ${ctx.sw?0.10:0.16})"/>`;
+}
+function ground(ctx,y=96){
+  return `<line x1="26" y1="${y}" x2="94" y2="${y}" stroke="${ctx.ink}" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+function gift(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-10" y="-9" width="20" height="17" rx="2.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="0" y1="-9" x2="0" y2="8" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/><path d="M0 -9 C -7 -16, -12 -10, 0 -9 C 12 -10, 7 -16, 0 -9" fill="none" stroke="${ctx.ink}" stroke-width="2.4" stroke-opacity=".55"/></g>`;}
+function box(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-9" y="-8" width="18" height="16" rx="2" fill="${ctx.teal}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="-9" y1="0" x2="9" y2="0" stroke="${ctx.ink}" stroke-width="2.2" stroke-opacity=".5"/></g>`;}
+function ball(ctx,x,y){return `<g transform="translate(${x} ${y})"><circle r="7.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><path d="M-5 -4 A 6.5 6.5 0 0 1 5 -4" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".5"/></g>`;}
+function apple(ctx,x,y){return `<g transform="translate(${x} ${y})"><circle r="8.5" fill="${ctx.sw?"rgba(255,107,87,.3)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><circle cx="6" cy="-5" r="3.2" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}"/><path d="M0 -8 Q 1 -12 4 -13" fill="none" stroke="${ctx.ink}" stroke-width="2"/></g>`;}
+function arrow(ctx,x1,y1,x2,y2){const a=Math.atan2(y2-y1,x2-x1),hl=6;return `<g stroke="${ctx.ink}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" fill="none"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><path d="M${x2-hl*Math.cos(a-.5)} ${y2-hl*Math.sin(a-.5)} L${x2} ${y2} L${x2-hl*Math.cos(a+.5)} ${y2-hl*Math.sin(a+.5)}"/></g>`;}
+function door(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-10" y="-34" width="20" height="34" rx="2.5" fill="${ctx.sw?"rgba(255,201,77,.35)":"#ffe3ad"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2.5}" ${ctx.sw?"":'stroke-opacity=".5"'}/><circle cx="5" cy="-17" r="1.8" fill="${ctx.ink}" fill-opacity=".6"/></g>`;}
+function flagMound(ctx,x,y){return `<g transform="translate(${x} ${y})"><path d="M-20 10 Q 0 -8 20 10 Z" fill="${ctx.sw?"rgba(84,184,165,.3)":"#cfe8e0"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><line x1="0" y1="-1" x2="0" y2="-24" stroke="${ctx.ink}" stroke-width="3" stroke-linecap="round"/><path d="M0 -24 L14 -19 L0 -14 Z" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/></g>`;}
+function dashedCircle(ctx,x,y,r){return `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${ctx.ink}" stroke-opacity=".4" stroke-width="2" stroke-dasharray="4 5"/>`;}
+function sparkles(ctx,x,y){let s="";const pts=[[x-18,y-40],[x+16,y-46],[x+22,y-26]];for(const [px,py] of pts){s+=`<path d="M${px} ${py-4} L${px+1.6} ${py-1.6} L${px+4} ${py} L${px+1.6} ${py+1.6} L${px} ${py+4} L${px-1.6} ${py+1.6} L${px-4} ${py} L${px-1.6} ${py-1.6} Z" fill="${ctx.acc}" stroke="${ctx.ink}" stroke-width="1.4" stroke-opacity=".4"/>`;}return s;}
+function heart(ctx,x,y,s=1){return `<path transform="translate(${x} ${y}) scale(${s})" d="M0 3 C -6 -4, -12 1, -6 6 L0 11 L6 6 C 12 1, 6 -4, 0 3 Z" fill="${ctx.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/>`;}
+function speedLines(ctx,x,y){return `<g stroke="${ctx.ink}" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"><line x1="${x-16}" y1="${y-10}" x2="${x-30}" y2="${y-10}"/><line x1="${x-12}" y1="${y-22}" x2="${x-28}" y2="${y-22}"/><line x1="${x-16}" y1="${y-34}" x2="${x-26}" y2="${y-34}"/></g>`;}
+function pencilPaper(ctx,x,y){return `<g transform="translate(${x} ${y})"><rect x="-26" y="-14" width="46" height="32" rx="3" fill="${ctx.sw?"rgba(255,255,255,.55)":"#fff"}" stroke="${ctx.ink}" stroke-width="${ctx.sw||2}" ${ctx.sw?"":'stroke-opacity=".35"'}/><path d="M-19 -5 q 5 4 10 0 t 10 0" fill="none" stroke="${ctx.ink}" stroke-width="2" stroke-opacity=".55"/><g transform="rotate(40 26 -10)"><rect x="20" y="-26" width="6" height="22" rx="1.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="2.5"`:""}/></g></g>`;}
+
+/* ---- 道具库 ---- */
+const PROP={
+  /* 别名补齐(v1.11):SCENES 曾引用 sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/
+     dashedCircle/speedLines/pencilPaper 但 PROP 缺失,sceneSVG 静默跳过导致约 13 个场景缺道具 */
+  sparkles:(c,x,y)=>sparkles(c,x,y),
+  gift:(c,x,y)=>gift(c,x,y),
+  heart:(c,x,y,s)=>heart(c,x,y,s||1),
+  ball:(c,x,y)=>ball(c,x,y),
+  apple:(c,x,y)=>apple(c,x,y),
+  pencilPaper:(c,x,y)=>pencilPaper(c,x,y),
+  dashedCircle:(c,x,y,r)=>dashedCircle(c,x,y,r||18),
+  speedLines:(c,x,y)=>speedLines(c,x,y),
+  arrowR:(c,x,y)=>arrow(c,x-14,y,x+14,y),
+  arrowL:(c,x,y)=>arrow(c,x+14,y,x-14,y),
+  arrowD:(c,x,y)=>arrow(c,x,y-14,x,y+14),
+  /* 新道具(v1.11,给 23 个 fallback 词补场景用) */
+  bubbleBang:(c,x,y)=>`<path d="M${x-15} ${y-12} h30 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-16 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="15" font-weight="800" fill="${c.acc}" font-family="inherit">!</text>`,
+  bubbleShout:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><g stroke="${c.acc}" stroke-width="2.6" stroke-linecap="round"><line x1="${x-8}" y1="${y-4}" x2="${x+8}" y2="${y-4}"/><line x1="${x-5}" y1="${y+2}" x2="${x+5}" y2="${y+2}"/></g>`,
+  waves:(c,x,y)=>`<g fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round" stroke-opacity=".8"><path d="M${x-26} ${y} q6 -6 13 0 t13 0 t13 0 t13 0"/><path d="M${x-20} ${y+8} q6 -5 12 0 t12 0 t12 0" stroke-opacity=".5"/></g>`,
+  bird:(c,x,y)=>`<path d="M${x-8} ${y} q4 -6 8 0 q4 -6 8 0" fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  bowArrow:(c,x,y)=>`<path d="M${x-10} ${y-14} a17 17 0 0 1 0 28" fill="none" stroke="${c.ink}" stroke-width="2.8" stroke-linecap="round"/><line x1="${x-10}" y1="${y-14}" x2="${x-10}" y2="${y+14}" stroke="${c.ink}" stroke-width="2.2"/><line x1="${x-12}" y1="${y}" x2="${x+16}" y2="${y}" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x+16} ${y} l-6 -3.5 v7 z" fill="${c.ink}"/>`,
+  glass:(c,x,y)=>`<path d="M${x-7} ${y-12} L${x-5} ${y+8} L${x+5} ${y+8} L${x+7} ${y-12} Z" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.2"/>`,
+  chair:(c,x,y)=>`<rect x="${x-11}" y="${y-18}" width="21" height="4.5" rx="2.2" fill="${c.teal}"/><rect x="${x-10}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/><rect x="${x+7}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/>`,
+  rug:(c,x,y)=>`<ellipse cx="${x}" cy="${y+2}" rx="26" ry="6" fill="${c.sw?"rgba(255,201,77,.3)":"#ffd9a8"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
+  lamppost:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-52}" stroke="${c.ink}" stroke-width="3.5" stroke-opacity=".7" stroke-linecap="round"/><circle cx="${x}" cy="${y-56}" r="5.5" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
+  book:(c,x,y)=>`<path d="M${x-12} ${y-9} Q ${x-4} ${y-13} ${x} ${y-9} Q ${x+4} ${y-13} ${x+12} ${y-9} L${x+12} ${y+8} Q ${x+4} ${y+4} ${x} ${y+8} Q ${x-4} ${y+4} ${x-12} ${y+8} Z" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-9}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="1.8"/>`,
+  bubbleSay:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-8}" y1="${y-2}" x2="${x+8}" y2="${y-2}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  bubbleQ:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-18 l-6 8 v-8 h-8 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="14" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  bubbleThink:(c,x,y)=>`<circle cx="${x}" cy="${y-6}" r="12" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><circle cx="${x-10}" cy="${y+9}" r="2.6" fill="${c.ink}" fill-opacity=".55"/><circle cx="${x-15}" cy="${y+15}" r="1.8" fill="${c.ink}" fill-opacity=".4"/>`,
+  bubbleOff:(c,x,y)=>`<path d="M${x-16} ${y-12} h32 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-30 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="${c.sw?"rgba(255,255,255,.45)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  hammer:(c,x,y)=>`<g transform="rotate(-35 ${x} ${y})"><rect x="${x-4}" y="${y-14}" width="8" height="12" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><rect x="${x-1.6}" y="${y-2}" width="3.2" height="16" rx="1.6" fill="${c.ink}"/></g>`,
+  bulb:(c,x,y)=>`<path d="M${x} ${y-14} a8.5 8.5 0 0 0 -5 15.4 c 1.4 1 1.8 2 1.8 3.4 h6.4 c0-1.4 .4-2.4 1.8-3.4 a8.5 8.5 0 0 0 -5 -15.4z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x-3}" y1="${y+7}" x2="${x+3}" y2="${y+7}" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  fork2:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.8" fill="none" stroke-linecap="round"><path d="M${x} ${y+10} L${x} ${y} L${x-10} ${y-10}"/><path d="M${x} ${y} L${x+10} ${y-10}"/></g>`,
+  startLine:(c,x,y)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-30}" stroke="${c.ink}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/><rect x="${x+2}" y="${y-30}" width="14" height="9" rx="2" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}/>`,
+  magnifier:(c,x,y)=>`<circle cx="${x-3}" cy="${y-4}" r="8.5" fill="rgba(160,210,235,.4)" stroke="${c.ink}" stroke-width="2.8"/><line x1="${x+3}" y1="${y+3}" x2="${x+11}" y2="${y+11}" stroke="${c.ink}" stroke-width="3.4" stroke-linecap="round"/>`,
+  person2:(c,x,y)=>person(c,"stand",x,y),
+  tagPrice:(c,x,y)=>`<g transform="rotate(18 ${x} ${y})"><path d="M${x-10} ${y-8} h12 l8 8 -8 8 h-12 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x+6}" cy="${y}" r="1.8" fill="${c.ink}"/></g>`,
+  coinS:(c,x,y)=>`<circle r="7" cx="${x}" cy="${y}" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800" fill="${c.ink}">€</text>`,
+  trophyDown:(c,x,y)=>`<g transform="rotate(180 ${x} ${y})"><path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/></g><line x1="${x+12}" y1="${y-10}" x2="${x+12}" y2="${y+6}" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x+9} ${y+3} l3 3 l3 -3" fill="none" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/>`,
+  trophy:(c,x,y)=>`<path d="M${x-8} ${y-8} h16 v5 a8 8 0 0 1 -16 0 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-8} ${y-6} h-4 a4 4 0 0 0 4 5M${x+8} ${y-6} h4 a4 4 0 0 1 -4 5" fill="none" stroke="${c.ink}" stroke-width="2.2"/><rect x="${x-2.5}" y="${y+5}" width="5" height="5" fill="${c.ink}" fill-opacity=".7"/>`,
+  frameWall:(c,x,y)=>`<rect x="${x-11}" y="${y-26}" width="22" height="17" rx="2" fill="${c.sw?"rgba(255,255,255,.4)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-4}" y1="${y-30}" x2="${x-4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/><line x1="${x+4}" y1="${y-30}" x2="${x+4}" y2="${y-26}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".5"/>`,
+  tombstone:(c,x,y)=>`<path d="M${x-10} ${y} v-14 a10 10 0 0 1 20 0 v14 z" fill="${c.sw?"rgba(255,255,255,.35)":"#cfd4dc"}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x}" y1="${y-16}" x2="${x}" y2="${y-6}" stroke="${c.ink}" stroke-width="2.4"/><line x1="${x-5}" y1="${y-11}" x2="${x+5}" y2="${y-11}" stroke="${c.ink}" stroke-width="2.4"/>`,
+  padlock:(c,x,y)=>`<rect x="${x-9}" y="${y-6}" width="18" height="14" rx="3" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x-5} ${y-6} v-4 a5 5 0 0 1 10 0 v4" fill="none" stroke="${c.ink}" stroke-width="2.6"/><circle cx="${x}" cy="${y+1}" r="2" fill="${c.ink}"/>`,
+  car:(c,x,y)=>`<path d="M${x-20} ${y-4} l4 -8 h16 l6 8 h6 v9 h-32 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><circle cx="${x-10}" cy="${y+6}" r="4.5" fill="${c.ink}"/><circle cx="${x+11}" cy="${y+6}" r="4.5" fill="${c.ink}"/>`,
+  ropePull:(c,x,y)=>`<path d="M${x-34} ${y-24} Q ${x-16} ${y-16} ${x-4} ${y-20}" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><circle cx="${x-34}" cy="${y-24}" r="3" fill="${c.ink}" fill-opacity=".6"/>`,
+  notes:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x}" cy="${y+6}" r="3"/><rect x="${x+2.2}" y="${y-10}" width="2.2" height="16"/><circle cx="${x+12}" cy="${y+2}" r="3"/><rect x="${x+14.2}" y="${y-14}" width="2.2" height="16"/><path d="M${x+2.2} ${y-10} l14 -4" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  balloon:(c,x,y)=>`<ellipse cx="${x}" cy="${y-8}" rx="9" ry="11" fill="${c.sw?"rgba(255,150,100,.3)":c.body}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y+3} q 2 4 0 8" fill="none" stroke="${c.ink}" stroke-width="1.8"/>`,
+  iceCube:(c,x,y)=>`<rect x="${x-9}" y="${y-12}" width="18" height="16" rx="3" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-14} ${y+10} q7 5 14 0 t14 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round"/>`,
+  jugPour:(c,x,y)=>`<path d="M${x-8} ${y-14} h14 l-2 12 h-10 z" fill="${c.sw?"rgba(160,210,235,.45)":"#a8cfe2"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-8} ${y-14} l-6 6" stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x-16}" cy="${y+4}" r="1.8" fill="${c.ink}" fill-opacity=".5"/><circle cx="${x-14}" cy="${y+10}" r="1.8" fill="${c.ink}" fill-opacity=".5"/>`,
+  strawGlass:(c,x,y)=>`<path d="M${x-7} ${y-10} L${x-5} ${y+10} L${x+5} ${y+10} L${x+7} ${y-10} Z" fill="rgba(160,210,235,.5)" stroke="${c.ink}" stroke-width="2.2"/><line x1="${x+2}" y1="${y-8}" x2="${x+9}" y2="${y-22}" stroke="${c.ink}" stroke-width="2.6" stroke-linecap="round"/>`,
+  towelZig:(c,x,y)=>`<path d="M${x-14} ${y-4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x-14} ${y+4} l5 -6 l4 6 l5 -6 l4 6 l5 -6 l4 6" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".55"/>`,
+  ropeKnot:(c,x,y)=>`<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${c.ink}" stroke-width="3.4"/><path d="M${x-14} ${y-6} q6 6 14 4M${x+14} ${y+6} q-6 -6 -14 -4" fill="none" stroke="${c.ink}" stroke-width="2.8" stroke-linecap="round"/>`,
+  envelope:(c,x,y)=>`<rect x="${x-12}" y="${y-8}" width="24" height="16" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-12} ${y-8} l12 8 l12 -8" fill="none" stroke="${c.ink}" stroke-width="2"/>`,
+  appleBite:(c,x,y)=>apple(c,x,y)+`<path d="M${x+7} ${y+2} q3 2 2 5" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".6"/>`,
+  inwardArrows:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M${x-22} ${y-8} l10 6"/><path d="M${x+22} ${y-8} l-10 6"/></g>`,
+  burstJump:(c,x,y)=>`<g stroke="${c.acc}" stroke-width="2.8" stroke-linecap="round"><line x1="${x-14}" y1="${y-2}" x2="${x-20}" y2="${y-8}"/><line x1="${x+14}" y1="${y-2}" x2="${x+20}" y2="${y-8}"/><line x1="${x}" y1="${y-8}" x2="${x}" y2="${y-16}"/></g>`,
+  noteBell:(c,x,y)=>`<g fill="${c.ink}"><circle cx="${x-4}" cy="${y+6}" r="3.2"/><rect x="${x-1.6}" y="${y-12}" width="2.4" height="18"/><path d="M${x-1.6} ${y-12} q8 2 8 8" fill="none" stroke="${c.ink}" stroke-width="2.2"/></g>`,
+  boatSink:(c,x,y)=>`<g transform="rotate(-12 ${x} ${y})"><path d="M${x-16} ${y-6} h32 l-5 8 h-22 z" fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><line x1="${x}" y1="${y-6}" x2="${x}" y2="${y-18}" stroke="${c.ink}" stroke-width="2.4"/></g><path d="M${x-18} ${y+6} q6 4 12 0 t12 0" fill="none" stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"/>`,
+  rainCloud:(c,x,y)=>`<path d="M${x-14} ${y-6} a7 7 0 0 1 7 -9 a8 8 0 0 1 15 2 a6 6 0 0 1 -2 7 z" fill="${c.sw?"rgba(255,255,255,.4)":"#dfe6f2"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-8}" y1="${y+2}" x2="${x-10}" y2="${y+8}"/><line x1="${x}" y1="${y+2}" x2="${x-2}" y2="${y+8}"/></g>`,
+  starBurst:(c,x,y)=>sparkles(c,x,y)+sparkles(c,x+14,y-6),
+  boxS:(c,x,y)=>box(c,x,y),
+  swords:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="3" stroke-linecap="round"><line x1="${x-12}" y1="${y-12}" x2="${x+10}" y2="${y+10}"/><line x1="${x+12}" y1="${y-12}" x2="${x-10}" y2="${y+10}"/></g>`,
+  starBig:(c,x,y)=>`<path d="M${x} ${y-12} l3.4 7 7.6 1 -5.5 5.4 1.3 7.6 -6.8 -3.6 -6.8 3.6 1.3 -7.6 -5.5 -5.4 7.6 -1 z" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/>`,
+  heartCross:(c,x,y)=>`<path d="M${x} ${y-2} C ${x-7} ${y-10}, ${x-14} ${y-4}, ${x-7} ${y+2} L${x} ${y+8} L${x+7} ${y+2} C ${x+14} ${y-4}, ${x+7} ${y-10}, ${x} ${y-2} Z" fill="${c.sw?"rgba(255,107,87,.4)":"#ff6b57"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M${x} ${y-6} v10M${x-5} ${y-1} h10" stroke="${c.sw?c.ink:"#fff"}" stroke-width="2.6" stroke-linecap="round"/>`,
+  scaleBalance:(c,x,y)=>`<line x1="${x}" y1="${y-16}" x2="${x}" y2="${y+8}" stroke="${c.ink}" stroke-width="2.6"/><line x1="${x-14}" y1="${y-12}" x2="${x+14}" y2="${y-12}" stroke="${c.ink}" stroke-width="2.4"/><path d="M${x-19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/><path d="M${x+19} ${y-12} l5 9 h-2 a5 5 0 0 1 -6 0 h-2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="2"/>`,
+  footprints:(c,x,y)=>`<g fill="${c.ink}" fill-opacity=".55"><ellipse cx="${x-8}" cy="${y-4}" rx="4.5" ry="6" transform="rotate(-14 ${x-8} ${y-4})"/><ellipse cx="${x+4}" cy="${y+6}" rx="4.5" ry="6" transform="rotate(-14 ${x+4} ${y+6})"/></g>`,
+  brokenCircle:(c,x,y)=>`<path d="M${x} ${y-13} a13 13 0 1 1 -9 4" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/><line x1="${x+4}" y1="${y-6}" x2="${x+12}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/><line x1="${x+12}" y1="${y-6}" x2="${x+4}" y2="${y+2}" stroke="${c.acc}" stroke-width="3" stroke-linecap="round"/>`,
+  checkCircle:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="12" fill="none" stroke="${c.ink}" stroke-width="2.8"/><path d="M${x-6} ${y-4} l4 5 l8 -9" fill="none" stroke="${c.sw?c.ink:"#3f9e6e"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+  snowflake:(c,x,y)=>`<g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round"><line x1="${x}" y1="${y-12}" x2="${x}" y2="${y+12}"/><line x1="${x-10.4}" y1="${y-6}" x2="${x+10.4}" y2="${y+6}"/><line x1="${x-10.4}" y1="${y+6}" x2="${x+10.4}" y2="${y-6}"/><line x1="${x}" y1="${y-12}" x2="${x-3}" y2="${y-8}"/><line x1="${x}" y1="${y-12}" x2="${x+3}" y2="${y-8}"/></g>`,
+  bangMark:(c,x,y)=>`<circle cx="${x}" cy="${y+8}" r="2" fill="${c.ink}"/><path d="M${x} ${y-12} l1.6 12 h-3.2 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="1.6"/><g stroke="${c.ink}" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".6"><line x1="${x-10}" y1="${y-8}" x2="${x-14}" y2="${y-12}"/><line x1="${x+10}" y1="${y-8}" x2="${x+14}" y2="${y-12}"/></g>`,
+  pathCurve:(c,x,y)=>`<path d="M${x-24} ${y+8} q 14 -10 8 -18 q -6 -8 6 -14" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/><path d="M${x-14} ${y-22} l6 -4 l0 7z" fill="${c.ink}"/>`,
+  dashedQ:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="${c.ink}" stroke-width="2.6" stroke-dasharray="5 5"/><text x="${x}" y="${y+1}" text-anchor="middle" font-size="15" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  paperLines:(c,x,y)=>`<rect x="${x-13}" y="${y-10}" width="26" height="20" rx="2" fill="${c.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="1.6" stroke-opacity=".55"><line x1="${x-9}" y1="${y-5}" x2="${x+9}" y2="${y-5}"/><line x1="${x-9}" y1="${y}" x2="${x+9}" y2="${y}"/></g>`,
+  forbidSign:(c,x,y)=>`<circle cx="${x}" cy="${y-4}" r="13" fill="none" stroke="#d64541" stroke-width="3.4"/><line x1="${x-9}" y1="${y-13}" x2="${x+9}" y2="${y+5}" stroke="#d64541" stroke-width="3.4"/>`,
+  stairs:(c,x,y)=>`<g fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}><rect x="${x-2}" y="${y-8}" width="14" height="8"/><rect x="${x+6}" y="${y-16}" width="14" height="8"/><rect x="${x+14}" y="${y-24}" width="14" height="8"/></g>`,
+  wallBar:(c,x,y)=>`<rect x="${x+2}" y="${y-30}" width="10" height="30" rx="2" fill="${c.sw?"rgba(255,255,255,.3)":"#d8cfc0"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55"><line x1="${x-14}" y1="${y-18}" x2="${x-4}" y2="${y-18}"/></g>`,
+  stinkApple:(c,x,y)=>apple(c,x,y)+`<path d="M${x+9} ${y-4} q4 -2 3 -6" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/>`,
+  coinBehind:(c,x,y)=>PROP.coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  arrowsMeet:(c,x,y)=>arrow(c,x-24,y+8,x-4,y)+arrow(c,x+24,y+8,x+4,y)+sparkles(c,x,y-6),
+  doorProp:(c,x,y)=>door(c,x,y),
+  flagMoundP:(c,x,y)=>flagMound(c,x,y),
+};
+
+/* ---- 手绘场景(前 12 词) ---- */
+const ART={
+  zijn:c=>bgCircle(c,215)+ground(c)+person(c,"open",60,96)+sparkles(c,60,60),
+  hebben:c=>bgCircle(c,12)+ground(c)+person(c,"hold",56,96)+box(c,72,78),
+  gaan:c=>bgCircle(c,275)+ground(c)+door(c,88,96)+person(c,"walk",46,96)+arrow(c,22,66,38,66),
+  komen:c=>bgCircle(c,160)+ground(c)+door(c,32,96)+person(c,"walk",74,96,true)+arrow(c,98,66,82,66),
+  zien:c=>bgCircle(c,48)+eyeBig(c,60,62)+sparkles(c,60,60),
+  geven:c=>bgCircle(c,330)+ground(c)+person(c,"reach",48,96)+gift(c,74,80)+heart(c,84,58,.9),
+  nemen:c=>bgCircle(c,65)+ground(c)+person(c,"hold",54,96)+ball(c,74,76),
+  blijven:c=>bgCircle(c,190)+flagMound(c,78,96)+person(c,"stand",58,94)+dashedCircle(c,58,68,26),
+  lopen:c=>bgCircle(c,130)+ground(c)+speedLines(c,52,74)+person(c,"run",62,96),
+  eten:c=>bgCircle(c,356)+apple(c,60,74)+`<ellipse cx="60" cy="90" rx="17" ry="5.5" fill="${c.sw?"rgba(255,255,255,.4)":"#fff"}" stroke="${c.ink}" stroke-width="2"/>`,
+  schrijven:c=>bgCircle(c,250)+pencilPaper(c,58,74),
+  slapen:c=>bgCircle(c,300)+`<rect x="26" y="80" width="66" height="8" rx="3" fill="${c.teal}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/><path d="M28 -30 a 9 9 0 1 0 9 11" transform="translate(32 118)" fill="${c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2.4"`:""}/>`+`<g transform="translate(0 0)">${person(c,"lie",48,92)}</g>`,
+  zien_art:null,
+};
+function eyeBig(ctx,x,y){return `<g transform="translate(${x} ${y})"><path d="M-26 0 Q 0 -22 26 0 Q 0 22 -26 0 Z" fill="${ctx.sw?"rgba(255,255,255,.5)":"#fff"}" stroke="${ctx.ink}" stroke-width="3.2"/><circle r="9.5" fill="${ctx.acc}" ${ctx.sw?`stroke="${ctx.ink}" stroke-width="3"`:""}/><circle r="3.6" fill="${ctx.ink}"/></g>`;}
+ART.zien=c=>bgCircle(c,48)+eyeBig(c,60,62)+sparkles(c,60,60);
+/* demo 新词插画(手绘元素库组合) */
+Object.assign(ART,{
+  kijken:c=>bgCircle(c,200)+eyeBig(c,74,50)+ground(c)+person(c,"stand",46,96),
+  worden:c=>bgCircle(c,285)+ground(c)+person(c,"walk",42,96)+arrow(c,64,60,88,60)+sparkles(c,84,42),
+  liegen:c=>bgCircle(c,350)+ground(c)+person(c,"stand",48,96)+PROP.bubbleSay(c,82,44)+`<path d="M58 88 l15 2 -14 4 z" fill="${c.acc}" stroke="${c.ink}" stroke-width="1.6"/>`,
+  zullen:c=>bgCircle(c,230)+ground(c)+person(c,"stand",44,96)+arrow(c,64,58,88,58)+dashedCircle(c,90,50,9),
+  drijven:c=>bgCircle(c,195)+PROP.waves(c,58,92)+person(c,"lie",52,84),
+  lachen:c=>bgCircle(c,55)+ground(c)+person(c,"stand",48,96)+`<path d="M64 50 q 10 13 20 0" fill="none" stroke="${c.ink}" stroke-width="3" stroke-linecap="round"/>`+sparkles(c,80,38),
+  laten:c=>bgCircle(c,140)+ground(c)+person(c,"reach",44,96)+PROP.person2(c,88,96)+arrow(c,62,58,74,58),
+});
+
+/* ---- 场景组合表(其余 73 词) ---- */
+const SCENES={
+  drinken:{p:"sit",pr:[["glass",80,76]]},
+  zitten:{p:"sit",pr:[["chair",58,96]]},
+  liggen:{p:"lie",px:44,py:104,pr:[["rug",50,104]]},
+  staan:{p:"stand",pr:[["lamppost",86,96]]},
+  lezen:{p:"sit",pr:[["book",78,76]]},
+  spreken:{p:"stand",pr:[["bubbleSay",82,48]]},
+  doen:{p:"stand",pr:[["hammer",80,72]]},
+  weten:{p:"stand",pr:[["bulb",56,26]]},
+  zeggen:{p:"stand",pr:[["bubbleSay",84,48]]},
+  houden:{p:"open",pr:[["boxS",60,34]]},
+  kiezen:{p:"stand",pr:[["fork2",62,42]]},
+  beginnen:{p:"walk",pr:[["startLine",36,96]]},
+  begrijpen:{p:"stand",pr:[["bulb",58,24],["sparkles",84,52]]},
+  brengen:{p:"walk",pr:[["gift",80,76],["arrowR",18,64]]},
+  denken:{p:"stand",pr:[["bubbleThink",82,44]]},
+  vinden:{p:"stand",pr:[["magnifier",80,72]]},
+  helpen:{p:"reach",pr:[["person2",86,96],["heart",66,58]]},
+  kopen:{p:"stand",pr:[["tagPrice",80,72],["coinS",62,80]]},
+  krijgen:{p:"hold",pr:[["gift",74,74],["arrowL",100,66]]},
+  vragen:{p:"stand",pr:[["bubbleQ",84,46]]},
+  wassen:{p:"stand",pr:[["apple",82,60],["glass",88,78]]},
+  dragen:{p:"hold",pr:[["boxS",72,66]]},
+  verliezen:{p:"stand",pr:[["trophyDown",82,66]]},
+  winnen:{p:"open",pr:[["trophy",60,30]]},
+  hangen:{p:"stand",pr:[["frameWall",84,52]]},
+  sterven:{p:"stand",pr:[["tombstone",82,84]]},
+  vergeten:{p:"stand",pr:[["bubbleQ",84,46],["dashedCircle",58,64,18]]},
+  bieden:{p:"reach",pr:[["envelope",76,72]]},
+  trekken:{p:"reach",pr:[["ropePull",58,72]]},
+  zingen:{p:"stand",pr:[["notes",82,44]]},
+  vallen:{p:"jump",pr:[["arrowD",88,44]]},
+  sluiten:{p:"stand",pr:[["padlock",80,70]]},
+  rijden:{p:"hold",pr:[["car",72,82]]},
+  zwijgen:{p:"stand",pr:[["bubbleOff",84,48]]},
+  wijzen:{p:"reach",pr:[["arrowR",72,56]]},
+  werpen:{p:"hold",pr:[["ball",90,54]]},
+  gelden:{p:"stand",pr:[["paperLines",80,70],["checkCircle",88,58]]},
+  smelten:{p:"stand",pr:[["iceCube",80,76]]},
+  zwellen:{p:"stand",pr:[["balloon",80,58]]},
+  binden:{p:"hold",pr:[["ropeKnot",80,72]]},
+  zenden:{p:"hold",pr:[["envelope",76,70],["arrowR",88,58]]},
+  bijten:{p:"stand",pr:[["appleBite",80,74]]},
+  gieten:{p:"stand",pr:[["jugPour",80,66]]},
+  wringen:{p:"hold",pr:[["towelZig",80,72]]},
+  zuigen:{p:"stand",pr:[["strawGlass",80,74]]},
+  krimpen:{p:"stand",pr:[["inwardArrows",58,58]]},
+  springen:{p:"jump",pr:[["burstJump",60,80]]},
+  klinken:{p:"stand",pr:[["noteBell",82,46]]},
+  zinken:{p:"stand",pr:[["boatSink",80,78]]},
+  lijden:{p:"stand",pr:[["rainCloud",82,42]]},
+  scheppen:{p:"open",pr:[["starBurst",60,30]]},
+  heffen:{p:"open",pr:[["boxS",60,32],["arrowR",88,50]]},
+  vriezen:{p:"stand",pr:[["snowflake",82,48]]},
+  schrikken:{p:"stand",pr:[["bangMark",82,44]]},
+  vechten:{p:"stand",pr:[["swords",80,70]]},
+  prijzen:{p:"stand",pr:[["starBig",82,44]]},
+  genezen:{p:"stand",pr:[["heartCross",80,70]]},
+  wegen:{p:"stand",pr:[["scaleBalance",80,62]]},
+  treden:{p:"walk",pr:[["footprints",80,88]]},
+  schenden:{p:"stand",pr:[["brokenCircle",80,66]]},
+  besluiten:{p:"stand",pr:[["checkCircle",80,66]]},
+  bedriegen:{p:"hold",pr:[["coinBehind",30,72]]},
+  bederven:{p:"stand",pr:[["stinkApple",80,74]]},
+  ontbreken:{p:"stand",pr:[["dashedQ",80,62]]},
+  beschrijven:{p:"stand",pr:[["paperLines",80,70],["pencilPaper",88,74]]},
+  vermijden:{p:"duck",pr:[["arrowR",84,52]]},
+  wijken:{p:"duck",pr:[["arrowR",84,44]]},
+  schuiven:{p:"hold",pr:[["boxS",78,80],["speedLines",70,74]]},
+  klimmen:{p:"walk",pr:[["stairs",72,96]]},
+  dringen:{p:"hold",pr:[["wallBar",86,96]]},
+  verbieden:{p:"stand",pr:[["forbidSign",80,52]]},
+  verlopen:{p:"walk",pr:[["pathCurve",36,92]]},
+  treffen:{p:"open",pr:[["arrowsMeet",60,46]]},
+  /* v1.11:最后 23 词补场景(消除首字母纹章 fallback) */
+  kunnen:{p:"open",pr:[["starBurst",60,28],["sparkles",86,52]]},
+  moeten:{p:"stand",pr:[["bubbleBang",84,46]]},
+  willen:{p:"reach",pr:[["heart",80,56]]},
+  mogen:{p:"stand",pr:[["doorProp",84,92],["checkCircle",58,50]]},
+  zoeken:{p:"duck",pr:[["magnifier",84,66]]},
+  zwemmen:{p:"lie",px:50,py:88,pr:[["waves",58,94]]},
+  vliegen:{p:"jump",pr:[["bird",82,40],["bird",58,30]]},
+  stelen:{p:"run",pr:[["coinBehind",80,72]]},
+  schieten:{p:"reach",pr:[["bowArrow",82,64]]},
+  roepen:{p:"open",pr:[["bubbleShout",84,42]]},
+  verdwijnen:{p:"duck",pr:[["dashedCircle",80,72,22]]},
+  duiken:{p:"jump",pr:[["waves",64,96],["arrowD",86,42]]},
+  verstaan:{p:"stand",pr:[["bubbleSay",84,46],["checkCircle",56,52]]},
+  genieten:{p:"sit",pr:[["heart",80,54],["sparkles",40,44]]},
+  dwingen:{p:"reach",pr:[["person2",88,96],["bubbleBang",62,40]]},
+  glijden:{p:"walk",pr:[["speedLines",40,86],["iceCube",84,78]]},
+  kruipen:{p:"duck",pr:[["speedLines",84,86]]},
+  bestaan:{p:"stand",pr:[["sparkles",84,48]]},
+  onthouden:{p:"stand",pr:[["bubbleThink",84,42],["ropeKnot",58,68]]},
+  vertrekken:{p:"walk",pr:[["doorProp",86,92],["arrowR",28,62]]},
+  verschijnen:{p:"duck",pr:[["sparkles",58,46],["starBurst",58,26]]},
+  bevriezen:{p:"stand",pr:[["snowflake",82,44],["iceCube",84,78]]},
+  stinken:{p:"duck",pr:[["stinkApple",82,76]]},
+};
+function genericArt(vIdx,c){
+  const V=VERBS[vIdx];
+  const letter=V.inf[0].toUpperCase();
+  let deco=`<circle cx="35" cy="31" r="3.2" fill="${c.acc}"/><circle cx="88" cy="38" r="2.6" fill="${c.acc}"/>`;
+  return bgCircle(c,V.hue)+`<text x="60" y="75" text-anchor="middle" font-weight="800" font-size="52" font-family="inherit" fill="${c.ink}">${letter}</text>`+deco+ground(c);
+}
+function sceneSVG(vIdx,c){
+  const V=VERBS[vIdx];
+  const sc=SCENES[V.inf]||{};
+  const pose=sc.p||"stand";
+  const px=sc.px||54, py=sc.py||96;
+  let inner=bgCircle(c,V.hue)+ground(c);
+  inner+=person(c,pose,px,py,!!sc.f);
+  if(sc.pr) for(const [name,x,y] of sc.pr){ if(PROP[name]) inner+=PROP[name](c,x,y); }
+  return inner;
+}
+function artSVG(vIdx,style){
+  const c=ctxOf(style);
+  const bespoke=ART[VERBS[vIdx].inf];
+  if(bespoke) return `<g>${bespoke(c)}</g>`;
+  if(SCENES[VERBS[vIdx].inf]) return `<g>${sceneSVG(vIdx,c)}</g>`;
+  return `<g>${genericArt(vIdx,c)}</g>`;
+}
+
+/* ================= 连连看引擎 ================= */
+const COLS=4; let ROWS=9;   // 闯关盘 4×5=20 格(9 词×1 对+2 随机缺口,零重复);三模式 4×9=36 格(9 词×2 对)
+const RING=16;                       // 外圈连线带宽(px)
+const PAIR_POINTS=15, CLEAR_BONUS=100;
+const BANNER_DEFAULT_S=15;               // 横幅秒数默认值(=连击窗口,与提示等待统一 15s,可在设置调 5-30s)
+const IDLE_HINT_MS_DEFAULT=12000;
+
+const boardEl=document.getElementById("grid");
+const wrapEl=document.getElementById("boardWrap");
+const pathSvg=document.getElementById("pathSvg");
+const bannerEl=document.getElementById("learnBanner");
+
+let tiles=[];                        // {v,k:'inf'|'form',r,c,el,alive}
+let occ=[];                          // (ROWS+2)x(COLS+2) 外圈坐标占用
+let curLevel=null, busy=false, selected=null;
+let scoreRun=0, streak=0, lastScoreShown=-1;
+let levelFont=12, hintTimer=null, pendingHint=false, lastAction=Date.now();
+let modeTargetBest=0, modeFormState=null;   // 分数条目标(开局捕获的最佳分)/上一盘词型(一屏一词型)
+let layout={ring:RING, tw:80, th:60};
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
+const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
+
+/* ---- 尺寸:确定性布局 ---- */
+function syncSize(){
+  const hud=document.getElementById("hud"), dock=document.getElementById("dock");
+  const usedH=hud.offsetHeight + dock.offsetHeight + 30;
+  const availH=Math.max(240, window.innerHeight - usedH) - RING*2;   // 网格可用高(扣外圈)
+  const th=Math.min(availH/ROWS, (window.innerWidth*0.94 - RING*2)/COLS*0.75);
+  const tw=th*4/3;
+  layout={ring:RING, tw, th};
+  const gridW=tw*COLS, gridH=th*ROWS;
+  boardEl.style.width=gridW+"px"; boardEl.style.height=gridH+"px";
+  boardEl.style.left=RING+"px"; boardEl.style.top=RING+"px";
+  wrapEl.style.width=(gridW+RING*2)+"px";
+  wrapEl.style.height=(gridH+RING*2)+"px";
+  document.getElementById("hud").style.width=(gridW+RING*2)+"px";
+  document.getElementById("dock").style.width=(gridW+RING*2)+"px";
+  // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块;Grug 手写字体更宽,按主题选测量字体
+  const ctx=measureCanvas.getContext("2d");
+  const hand=(save.settings.theme||"grug")==="grug";
+  ctx.font=(hand?'700 100px "Chalkboard SE","Comic Sans MS",cursive':'700 100px -apple-system, "Segoe UI", system-ui, sans-serif');
+  // 逐块测字(用户反馈:一个长词不再拖小整盘字号);长词单独缩,短词保持可读字号
+  for(const t of tiles){
+    if(!t.el) continue;
+    const word=t.k==="inf"?VERBS[t.v].inf:(VERBS[t.v][t.f]||VERBS[t.v].sg);
+    const fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
+    t.el.firstChild.style.fontSize=fs+"px";
+    positionTile(t);
+  }
+}
+const measureCanvas=document.createElement("canvas");
+
+function positionTile(t){
+  t.el.style.left=(t.c*100/COLS)+"%";
+  t.el.style.top=(t.r*100/ROWS)+"%";
+  t.el.style.width=(100/COLS)+"%";
+  t.el.style.height=(100/ROWS)+"%";
+  t.el.dataset.r=t.r; t.el.dataset.c=t.c;
+}
+function cellCenter(r,c){   // 外圈坐标(含 0 与 ROWS+1/COLS+1 的环)
+  const x = c===0 ? layout.ring/2 : c===COLS+1 ? layout.ring+COLS*layout.tw+layout.ring/2 : layout.ring+(c-0.5)*layout.tw;
+  const y = r===0 ? layout.ring/2 : r===ROWS+1 ? layout.ring+ROWS*layout.th+layout.ring/2 : layout.ring+(r-0.5)*layout.th;
+  return [x,y];
+}
+
+/* ---- 布点:14 对 + 可解性模拟 ---- */
+function buildPairsFrom(picks, per=2, gapCount=0){   // per=每词对数(闯关 1 / 模式 2);gapCount=开局随机空格(闯关 2,降低难度)
+  const cells=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) cells.push([r,c]);
+  for(let i=cells.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [cells[i],cells[j]]=[cells[j],cells[i]]; }
+  const gapKey=new Set(cells.slice(0,gapCount).map(([r,c])=>r+","+c));
+  const open=cells.filter(([r,c])=>!gapKey.has(r+","+c));
+  const tiles=[];
+  picks.forEach((p,pi)=>{
+    for(let k=0;k<per;k++) tiles.push({v:p.v,k:"inf",f:p.f,chip:pi},{v:p.v,k:"form",f:p.f,chip:pi});
+  });
+  // 洗牌(词块与位置都随机;缺口格永远空置)
+  for(let tries=0;tries<60;tries++){
+    const pos=[...open];
+    for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+    const tl=[...tiles];
+    for(let i=tl.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [tl[i],tl[j]]=[tl[j],tl[i]]; }
+    const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    pos.forEach(([r,c],i)=>{ g[r][c]={...tl[i]}; });
+    if(simulateSolvable(g)) return g;
+  }
+  // 兜底:行主序相邻成对放置(相邻 0 折角必然可连;缺口已在 open 之外)
+  const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  open.forEach(([r,c],i)=>{ g[r][c]={...tiles[i]}; });
+  return g;
+}
+function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type})), 1, 2); }
+function occFrom(g){
+  const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) o[r+1][c+1]=true;
+  return o;
+}
+// 路径搜索:≤2 折角,BFS(方向,折角数),含外圈
+function findPathOcc(occ,ar,ac,br,bc){
+  const A=[ar+1,ac+1], B=[br+1,bc+1];
+  const H=ROWS+2, W=COLS+2;
+  const pass=(r,c)=> r>=0&&r<H&&c>=0&&c<W && ((r===B[0]&&c===B[1]) || !occ[r][c]);
+  const best=Array.from({length:H},()=>Array.from({length:W},()=>[9,9,9,9]));
+  const par=Array.from({length:H},()=>Array.from({length:W},()=>null));
+  const q=[];
+  for(let d=0;d<4;d++){
+    const r=A[0]+DR[d], c=A[1]+DC[d];
+    if(pass(r,c) && best[r][c][d]>0){
+      best[r][c][d]=0;
+      if(!par[r][c]) par[r][c]=[null,null,null,null];
+      par[r][c][d]={cell:[A[0],A[1]],dir:-1};
+      q.push([r,c,d,0]);
+    }
+  }
+  let hit=null;
+  while(q.length && !hit){
+    const [r,c,d,t]=q.shift();
+    if(r===B[0]&&c===B[1]){ hit=[r,c,d]; break; }
+    for(const nd of [d,(d+1)%4,(d+3)%4]){
+      const nt=t+(nd===d?0:1);
+      if(nt>2) continue;
+      const r2=r+DR[nd], c2=c+DC[nd];
+      if(!pass(r2,c2)) continue;
+      if(best[r2][c2][nd]>nt){
+        best[r2][c2][nd]=nt;
+        if(!par[r2][c2]) par[r2][c2]=[null,null,null,null];
+        par[r2][c2][nd]={cell:[r,c],dir:d};
+        q.push([r2,c2,nd,nt]);
+      }
+    }
+  }
+  if(!hit) return null;
+  const pts=[];
+  let cur=hit;
+  while(cur){
+    const [r,c,d]=cur;
+    pts.push([r,c]);
+    const p=par[r][c][d];
+    if(!p) break;
+    if(p.dir===-1){ pts.push([p.cell[0],p.cell[1]]); break; }
+    cur=[p.cell[0],p.cell[1],p.dir];
+  }
+  pts.reverse();
+  return pts;   // 外圈坐标折线(含 A、B)
+}
+const DR=[-1,0,1,0], DC=[0,1,0,-1];
+function pairConnectable(g,a,b){   // a,b = [r,c];判定同动词 + inf/form 配对 + 路径
+  const ta=g[a[0]][a[1]], tb=g[b[0]][b[1]];
+  if(!ta||!tb) return false;
+  if(ta.v!==tb.v) return false;
+  if(ta.k===tb.k) return false;    // 必须 inf + form
+  return !!findPathOcc(occFrom(g),a[0],a[1],b[0],b[1]);
+}
+function findAnyPair(g){
+  const list=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) list.push([r,c]);
+  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){
+    const a=list[i], b=list[j];
+    const ta=g[a[0]][a[1]], tb=g[b[0]][b[1]];
+    if(ta.v!==tb.v||ta.k===tb.k) continue;
+    if(findPathOcc(occFrom(g),a[0],a[1],b[0],b[1])) return [a,b];
+  }
+  return null;
+}
+function simulateSolvable(g){
+  const clone=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) clone[r][c]=g[r][c]?{...g[r][c]}:null;
+  let left=0;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(clone[r][c]) left++;
+  while(left>0){
+    const p=findAnyPair(clone);
+    if(!p) return false;
+    clone[p[0][0]][p[0][1]]=null; clone[p[1][0]][p[1][1]]=null;
+    left-=2;
+  }
+  return true;
+}
+function reshuffleRemaining(){
+  const list=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(board[r][c]) list.push({t:board[r][c],r,c});
+  if(list.length<4) return;
+  for(let tries=0;tries<80;tries++){
+    const pos=[...list.map(p=>[p.r,p.c])];
+    for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+    const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    list.forEach((p,i)=>{ g[pos[i][0]][pos[i][1]]={v:p.t.v,k:p.t.k}; });
+    if(findAnyPair(g)){ applyShuffle(g,list); return; }
+  }
+  applyShuffleShallow(list);
+}
+function applyShuffle(g,list){
+  for(const p of list){ board[p.r][p.c]=null; }
+  for(const p of list){
+    const nt=g[p.r][p.c];
+    board[p.r][p.c]=nt;
+    p.t.r=p.r; p.t.c=p.c;
+    positionTile(p.t);
+  }
+}
+// 兜底:把剩余块按"原形+变位"成对放入行主序相邻格(经典路径下必然可连)
+function applyShuffleShallow(list){
+  // 按动词分组:原形与形式各自排队,配成对
+  const infs=[], forms=[];
+  for(const p of list){ (p.t.k==="inf"?infs:forms).push(p.t); }
+  const pairs=[];
+  while(infs.length && forms.length){
+    const inf=infs.shift(), form=forms.find(f=>f.v===inf.v);
+    if(form){ forms.splice(forms.indexOf(form),1); pairs.push([inf,form]); }
+    else pairs.push([inf, forms.shift()]);   // 数量失衡的兜底(正常不会发生)
+  }
+  while(infs.length) pairs.push([infs.shift(), infs.shift()]);
+  while(forms.length){ const a=forms.shift(); const b=forms.shift()||a; pairs.push([a,b]); }
+  // 行主序收集格子,成对放入相邻格
+  const pos=[...list.map(p=>[p.r,p.c])];
+  pos.sort((A,B)=> A[0]===B[0] ? A[1]-B[1] : A[0]-B[0]);
+  for(const p of list){ board[p.r][p.c]=null; }
+  pairs.forEach(([a,b],i)=>{
+    const [r1,c1]=pos[i*2], [r2,c2]=pos[i*2+1];
+    if(a){ a.r=r1; a.c=c1; board[r1][c1]=a; positionTile(a); }
+    if(b){ b.r=r2; b.c=c2; board[r2][c2]=b; positionTile(b); }
+  });
+}
+
+/* ---- 渲染 ---- */
+function buildBoardDOM(){
+  boardEl.innerHTML="";
+  pathSvg.innerHTML="";
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const t=board[r][c];
+    if(!t) continue;   // 开局缺口格(闯关 4×5 盘的 2 个随机空位)
+    const el=document.createElement("div");
+    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+t.f);
+    el.style.setProperty("--h",VERBS[t.v].hue);
+    const face=document.createElement("div");
+    face.className="face";
+    face.textContent=t.k==="inf"?VERBS[t.v].inf:VERBS[t.v][t.f];
+    face.style.fontSize=levelFont+"px";
+    el.appendChild(face);
+    el._t=t; t.el=el;
+    positionTile(t);
+    boardEl.appendChild(el);
+  }
+}
+function occNow(){
+  const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
+  for(const t of tiles) if(t.alive) o[t.r+1][t.c+1]=true;
+  return o;
+}
+function findAnyPairNow(){
+  const alive=tiles.filter(t=>t.alive);
+  for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){
+    const a=alive[i], b=alive[j];
+    if(a.v!==b.v||a.k===b.k) continue;
+    const o=occNow();
+    if(findPathOcc(o,a.r,a.c,b.r,b.c)) return [a,b];
+  }
+  return null;
+}
+
+/* ---- 关卡流程 ---- */
+async function startLink(idx){
+  const lv=LINK_LEVELS[idx];
+  if(!lv) return;
+  abandonSession();
+  mode="levels";
+  document.body.classList.add("in-levels");   // 闯关:横幅固定槽位
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
+  curLevel=lv;
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=displayId(lv);
+  ROWS=5;   // 闯关盘 4×5=20 格(9 词×1 对+2 随机缺口,零重复)
+  syncSize();
+  // 布点(可解)
+  board=buildPairs();
+  tiles=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; if(!t) continue; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
+  buildBoardDOM();
+  applyTileRotations();
+  syncSize();
+  PAIR_TOTAL=tiles.length/2;   // 闯关 9 对(0/9);模式盘 18 对(0/18)
+  pairsLeft=PAIR_TOTAL;
+  updateHUD();
+  busy=false;
+  lastAction=Date.now();
+  maybeStartDemo();
+}
+function displayId(lv){ return String(lv.num); }   // demo:纯序号 1..18(不用 A1.x)
+let PAIR_TOTAL=18;   // 当前盘的总对数(发牌时按实块数重设:闯关 9 / 模式 18)
+let pairsLeft=PAIR_TOTAL;
+
+/* ---- 模式:无尽 / 每日挑战(过第 1 关解锁;只用已收集动词) ---- */
+const MODE_UNLOCK=2, DAILY_SECONDS=180;
+let mode="levels";           // "levels" | "endless" | "daily"
+let modeRng=Math.random;     // 每日:当日种子;无尽:真随机
+const MODE_FORMS=["sg","pl","pp"];
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function dailySeed(){        // 日期字符串 → 确定性 rng(全玩家同日同盘)
+  const key=todayKey();
+  let h=1779033703 ^ key.length;
+  for(const ch of key){ h=Math.imul(h^ch.charCodeAt(0),3432918353); h=((h<<13)|(h>>>19))>>>0; }
+  return ()=>{ h=Math.imul(h^(h>>>16),2246822507); h=Math.imul(h^(h>>>13),3266489909); h^=h>>>16; return (h>>>0)/4294967296; };
+}
+function shuffleWith(arr,r){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function collectedPool(){
+  const all=new Set(); LINK_LEVELS.forEach(lv=>lv.verbs.forEach(vi=>all.add(vi)));
+  const got=[...all].filter(vi=>(save.counts[VERBS[vi].inf]||0)>0);
+  return got.length?got:[0,1,2,3,4,5,6];
+}
+function sampleModeVerbs(pool,n,r){   // 一屏只一种词型搭配(用户反馈);同盘变位词串不重复;换盘换型不与上一盘重复
+  let f;
+  if(modeFormState==null||MODE_FORMS.indexOf(modeFormState)<0){ f=MODE_FORMS[Math.floor(r()*MODE_FORMS.length)]; }
+  else{
+    const i=MODE_FORMS.indexOf(modeFormState);
+    f=MODE_FORMS[(i+1+Math.floor(r()*(MODE_FORMS.length-1)))%MODE_FORMS.length];
+  }
+  modeFormState=f;
+  const picks=[], seenStr=new Set();
+  const tryPush=(vi)=>{
+    if(picks.length>=n) return;
+    const s=VERBS[vi][f];
+    if(seenStr.has(s)) return;
+    seenStr.add(s); picks.push({v:vi,f});
+  };
+  shuffleWith(pool,r).forEach(tryPush);
+  let guard=0;
+  while(picks.length<n && guard++<300){ tryPush(pool[Math.floor(r()*pool.length)]); }
+  while(picks.length<n){ const vi=pool[guard++%pool.length]; picks.push({v:vi,f}); }  // 极端兜底(收词过少)
+  return picks;
+}
+function dealModeBoard(){
+  ROWS=9;   // 挑战模式恢复 4×9=36 格盘(9 词×2 对,允许同屏重复)
+  document.body.classList.remove("in-levels");
+  const picks=sampleModeVerbs(collectedPool(),9,mode==="daily"?modeRng:Math.random);
+  clearSel(); clearHint();
+  board=buildPairsFrom(picks, 2, 0);
+  tiles=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; if(!t) continue; t.r=r; t.c=c; t.alive=true; tiles.push(t); }
+  buildBoardDOM();
+  applyTileRotations();
+  syncSize();   // 按新盘词长校字号
+  PAIR_TOTAL=tiles.length/2;
+  pairsLeft=PAIR_TOTAL;
+  updateHUD();
+}
+function startEndless(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  abandonSession();
+  mode="endless"; modeRng=Math.random;
+  stopDailyTimer();
+  document.getElementById("timerTag").style.display="none";
+  curLevel={id:"Oneindig"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.endless");
+  modeTargetBest=save.best["Oneindig"]||0; modeFormState=null;
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+}
+function startDaily(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 每日限一次:今天已完成,拒绝再开
+  abandonSession();
+  mode="daily"; modeRng=dailySeed();
+  curLevel={id:"Dagelijks"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.daily");
+  modeTargetBest=save.dailyBest[todayKey()]||0; modeFormState=null;
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+  startDailyTimer();
+}
+
+/* ---- 每日挑战计时(180s,时间到=当日完成) ---- */
+let dailyLeft=0, dailyIv=null;
+function stopDailyTimer(){ if(dailyIv){ clearInterval(dailyIv); dailyIv=null; } }
+function updateTimerTag(){
+  const m=Math.floor(dailyLeft/60), s=String(dailyLeft%60).padStart(2,"0");
+  const el=document.getElementById("timerTag");
+  el.style.display=""; el.innerHTML=`${ICO_CLOCK}<b>${m}:${s}</b>`;
+}
+function startDailyTimer(){
+  dailyLeft=DAILY_SECONDS;
+  updateTimerTag();
+  stopDailyTimer();
+  dailyIv=setInterval(()=>{
+    if(mode!=="daily"||!curLevel){ stopDailyTimer(); return; }
+    dailyLeft--; updateTimerTag();
+    if(dailyLeft<=0){ stopDailyTimer(); endTimeUp(); }
+  },1000);
+}
+function endTimeUp(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const key=todayKey();
+    const prev=save.dailyBest[key]||0;
+    const rec=scoreRun>prev;
+    save.dailyBest[key]=Math.max(prev,scoreRun);   // 0 分也记录:菜单完成态要能显示
+    save.dailyDone=key;
+    persist();
+    curLevel=null;
+    updateHUD();   // curLevel 已空:隐藏计时器
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
+    b.onclick=()=>{ hideResult(); openMenu(); };
+    btns.appendChild(b);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
+
+/* ---- 生存模式:每对之间限时,点错不失败,超时结束 ---- */
+const SURVIVAL_SECONDS=15;
+let survivalDeadline=null, survivalIv=null;
+function stopSurvivalTimer(){ if(survivalIv){ clearInterval(survivalIv); survivalIv=null; } survivalDeadline=null; }
+function updateSurvivalTag(){
+  const el=document.getElementById("timerTag");
+  if(!survivalDeadline) return;
+  const s=Math.max(0, Math.ceil((survivalDeadline-Date.now())/1000));
+  el.innerHTML=`${ICO_CLOCK}<b>${s}</b>`;
+  el.classList.toggle("urgent", s<=5);
+}
+function startSurvival(){
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  abandonSession();
+  mode="survival";
+  curLevel={id:"Survival"};
+  selected=null; pendingHint=false;
+  scoreRun=0; streak=0; lastScoreShown=-1;
+  document.getElementById("lvlTag").textContent=t("mode.survival");
+  modeTargetBest=save.best["Survival"]||0; modeFormState=null;
+  syncSize();
+  dealModeBoard();
+  busy=false; lastAction=Date.now();
+  survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000;
+  updateSurvivalTag();
+  if(survivalIv) clearInterval(survivalIv);
+  survivalIv=setInterval(()=>{
+    if(mode!=="survival"||!curLevel){ clearInterval(survivalIv); survivalIv=null; return; }
+    updateSurvivalTag();
+    if(Date.now()>=survivalDeadline){ clearInterval(survivalIv); survivalIv=null; endSurvival(); }
+  },250);
+}
+function endSurvival(){
+  const wait=()=>{
+    if(busy){ setTimeout(wait,250); return; }
+    busy=true; stopSpeech(); hideBanner();
+    const prev=save.best["Survival"]||0;
+    const rec=scoreRun>prev;
+    save.best["Survival"]=Math.max(prev,scoreRun);
+    persist();
+    curLevel=null;
+    updateHUD();
+    document.getElementById("resultTitle").textContent=t("result.timeup");
+    document.getElementById("resultText").innerHTML=
+      `${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+    const btns=document.getElementById("resultBtns");
+    btns.innerHTML="";
+    const b=document.createElement("button"); b.className="btn ghost"; b.textContent=t("btn.menu");
+    b.onclick=()=>{ hideResult(); openMenu(); };
+    btns.appendChild(b);
+    document.getElementById("resultModal").classList.add("on");
+    blip(392,.12); setTimeout(()=>blip(330,.16),130);
+  };
+  wait();
+}
+
+/* 全程非阻塞(用户反馈:动效不得挡住快速连击):状态同步落账,动画与收尾走 setTimeout */
+function attemptPair(a,b){
+  if(busy) return false;
+  // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
+  const validPair = a && b && a!==b && a.alive && b.alive && a.v===b.v && a.k!==b.k;
+  const o=occNow();
+  const path=validPair ? findPathOcc(o,a.r,a.c,b.r,b.c) : null;
+  if(!path){
+    if(a&&a.el){ a.el.classList.add("shake"); b.el.classList.add("shake");
+      setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320); }
+    blip(180,.08,"sine",.05);
+    if(streak>0){ streak=0; updateHUD(); }
+    return false;
+  }
+  // 成功:折线动画 + 音效 + 闪亮 + 弹字
+  drawPath(path);
+  const V=VERBS[a.v];
+  const formWord=a.k==="form"?wordOf(a):wordOf(b);
+  // 计分:每对 15;连击(横幅窗口内)加成
+  streak++;
+  let pts=PAIR_POINTS;
+  if(streak>=2){ pts+=10*(streak-1); }
+  scoreRun+=pts;
+  successJingle(streak);
+  if(a.k==="form"||b.k==="form"){
+    save.counts[V.inf]=(save.counts[V.inf]||0)+1;
+    persist();
+  }
+  a.alive=false; b.alive=false;
+  board[a.r][a.c]=null; board[b.r][b.c]=null;   // 立即腾格:后续配对即刻可判
+  pairsLeft--;
+  a.el.classList.add("flash","lit"); b.el.classList.add("flash","lit");
+  popScore(pts,streak,b.r+1,b.c+1);
+  if(trial()){   // 试点:里程碑庆祝 + 分数飞向计分器
+    milestone(streak);
+    flyScore(b.el,"+"+pts);
+  }
+  if(mode==="survival"){ survivalDeadline=Date.now()+SURVIVAL_SECONDS*1000; updateSurvivalTag(); }   // 生存:续命
+  updateHUD();
+  showLearnBanner(a.v, formWord, a.f);   // 高亮本盘词型
+  if(save.settings.ttsVolume<=0){ setTimeout(()=>{ blip(660,.09,"sine",.06); setTimeout(()=>blip(990,.12,"sine",.05),90); },160); }   // 关朗读:连对确认音
+  setTimeout(()=>{ a.el.classList.add("gone"); b.el.classList.add("gone"); },170);
+  setTimeout(()=>{ a.el.remove(); b.el.remove(); },470);
+  if(pairsLeft<=0){
+    scoreRun+=CLEAR_BONUS;
+    updateHUD();
+    if(trial()){ confetti(); [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>blip(f,.12,"triangle",.07),i*70)); }   // 试点:清盘终章
+    setTimeout(()=>{
+      if(mode==="levels"){ if(curLevel) finishLevel(); }
+      else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
+    },480);
+  }else if(!findAnyPairNow()){
+    setTimeout(()=>{
+      if(!curLevel) return;
+      toast(t("toast.nopair"));
+      reshuffleRemaining();
+    },500);
+  }
+  return true;
+}
+function drawPath(path){
+  const svg=document.getElementById("pathSvg");
+  svg.setAttribute("viewBox",`0 0 ${wrapEl.clientWidth} ${wrapEl.clientHeight}`);
+  const hot=getComputedStyle(document.body).getPropertyValue("--hot").trim()||"#e06b45";
+  // 端点取两块朝向路径一侧的「边中点」(用户反馈:不连中心)
+  const edge=(pt,nxt)=>{
+    const [x,y]=cellCenter(pt[0],pt[1]);
+    const dx=nxt[1]-pt[1], dy=nxt[0]-pt[0];   // pt=[r,c]:列差=水平、行差=垂直(此前轴序颠倒导致斜线)
+    if(Math.abs(dx)>=Math.abs(dy)) return [x+Math.sign(dx)*layout.tw/2, y];
+    return [x, y+Math.sign(dy)*layout.th/2];
+  };
+  const p0=edge(path[0],path[1]);
+  const p1=edge(path[path.length-1],path[path.length-2]);
+  const ptsStr=[p0,...path.slice(1,-1).map(([r,c])=>cellCenter(r,c)),p1]
+    .map(([x,y])=>`${Math.round(x)},${Math.round(y)}`).join(" ");
+  svg.innerHTML=
+    `<polyline points="${ptsStr}" fill="none" stroke="${hot}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`+
+    `<polyline points="${ptsStr}" fill="none" stroke="${hot}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 8"/>`;
+  for(const el of [window.__litA,window.__litB]) {}
+  setTimeout(()=>{ svg.innerHTML=""; },560);
+}
+// 得分弹字:在消除块位置升起 "+pts ×streak"
+function popScore(pts,streak,tr,tc){
+  const [x,y]=cellCenter(tr,tc);
+  const el=document.createElement("div");
+  el.className="score-pop";
+  el.textContent=`+${pts}${streak>=2?"  ×"+streak:""}`;
+  el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
+  wrapEl.appendChild(el);
+  setTimeout(()=>el.remove(),820);
+}
+// 成功音效:低频"咚"+ 双音上扬,连击≥3 加第三个音
+function successJingle(streak){
+  const base=540+Math.min(streak,8)*45;
+  blip(170,.06,"sine",.07);
+  blip(base,.07,"triangle",.09);
+  setTimeout(()=>blip(base*1.335,.09,"triangle",.07),70);
+  if(streak>=3) setTimeout(()=>blip(base*1.782,.12,"triangle",.06),150);
+}
+
+/* ---- 竞品调研试点(docs/RESEARCH-competitors.md P1/P3/P5/P6;只在试验关 A1.1/A1.2 生效) ---- */
+const TRIAL_LEVELS=new Set(["L0","L1"]);
+const trial=()=> mode==="levels" && curLevel && TRIAL_LEVELS.has(curLevel.id);
+function comboWord(streak){   // P1 里程碑:×3/×5/×8,之后每 +4 再庆祝
+  if(streak===3) return "combo.m3";
+  if(streak===5) return "combo.m5";
+  if(streak===8) return "combo.m8";
+  if(streak>=12 && (streak-12)%4===0) return "combo.m12";
+  return null;
+}
+let celeTimer=null;
+function milestone(streak){
+  const word=comboWord(streak);
+  if(!word) return;
+  const st=document.getElementById("scoreTag");
+  st.classList.add("celebrate");
+  st.innerHTML=`<span class="cele">${t(word)}</span>`;
+  clearTimeout(celeTimer);
+  celeTimer=setTimeout(()=>{ st.classList.remove("celebrate"); updateHUD(); },1300);
+  wrapEl.classList.remove("ripple"); void wrapEl.offsetWidth; wrapEl.classList.add("ripple");
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>blip(f,.1,"triangle",.08),i*60));
+}
+function flyScore(fromEl,text){   // P5:分数从消除处飞向计分器(资源流向,Royal Match 式)
+  try{
+    const from=fromEl.getBoundingClientRect();
+    const to=document.getElementById("scoreTag").getBoundingClientRect();
+    const el=document.createElement("div");
+    el.className="score-fly"; el.textContent=text;
+    el.style.left=(from.left+from.width/2)+"px"; el.style.top=(from.top+from.height/2)+"px";
+    document.body.appendChild(el);
+    void el.offsetWidth;   // 强制重流,保证 transition 从原位出发(勿用 rAF)
+    const dx=(to.left+to.width/2)-(from.left+from.width/2), dy=(to.top+to.height/2)-(from.top+from.height/2);
+    el.style.transform=`translate(${dx}px,${dy}px) scale(.45)`;
+    el.style.opacity="0";
+    setTimeout(()=>el.remove(),680);
+  }catch(e){}
+}
+function confetti(){   // P6:清盘终章彩带
+  for(let i=0;i<26;i++){
+    const el=document.createElement("div");
+    el.className="confetti";
+    el.style.left="50%"; el.style.top="28%";
+    el.style.background=`hsl(${Math.floor(Math.random()*360)} 70% 60%)`;
+    el.style.setProperty("--dx",(Math.random()*wrapEl.clientWidth-wrapEl.clientWidth/2)+"px");
+    el.style.setProperty("--dy",(wrapEl.clientHeight*.6+Math.random()*90)+"px");
+    el.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    wrapEl.appendChild(el);
+    setTimeout(()=>el.remove(),1500);
+  }
+}
+
+/* ---- 横幅(所有模式,10s=连击窗口) ---- */
+let bannerTimer=null, bannerVerb=null;
+function hideBanner(){
+  clearTimeout(bannerTimer); bannerTimer=null; bannerVerb=null;
+  stopSpeech();
+  bannerEl.classList.remove("show");
+  bannerEl.classList.remove("collapsed");
+  if(streak>0){ streak=0; updateHUD(); }   // 连击倒计时随卡片结束
+}
+function collapseBanner(){
+  if(!bannerEl.classList.contains("show")) return;
+  bannerEl.classList.add("collapsed");   // 手动点掉:只收词面,连击窗口与倒计时条继续(用户反馈);朗读不打断
+}
+function showLearnBanner(v,formWord,activeF){
+  clearTimeout(bannerTimer);
+  const V=VERBS[v];
+  bannerVerb=v;
+  document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
+  document.getElementById("bannerForms").innerHTML=
+    [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]].filter(([,w])=>w)
+      .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
+  document.getElementById("bannerGloss").textContent=glossOf(V);
+  bannerEl.style.setProperty("--h",V.hue);
+  bannerEl.classList.remove("show");
+  bannerEl.classList.remove("collapsed");
+  void bannerEl.offsetWidth;
+  bannerEl.classList.add("show");
+  bannerEl.onclick=collapseBanner;   // 点掉≠断连击:收起词面,倒计时继续
+  bannerTimer=setTimeout(hideBanner,(save.settings.bannerMs||BANNER_DEFAULT_S)*1000);
+  speakPair(V,formWord);
+}
+/* ---- iOS/Safari:首次手势解锁 speechSynthesis(静音音节),否则延迟/异步的 speak 会被忽略 ---- */
+let ttsUnlocked=false;
+document.addEventListener("pointerdown",()=>{
+  if(ttsUnlocked || !("speechSynthesis" in window)) return;
+  ttsUnlocked=true;
+  try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; window.speechSynthesis.speak(u); }catch(e){}
+},true);
+
+/* ---- 手绘图标(色块与线条重叠,替代 emoji) ---- */
+const ICO_STAR=`<svg class="hico" viewBox="0 0 24 24"><path d="M6.2 8.4 11.4 7 16 5.6 19.6 9 18 14 14.8 18.4 9.2 17.6 5.4 13.2Z" fill="#e3b52e" transform="translate(1.3,1.5)"/><path d="M5.4 7.8 10.8 6.4 15.6 5 19.2 8.6 17.6 13.8 14.4 18.2 8.8 17.4 4.8 12.8Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_FLAME=`<svg class="hico" viewBox="0 0 24 24"><path d="M8.4 4.8C10.4 7.2 14.8 9.2 16 12.4 17.4 16 15.2 19.8 11.6 20 8 20.2 5.2 17.6 5.6 14 5.9 11.2 7.6 8 8.4 4.8Z" fill="#e8734a" transform="translate(1.2,1.2)"/><path d="M7.8 4.2C9.8 6.8 14.4 8.8 15.6 12.2 17 15.9 14.7 19.4 11.3 19.6 7.9 19.8 5.1 17.2 5.5 13.7 5.8 10.9 7 7.5 7.8 4.2Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+const ICO_CLOCK=`<svg class="hico" viewBox="0 0 24 24"><circle cx="12.4" cy="12.6" r="8.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12.2 7.6 12.4 12.4 16 14.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>`;
+
+function updateHUD(){
+  const inLevel=!!curLevel;
+  const modeUI=inLevel&&mode!=="levels";
+  const showGoal=inLevel&&(mode==="levels"||mode==="daily");
+  const goalEl=document.getElementById("goalTag");
+  goalEl.style.display=showGoal?"":"none";
+  if(showGoal){
+    document.getElementById("goalTxt").textContent=`${PAIR_TOTAL-pairsLeft}/${PAIR_TOTAL}`;
+    document.getElementById("goalBar").style.width=Math.round((PAIR_TOTAL-pairsLeft)/PAIR_TOTAL*100)+"%";
+  }
+  const lv=document.getElementById("lvlTag");
+  lv.style.display=(inLevel&&mode!=="levels")?"none":"";   // 模式下中槽只留一个胶囊(修生存倒计时换行)
+  document.body.classList.toggle("mode-hud", modeUI);
+  const tt=document.getElementById("timerTag");
+  tt.style.display=(inLevel&&mode==="survival")?"":"none";
+  if(tt.style.display==="none") tt.classList.remove("urgent");
+  if(scoreRun!==lastScoreShown){
+    if(mode==="endless" && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
+    if(mode==="daily"){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
+  }
+  const bt=document.getElementById("bestTag");
+  bt.style.display="none";   // 个人最佳移入右侧分数条的目标位(模式)
+  const st=document.getElementById("scoreTag");
+  if(!st.classList.contains("celebrate")){
+    if(modeUI){
+      st.className="score-bar"+((modeTargetBest>0&&scoreRun>modeTargetBest)?" record":"");
+      const fill=modeTargetBest>0?Math.min(100,scoreRun/modeTargetBest*100):(scoreRun>0?100:0);
+      st.innerHTML=`<i style="width:${fill}%"></i><b>${scoreRun}</b><span class="sb-goal">${ICO_STAR}${modeTargetBest}</span>`;
+    }else{
+      st.className="score-tag";
+      st.innerHTML=`${ICO_STAR}<b>${scoreRun}</b>`;
+    }
+    if(scoreRun!==lastScoreShown){
+      st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump");
+    }
+  }
+  lastScoreShown=scoreRun;
+  const ct=document.getElementById("comboTag");
+  if(streak>=2){ ct.style.display=""; ct.innerHTML=`${ICO_FLAME}<b>×${streak}</b>`; }
+  else ct.style.display="none";
+}
+
+/* ---- 提示 ---- */
+function hint(){
+  if(busy||!curLevel) return;
+  const p=findAnyPairNow();
+  if(!p){ toast(t("toast.nopair")); reshuffleRemaining(); return; }
+  clearHint();
+  for(const t of p){ t.el.classList.add("hint"); }
+  hintTimer=setTimeout(clearHint,2600);
+}
+function clearHint(){
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  boardEl.querySelectorAll(".hint").forEach(el=>el.classList.remove("hint"));
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("on"),1800);
+}
+
+/* ---- 选择/配对输入 ---- */
+boardEl.addEventListener("click",e=>{
+  if(!curLevel) return;
+  const el=e.target.closest(".tile");
+  if(!el) return;
+  const t=el._t;
+  if(!t||!t.alive) return;   // 消除动画中的残块不可再选
+  if(demo){ demoClick(t); return; }   // 首教演示接管输入(须在 busy 守卫前:演示期间 busy=true)
+  if(busy) return;
+  lastAction=Date.now();
+  if(!selected){
+    selected=t; el.classList.add("sel"); blip(420,.04,"sine",.04);   // 选中即点亮已移除:等 hintWait 再提示(用户反馈 #3)
+    return;
+  }
+  if(selected===t){ clearSel(); return; }
+  const a=selected, b=t;
+  clearSel();
+  attemptPair(a,b);
+});
+function clearSel(){
+  if(selected){ selected.el.classList.remove("sel"); selected=null; }
+  boardEl.querySelectorAll(".peer").forEach(el=>el.classList.remove("peer"));
+}
+
+/* ---- 交互式首教学(P3):首次进 A1.1 时 3 步演示,只出现一次;点对推进,点错抖目标 ---- */
+let demo=null;
+function maybeStartDemo(){
+  if(save.demoDone || mode!=="levels" || !curLevel || curLevel.id!=="L0") return;
+  let pair=null;
+  for(const vi of curLevel.verbs){
+    const inf=tiles.find(t=>t.alive&&t.v===vi&&t.k==="inf");
+    const form=tiles.find(t=>t.alive&&t.v===vi&&t.k==="form");
+    if(inf&&form&&findPathOcc(occNow(),inf.r,inf.c,form.r,form.c)){ pair=[inf,form]; break; }
+  }
+  if(!pair) return;
+  demo={step:1, inf:pair[0], form:pair[1], bar:null};
+  busy=true;   // 演示期间接管输入
+  const bar=document.createElement("div");
+  bar.id="demoBar";
+  bar.textContent=t("demo.step1");
+  wrapEl.appendChild(bar);
+  demo.bar=bar;
+  demo.inf.el.classList.add("demo-target");
+}
+function demoClick(tile){   // 注意:参数不可叫 t,会遮蔽全局 i18n 函数 t()
+  if(demo.step===1){
+    if(tile===demo.inf){
+      demo.inf.el.classList.remove("demo-target"); demo.form.el.classList.add("demo-target");
+      demo.step=2; demo.bar.textContent=t("demo.step2"); blip(480,.05,"sine",.05);
+    }else wiggle(demo.inf);
+  }else if(demo.step===2){
+    if(tile===demo.form){
+      demo.form.el.classList.remove("demo-target");
+      demo.step=3; demo.bar.textContent=t("demo.step3"); blip(560,.06,"sine",.05);
+      setTimeout(()=>{
+        busy=false;
+        attemptPair(demo.inf,demo.form);   // 连线自己画出来
+        if(demo.bar){ demo.bar.remove(); }
+        demo=null;
+        save.demoDone=true; persist();
+        setTimeout(()=>toast(t("demo.go")),650);
+      },500);
+    }else wiggle(demo.form);
+  }
+}
+function wiggle(t){
+  t.el.classList.add("shake"); blip(180,.06,"sine",.04);
+  setTimeout(()=>t.el.classList.remove("shake"),320);
+}
+</script>
+<script>
+"use strict";
+/* ================= i18n ================= */
+let board=[];                        // 由引擎脚本赋值
+function abandonSession(){
+  stopSpeech(); hideBanner();
+  if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); }   // 弃局时撤演示
+}
+function speakVerb(word){
+  const gen=++speakGen;
+  return new Promise(res=>{
+    if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
+    try{
+      const ss=window.speechSynthesis;
+      const busyS=ss.speaking||ss.pending;
+      if(busyS) ss.cancel();
+      const u=new SpeechSynthesisUtterance(word);
+      u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+      u.rate=0.82; u.volume=save.settings.ttsVolume/100;
+      let startedAny=false;
+      u.onstart=()=>{ startedAny=true; };
+      u.onend=()=>res(); u.onerror=()=>res();
+      if(busyS) setTimeout(()=>{ if(gen===speakGen) ss.speak(u); else res(); },70);
+      else ss.speak(u);
+      setTimeout(()=>{ if(gen===speakGen && !startedAny && (ss.speaking||ss.pending)) warnTtsBlocked(); },1300);
+    }catch(e){ res(); }
+  });
+}
+function finishLevel(){
+  const idx=LINK_LEVELS.indexOf(curLevel);
+  const lvId=LINK_LEVELS[idx].id;
+  const disp=displayId(curLevel);
+  save.done[lvId]=true;
+  if(idx+2>save.lUnlocked){ save.lUnlocked=idx+2; }
+  const prev=save.best[lvId]||0;
+  const rec=scoreRun>prev;
+  if(rec){ save.best[lvId]=scoreRun; }
+  persist();
+  curLevel=null;
+  document.getElementById("resultTitle").textContent=t("result.title");
+  document.getElementById("resultText").innerHTML=
+    t("result.done")+"<br>"+`${ICO_STAR}<b>${scoreRun}</b>${rec?" — "+t("result.record"):""} · ${t("result.best")}: ${Math.max(prev,scoreRun)}`;
+  const btns=document.getElementById("resultBtns");
+  btns.innerHTML="";
+  if(idx<LINK_LEVELS.length-1){
+    const b=document.createElement("button"); b.className="btn primary"; b.textContent=t("btn.next");
+    b.onclick=()=>{ hideResult(); startLink(idx+1); };
+    btns.appendChild(b);
+  }
+  const b2=document.createElement("button"); b2.className="btn ghost"; b2.textContent=t("btn.again");
+  b2.onclick=()=>{ hideResult(); startLink(idx); };
+  btns.appendChild(b2);
+  const b3=document.createElement("button"); b3.className="btn ghost"; b3.textContent=t("btn.menu");
+  b3.onclick=()=>{ hideResult(); openMenu(); };
+  btns.appendChild(b3);
+  document.getElementById("resultModal").classList.add("on");
+  blip(523,.1); setTimeout(()=>blip(659,.1),110); setTimeout(()=>blip(784,.16),220);
+}
+function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
+
+/* ================= 菜单 ================= */
+function openMenu(){
+  if(curLevel){ stopSpeech(); hideBanner(); }   // 会话保活:棋盘保留
+  showMenuView("main");
+  const resume=document.getElementById("mResume");
+  resume.style.display=curLevel?"flex":"none";
+  resume.onclick=()=>document.getElementById("menuScreen").classList.remove("on");
+  const mc=document.getElementById("mContinue");
+  const nextIdx=LEVELS_done();
+  mc.style.display=nextIdx<LINK_LEVELS.length?"":"none";
+  // 无尽/每日按钮:解锁态 + 今日完成态 + 副标题
+  const unlockedModes=save.lUnlocked>=MODE_UNLOCK;
+  const dailyDone=save.dailyDone===todayKey();
+  document.getElementById("mDaily").classList.toggle("locked",!unlockedModes||dailyDone);
+  document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
+  const dBest=save.dailyBest[todayKey()];
+  document.getElementById("mDailySub").textContent=unlockedModes
+    ?(dBest!=null?`${dailyDone?"✓ ":""}${t("result.today")}: ${dBest}`:t("menu.newdaily"))
+    :t("menu.needlevel");
+  const eBest=save.best["Oneindig"];
+  document.getElementById("mEndlessSub").textContent=unlockedModes
+    ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
+    :t("menu.needlevel");
+  const sBest=save.best["Survival"];
+  document.getElementById("mSurvival").classList.toggle("locked",!unlockedModes);
+  document.getElementById("mSurvivalSub").textContent=unlockedModes
+    ?(sBest?`${t("result.best")}: ${sBest}`:t("menu.survivalnew"))
+    :t("menu.needlevel");
+  document.getElementById("menuScreen").classList.add("on");
+}
+function LEVELS_done(){
+  for(let i=0;i<LINK_LEVELS.length;i++){ if(!save.done[LINK_LEVELS[i].id]) return i; }
+  return LINK_LEVELS.length;
+}
+function showMenuView(v){
+  document.getElementById("menuMain").style.display=v==="main"?"":"none";
+  document.getElementById("menuLevels").style.display=v==="levels"?"":"none";
+  if(v==="levels") renderLevelGrid();
+}
+function renderLevelGrid(){
+  const g=document.getElementById("lvGrid");
+  g.innerHTML="";
+  LINK_LEVELS.forEach((lv,i)=>{
+    const b=document.createElement("button");
+    const locked=i>save.lUnlocked-1;
+    b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
+    b.innerHTML=`${lv.num}<small>${t(SHORT_KEY[lv.type])}</small>`;
+    b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
+    g.appendChild(b);
+  });
+}
+
+/* ================= 设置 ================= */
+function seg(el,opts,cur,cb){
+  el.innerHTML="";
+  for(const [val,label] of opts){
+    const btn=document.createElement("button");
+    btn.textContent=label;
+    if(String(val)===String(cur)) btn.classList.add("sel");
+    btn.onclick=()=>{ cb(val); persist(); applySettings(); renderSettings(); };
+    el.appendChild(btn);
+  }
+}
+function openSettings(){
+  renderSettings();
+  document.getElementById("settingsModal").classList.add("on");
+}
+function renderSettings(){
+  const S=save.settings;
+  updateVoiceName();
+  seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
+  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"],["en","English"]],S.uiLang,v=>S.uiLang=v);
+  document.getElementById("setVolume").value=S.volume;
+  document.getElementById("setTts").value=S.ttsVolume;
+  const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;
+  document.getElementById("hintWaitVal").textContent=S.hintWait>0?`${S.hintWait} s`:t("opt.off");
+  const bn=document.getElementById("setBanner"); bn.value=S.bannerMs;
+  document.getElementById("bannerVal").textContent=`${S.bannerMs||15} s`;
+  seg(document.getElementById("setTheme"),[["grug",t("theme.grug")],["papier",t("theme.papier")]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
+  seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
+}
+
+/* ================= 图鉴 ================= */
+const bookCollapsed={};
+function toggleBookGroup(band){
+  bookCollapsed[band]=!bookCollapsed[band];
+  openBook();
+}
+function openBook(){
+  const list=document.getElementById("bookList");
+  list.innerHTML="";
+  const bands=[...new Set(TIERS.map(t=>t.band))];
+  for(const band of bands){
+    const collapsed=!!bookCollapsed[band];
+    const head=document.createElement("button");
+    head.className="book-group";
+    head.innerHTML=`<i>${collapsed?"▸":"▾"}</i> ${band}`;
+    head.onclick=()=>toggleBookGroup(band);
+    list.appendChild(head);
+    if(collapsed) continue;
+    const tier=TIERS.find(t=>t.band===band);
+    for(const vi of tier.pool){
+      const V=VERBS[vi];
+      const got=(save.counts[V.inf]||0)>0;
+      const row=document.createElement("div");
+      row.className="book-row"+(got?" viewable":"");
+      row.innerHTML=got
+        ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+          <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
+        :`<div class="book-art empty">?</div>
+          <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
+      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(vi); }
+      list.appendChild(row);
+    }
+  }
+  document.getElementById("bookDrawer").classList.add("on");
+}
+let cardResolve=null;
+function showCard(vi){
+  return new Promise(res=>{
+    cardResolve=res;
+    const V=VERBS[vi];
+    document.getElementById("cardArt").innerHTML=artSVG(vi,save.style);
+    document.getElementById("cardInf").innerHTML="";
+    document.getElementById("cardForms").innerHTML=
+      [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]].filter(([,w])=>w)
+        .map(([k,w])=>`<span class="cf${k==="inf"?" swu":""}">${w}</span>`).join("");
+    document.getElementById("cardGloss").textContent=glossOf(V);
+    document.getElementById("cardTip").textContent=t("card.tip");
+    document.getElementById("cardModal").classList.remove("gloss-open");
+    document.getElementById("cardModal").classList.add("on");
+    stopSpeech(); speakVerb(V.inf);
+  });
+}
+function closeCard(){
+  document.getElementById("cardModal").classList.remove("on");
+  stopSpeech();
+  if(cardResolve){ const r=cardResolve; cardResolve=null; r(); }
+}
+
+/* ================= 提示等待(闲置) ================= */
+setInterval(()=>{
+  const wait=(save.settings.hintWait||0)*1000;
+  if(!curLevel||busy||anyOverlayOpen()) return;
+  if(!(wait>0) || Date.now()-lastAction<=wait) return;   // hintWait=0(Off)=完全关闭
+  if(boardEl.querySelector(".hint")) return;
+  lastAction=Date.now();
+  if(selected){   // 已选中一块:点亮它的同动词块(延迟提示,不抢在玩家自己发现之前)
+    for(const x of tiles){ if(x.alive&&x!==selected&&x.v===selected.v) x.el.classList.add("peer"); }
+  }else{
+    hint();
+  }
+},1000);
+
+/* ================= 事件绑定 ================= */
+document.getElementById("btnMenu").onclick=openMenu;
+document.getElementById("menuClose").onclick=()=>{ if(curLevel) document.getElementById("menuScreen").classList.remove("on"); };
+document.getElementById("menuScreen").addEventListener("click",e=>{
+  if(e.target===document.getElementById("menuScreen") && curLevel){ document.getElementById("menuScreen").classList.remove("on"); }
+});
+document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
+document.getElementById("btnBook").onclick=openBook;
+document.getElementById("mDaily").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  document.getElementById("menuScreen").classList.remove("on");
+  startDaily();
+};
+document.getElementById("mEndless").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  document.getElementById("menuScreen").classList.remove("on");
+  startEndless();
+};
+document.getElementById("mSurvival").onclick=()=>{
+  if(save.lUnlocked<MODE_UNLOCK) return;
+  document.getElementById("menuScreen").classList.remove("on");
+  startSurvival();
+};
+document.getElementById("mContinue").onclick=()=>{
+  document.getElementById("menuScreen").classList.remove("on");
+  startLink(LEVELS_done());
+};
+document.getElementById("mLevels").onclick=()=>showMenuView("levels");
+document.getElementById("mBack").onclick=()=>showMenuView("main");
+document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
+document.getElementById("mSettings").onclick=openSettings;
+document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
+document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
+document.getElementById("setHintWait").oninput=e=>{
+  save.settings.hintWait=+e.target.value; persist();
+  document.getElementById("hintWaitVal").textContent=save.settings.hintWait>0?`${save.settings.hintWait} s`:t("opt.off");
+};
+document.getElementById("setBanner").oninput=e=>{
+  save.settings.bannerMs=+e.target.value; persist();
+  document.getElementById("bannerVal").textContent=`${save.settings.bannerMs} s`;
+};
+document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
+document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
+document.getElementById("cardPanel").onclick=()=>{
+  const m=document.getElementById("cardModal");
+  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="…"; }
+  else closeCard();
+};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
+["bookDrawer","helpModal","settingsModal"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
+});
+window.addEventListener("resize",()=>{ syncSize(); });
+if(window.visualViewport) window.visualViewport.addEventListener("resize",()=>syncSize());
+let lastVW=window.innerWidth, lastVH=window.innerHeight;
+setInterval(()=>{ if(window.innerWidth!==lastVW || window.innerHeight!==lastVH){ lastVW=window.innerWidth; lastVH=window.innerHeight; syncSize(); } },1200);
+
+/* ================= 调试钩子 ================= */
+window.NLM3={
+  state:()=>({level:curLevel&&curLevel.id, mode, dailyLeft, survivalLeft:survivalDeadline?Math.max(0,survivalDeadline-Date.now()):null, pairs:pairsLeft, score:scoreRun, streak, busy,
+    board:board.map(row=>row.map(t=>t?[t.v,t.k]:null))}),
+  verbs:VERBS, levels:LINK_LEVELS,
+  findPair:()=>{ const p=findAnyPairNow(); return p?[p[0].r,p[0].c,p[1].r,p[1].c]:null; },
+  connect:(r1,c1,r2,c2)=>attemptPair(board[r1][c1],board[r2][c2]),
+  settings:()=>({...save.settings}),
+  forceTimeUp:()=>{ dailyLeft=1; },
+  forceSurvivalEnd:()=>{ if(survivalDeadline) survivalDeadline=Date.now()-1; },
+  skipDemo:()=>{ if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); busy=false; save.demoDone=true; persist(); } },
+  save:()=>save,
+};
+
+/* ================= 启动 ================= */
+initVoices();
+applySettings();
+syncSize();
+openMenu();
+</script>
+</body>
+</html>
