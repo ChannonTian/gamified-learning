@@ -111,6 +111,7 @@ gamified-learning/
 - **Google OAuth 三个硬知识**:①`workers.dev`/`github.io`/免费域名都在公共后缀名单,**无法通过 Google 域名验证**——发布(Publish)必须有自购域名+Search Console 验证+公开的 privacy/terms 页;②Testing 模式 Test users 上限 100 人,名单外 "Access blocked";③Auth Platform 的 metrics 面板有 1–2 天延迟,以 D1 数据为准。
 - **清理测试账号必须精确圈定**:DELETE 的 WHERE 里只放测试用户名;曾险些误伤真实用户数据(自查后手动补了 display_name)——动远程库前先 SELECT 确认影响行。
 - **QA 别留在本地服务器页面**:测完 `wrangler dev` 要停+提醒关掉 127.0.0.1 标签页——用户在死掉的本地页点登录("停留在登录界面"),排查半天其实是服务器没起。另外 Google 凭据在本地要用 `--var` 假值,真值只在生产 Secret。
+- **协作者分支不许清理**:远程 `claude/*`、`openai/*` 等命名分支是其他 AI 会话/队友的工作留档(即使看起来未合并/过时),**清理分支时一律跳过**(2026-10-05 用户拍板:你不是一个人在战斗)。只清理自己创建且已合并的分支。
 
 ## 引擎与 QA 类(v1.17 之前)
 
