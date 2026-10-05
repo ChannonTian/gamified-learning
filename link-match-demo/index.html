@@ -2752,20 +2752,27 @@ document.getElementById("btnBook").onclick=openBook;
 document.getElementById("bookClose").onclick=e=>{ e.stopPropagation(); document.getElementById("bookDrawer").classList.remove("on"); };
 function modeIntro(mode){
   if(save.lUnlocked<MODE_UNLOCK){ toast(t("menu.needlevel")); return; }
-  if(mode==="daily"&&save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  const dailyDone=mode==="daily"&&save.dailyDone===todayKey();
   const info={
     endless:{tt:t("menu.endless"),best:save.best["Oneindig"]?`${t("result.best")}: ${save.best["Oneindig"]}`:"—",go:startEndless},
     daily:{tt:t("menu.daily"),best:`${t("result.today")}: ${save.dailyBest[todayKey()]||0}`,go:startDaily},
     survival:{tt:t("menu.survival"),best:save.best["Survival"]?`${t("result.best")}: ${save.best["Survival"]}`:"—",go:startSurvival},
   }[mode];
   document.getElementById("miTitle").textContent=info.tt;
-  document.getElementById("miText").textContent=t("mi."+mode);
+  document.getElementById("miText").textContent=t("mi."+mode)+(dailyDone?" "+t("menu.dailydone"):"");
   document.getElementById("miBest").textContent=info.best;
   const btns=document.getElementById("miBtns"); btns.innerHTML="";
-  const go=document.createElement("button"); go.className="btn primary"; go.textContent=t("mi.start");
-  go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); document.getElementById("menuScreen").classList.remove("on"); info.go(); };
   const back=document.createElement("button"); back.className="btn ghost"; back.textContent=t("mi.back");
   back.onclick=()=>document.getElementById("modeIntro").classList.remove("on");
+  if(dailyDone){   // 已完成:不开新局,但仍给排行榜入口(否则今天打完就再也进不去榜单)
+    const lb=document.createElement("button"); lb.className="btn primary"; lb.textContent=t("lb.title");
+    lb.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); openLeaderboard(); };
+    btns.append(lb,back);
+    document.getElementById("modeIntro").classList.add("on");
+    return;
+  }
+  const go=document.createElement("button"); go.className="btn primary"; go.textContent=t("mi.start");
+  go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); document.getElementById("menuScreen").classList.remove("on"); info.go(); };
   btns.append(go);
   if(mode==="daily"){
     const lb=document.createElement("button"); lb.className="btn ghost"; lb.textContent=t("lb.title");
