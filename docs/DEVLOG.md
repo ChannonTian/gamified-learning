@@ -1,5 +1,15 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · v1.14(link-match + demo)幽灵块根因修复 + 模式介绍弹窗 + 菜单改版(用户五轮反馈十项)
+
+- **幽灵块(致命,demo L3/L4 实测)**:`buildPairsFrom` 把全部空位 forEach 放块——8 词关 16 块放进 18 空位,末尾 2 位写入 `{...undefined}`=**空对象幽灵块**(truthy)→ buildBoardDOM 渲染 `VERBS[undefined].hue` 抛错 → **棋盘半成品/计数 stale/一点就"通关"/无法通关**(9 词关 18=18 恰好不触发,故"前两关不错")。修复:洗牌后 `pos.length=tiles.length` 只取实块数;兜底路径同雷(tiles.forEach)。demo 与主版同步。
+- **横幅进度条时长**:`--bdur` 从未设置(动画默认 10s)→ 窗口改 15s 后肉眼可见"条先没" → showLearnBanner 按 bannerMs 设置。两文件同步。
+- **k-pp 选中**:drop-shadow 方案观感不对(用户截图)→ 改 **inset 3px accent 内环(随 clip 走)+ 剪影光晕**,暗色单独外阴影。两文件同步。
+- **demo 专属**:关卡列表按三形态分组(band-head 标题);图鉴修好(TIERS 残留崩溃 → NIG-I..IV 四组 50 行)+ 主菜单加图鉴入口。
+- **菜单改版(两文件)**:主菜单加**界面语言切换行**(nl/中文/en,即时生效);模式按钮去副标题 → **右侧分数不换行**、模式名**虚线下划线 + title 悬停气泡**;点模式先弹**介绍弹窗**(说明+最高分+开始/返回)——不再"没准备好就被开局"。
+- **每日挑战去掉 0/18 目标胶囊**(levels 保留);词卡整体放大(基础 16px;闯关槽位 64px/字号 18px/插画 52px)。
+- QA:demo L3/L4 各 6 次重建 16 块成对 ✓、bot 18/18 关、介绍弹窗流程(含 Start 真进入)、--bdur=15s(计算样式核实)、图鉴 4 组 50 行、中文界面截图;主版镜像同项全绿(菜单/介绍/0/9/15s/每日无胶囊);引擎回归 ALL PASS;零错误。
+
 ## 2026-10-05 · link-match-demo:Taalhuis NIG I–IV 限定词表特别试玩版(用户供包)
 
 - **独立单文件 `link-match-demo/`**:词表锁定为用户提供的 Taalhuis "Lijstje werkwoorden NIG I–IV"(4 份 PDF,50 词,含 sg/pl/pp/英文释义)——43 词复用主库(形式/插画/翻译),**7 个新词补数据+专属小插画**(kijken/worden/liegen/zullen/drijven/lachen/laten,形式取词表原文)。

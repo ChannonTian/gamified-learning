@@ -69,8 +69,10 @@
   /* 切角块的选中外框:outline 会被 clip-path 裁掉(用户截图),改随形 drop-shadow 光晕 */
   body.theme-grug .tile.sel.k-pp .face{
     outline:none;
-    filter:drop-shadow(0 0 2.5px var(--accent)) drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent));
+    box-shadow:inset 0 0 0 3px var(--accent), 3px 4px 0 rgba(59,51,42,.14);
+    filter:drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent));
   }
+  body.theme-grug.dark .tile.sel.k-pp .face{ box-shadow:inset 0 0 0 3px var(--accent), 3px 4px 0 rgba(0,0,0,.3); }
   body.theme-grug.dark .face{
     background:color-mix(in srgb, hsl(var(--h) 20% 40%) 15%, #26282e);
     color:#e7ddc4;
@@ -312,7 +314,10 @@
   .dock-row{ display:flex; gap:12px; justify-content:center; }
   /* 横幅槽位:闯关模式固定高度——按钮固定下移,横幅+倒计时条位置不变;挑战模式保持覆盖式 */
   #bannerSlot{ position:static; height:0; width:100%; }
-  body.in-levels #bannerSlot{ position:relative; height:56px; }
+  body.in-levels #bannerSlot{ position:relative; height:64px; }
+  body.in-levels #bannerForms{ font-size:18px; }
+  body.in-levels #bannerGloss{ font-size:13.5px; max-width:38%; }
+  body.in-levels #bannerArt{ width:52px; height:52px; }
   body.in-levels #learnBanner.collapsed{ transform:none !important; top:auto; height:13px; }
   .dock-btn{
     display:flex; align-items:center; gap:8px;
@@ -338,7 +343,7 @@
   #bannerArt{width:46px; height:46px; flex:none;}
   .b-main{flex:1; min-width:0;}
   /* 四形态词卡:原形/单过去/复过去/分词;当前词型加粗高亮,其余浅灰;原形同字号+下划线 */
-  #bannerForms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:1px 9px; font-size:15px; font-weight:700; line-height:1.3; }
+  #bannerForms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:1px 10px; font-size:16px; font-weight:700; line-height:1.3; }
   #bannerForms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
   #bannerForms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
   body.theme-grug.dark #bannerForms .bf.on{ color:hsl(var(--h) 45% 66%); }
@@ -391,7 +396,11 @@
   .menu-btn:active{transform:scale(.97);}
   .menu-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
   .menu-btn.ghost{background:var(--paper);}
-  .menu-btn .m-label{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .lang-row{ display:flex; gap:6px; justify-content:center; margin:-2px 0 12px; }
+  .lang-btn{ border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:5px 13px; font-size:12px; font-weight:700; cursor:pointer; }
+  .lang-btn.sel{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .menu-btn .m-name{ flex:1; min-width:0; text-align:left; text-decoration:underline dashed 1.6px; text-underline-offset:4px; text-decoration-color:color-mix(in srgb, currentColor 50%, transparent); }
+  .menu-btn .m-score{ margin-left:auto; font-size:12px; font-weight:800; white-space:nowrap; opacity:.75; }
   .menu-btn small{font-size:10.5px; font-weight:600; color:#8b93a3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .menu-btn.locked{opacity:.5;}
   .lv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:14px 0 6px;}
@@ -527,13 +536,15 @@
   <div class="panel">
     <div id="menuMain">
       <button class="close-x" id="menuClose" style="position:absolute; top:14px; right:14px;">✕</button>
-      <h1 style="margin-bottom:14px;">Koppelen</h1>
+      <h1 style="margin-bottom:10px;">Koppelen</h1>
+      <div class="lang-row" id="menuLang"></div>
       <button class="menu-btn primary" id="mResume" style="display:none;"><svg class="ic" viewBox="0 0 24 24"><path d="M20 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M15 12H5M9 8l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.back">Terug naar spel</span></button>
       <button class="menu-btn" id="mContinue"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4v16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9 12H19M15 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="menu.continue">Verder spelen</span></button>
       <button class="menu-btn" id="mLevels"><svg class="ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.8" y="3.8" width="7" height="7" rx="2"/><rect x="13.2" y="3.8" width="7" height="7" rx="2"/><rect x="3.8" y="13.2" width="7" height="7" rx="2"/><rect x="13.2" y="13.2" width="7" height="7" rx="2"/></g></svg><span data-i18n="menu.levels">Levels</span></button>
-      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-label"><span data-i18n="menu.daily">Dagelijkse uitdaging</span><small id="mDailySub"></small></span></button>
-      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
-      <button class="menu-btn" id="mSurvival"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M6.8 12h2.6l1.4-3.2 2.4 6.4 1.4-3.2h2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="m-label"><span data-i18n="menu.survival">Overleven</span><small id="mSurvivalSub"></small></span></button>
+      <button class="menu-btn" id="mBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
+      <button class="menu-btn" id="mDaily"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M3.5 9.5h17M8 2.8v4M16 2.8v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M7.5 13.5h3M7.5 16.8h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/></svg><span class="m-name" data-i18n="menu.daily">Dagelijkse uitdaging</span><span class="m-score" id="mDailyScore"></span></button>
+      <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-name" data-i18n="menu.endless">Oneindig</span><span class="m-score" id="mEndlessScore"></span></button>
+      <button class="menu-btn" id="mSurvival"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M6.8 12h2.6l1.4-3.2 2.4 6.4 1.4-3.2h2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="m-name" data-i18n="menu.survival">Overleven</span><span class="m-score" id="mSurvivalScore"></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
@@ -541,6 +552,16 @@
       <h2><button class="back-btn" id="mBack" style="border:none;background:none;color:var(--ink);font-size:20px;margin-left:-8px;cursor:pointer;">←</button><span data-i18n="menu.levels">Levels</span></h2>
       <div class="lv-grid" id="lvGrid"></div>
     </div>
+  </div>
+</div>
+
+<!-- Mode-intro -->
+<div class="overlay" id="modeIntro">
+  <div class="panel" style="text-align:center;">
+    <h2 id="miTitle" style="margin-bottom:8px;"></h2>
+    <p id="miText" style="font-size:13.5px; line-height:1.55; margin:6px 0 10px;"></p>
+    <p id="miBest" style="font-weight:800; font-size:14px; margin:0 0 6px;"></p>
+    <div id="miBtns" style="display:flex; gap:10px; justify-content:center; margin-top:8px;"></div>
   </div>
 </div>
 
@@ -792,6 +813,7 @@ const I18N={
     "menu.daily":"Dagelijkse uitdaging","menu.endless":"Oneindig","menu.survival":"Overleven","menu.survivalnew":"Elke koppel binnen de tijd!","menu.needlevel":"Rond niveau 1 af om te ontgrendelen","menu.newdaily":"Elke dag een nieuwe puzzel","menu.endlessnew":"Punten jagen met jouw verzameling","menu.dailydone":"Vandaag al voltooid — morgen een nieuwe puzzel!",
     "mode.endless":"Oneindig","mode.daily":"Dagelijks","mode.survival":"Overleven","result.timeup":"Tijd voorbij!","result.today":"Vandaag",
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
+    "mi.endless":"Jacht punten met je verzamelde vormen: elke keer 18 paren, de combo loopt door na een schoon bord.","mi.daily":"180 seconden, één keer per dag. Iedereen krijgt dezelfde puzzel.","mi.survival":"Elke koppel binnen 15 seconden — anders is het voorbij. Fout klikken mag.","mi.start":"Start","mi.back":"Terug",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
@@ -820,6 +842,7 @@ const I18N={
     "menu.daily":"每日挑战","menu.endless":"无尽模式","menu.survival":"生存模式","menu.survivalnew":"每次消除之间限时,超时即结束","menu.needlevel":"通过第 1 关后解锁","menu.newdaily":"每天一盘新谜题","menu.endlessnew":"用你的词库刷分","menu.dailydone":"今日已完成,明天再来!",
     "mode.endless":"无尽模式","mode.daily":"每日挑战","mode.survival":"生存","result.timeup":"时间到!","result.today":"今日",
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
+    "mi.endless":"用已收集的动词刷分:每盘 18 对,清盘后连击延续。","mi.daily":"180 秒,每天一次,所有玩家同一盘面。","mi.survival":"每次配对须在 15 秒内完成,超时即结束;点错不失败。","mi.start":"开始","mi.back":"返回",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
@@ -848,6 +871,7 @@ const I18N={
     "menu.daily":"Daily challenge","menu.endless":"Endless","menu.survival":"Survival","menu.survivalnew":"Beat the clock between pairs","menu.needlevel":"Finish level 1 to unlock","menu.newdaily":"A new puzzle every day","menu.endlessnew":"Chase points with your collection","menu.dailydone":"Already done today — a new puzzle tomorrow!",
     "mode.endless":"Endless","mode.daily":"Daily","mode.survival":"Survival","result.timeup":"Time's up!","result.today":"Today",
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
+    "mi.endless":"Chase points with your collected forms: 18 pairs per board, the combo carries over.","mi.daily":"180 seconds, once per day. Everyone gets the same puzzle.","mi.survival":"Each pair within 15 seconds — or it is over. Wrong taps are fine.","mi.start":"Start","mi.back":"Back",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
@@ -1365,6 +1389,7 @@ function buildPairsFrom(picks, per=2, gapCount=0){   // per=每词对数(闯关 
   for(let tries=0;tries<60;tries++){
     const pos=[...open];
     for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
+    pos.length=tiles.length;   // 只取实块数个格位(块数<空位时越界会生成 {...undefined} 幽灵块,demo L3/L4 实测崩坏)
     const tl=[...tiles];
     for(let i=tl.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [tl[i],tl[j]]=[tl[j],tl[i]]; }
     const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
@@ -1373,7 +1398,7 @@ function buildPairsFrom(picks, per=2, gapCount=0){   // per=每词对数(闯关 
   }
   // 兜底:行主序相邻成对放置(相邻 0 折角必然可连;缺口已在 open 之外)
   const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
-  open.forEach(([r,c],i)=>{ g[r][c]={...tiles[i]}; });
+  tiles.forEach((tl,i)=>{ const [r,c]=open[i]; g[r][c]={...tl}; });
   return g;
 }
 function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type})), 1, 2); }
@@ -1943,6 +1968,7 @@ function showLearnBanner(v,formWord,activeF){
       .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   document.getElementById("bannerGloss").textContent=glossOf(V);
   bannerEl.style.setProperty("--h",V.hue);
+  bannerEl.style.setProperty("--bdur",(save.settings.bannerMs||BANNER_DEFAULT_S)+"s");   // 倒计时条时长=真实窗口(此前默认 10s 与 15s 窗口不符)
   bannerEl.classList.remove("show");
   bannerEl.classList.remove("collapsed");
   void bannerEl.offsetWidth;
@@ -1967,7 +1993,7 @@ const ICO_CLOCK=`<svg class="hico" viewBox="0 0 24 24"><circle cx="12.4" cy="12.
 function updateHUD(){
   const inLevel=!!curLevel;
   const modeUI=inLevel&&mode!=="levels";
-  const showGoal=inLevel&&(mode==="levels"||mode==="daily");
+  const showGoal=inLevel&&mode==="levels";   // 每日挑战不显示对数目标(用户反馈)
   const goalEl=document.getElementById("goalTag");
   goalEl.style.display=showGoal?"":"none";
   if(showGoal){
@@ -2158,8 +2184,20 @@ function finishLevel(){
 function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
 
 /* ================= 菜单 ================= */
+function renderMenuLang(){
+  const el=document.getElementById("menuLang"); if(!el) return;
+  el.innerHTML="";
+  for(const [v,label] of [["nl","Nederlands"],["zh","中文"],["en","English"]]){
+    const b=document.createElement("button");
+    b.className="lang-btn"+(save.settings.uiLang===v?" sel":"");
+    b.textContent=label;
+    b.onclick=()=>{ save.settings.uiLang=v; persist(); applyI18n(); openMenu(); };
+    el.appendChild(b);
+  }
+}
 function openMenu(){
   if(curLevel){ stopSpeech(); hideBanner(); }   // 会话保活:棋盘保留
+  renderMenuLang();
   showMenuView("main");
   const resume=document.getElementById("mResume");
   resume.style.display=curLevel?"flex":"none";
@@ -2173,18 +2211,15 @@ function openMenu(){
   document.getElementById("mDaily").classList.toggle("locked",!unlockedModes||dailyDone);
   document.getElementById("mEndless").classList.toggle("locked",!unlockedModes);
   const dBest=save.dailyBest[todayKey()];
-  document.getElementById("mDailySub").textContent=unlockedModes
-    ?(dBest!=null?`${dailyDone?"✓ ":""}${t("result.today")}: ${dBest}`:t("menu.newdaily"))
-    :t("menu.needlevel");
+  document.getElementById("mDailyScore").textContent=unlockedModes?((dailyDone?"✓ ":"")+(dBest!=null?dBest:"—")):"";
+  document.getElementById("mDaily").title=t("mi.daily");
   const eBest=save.best["Oneindig"];
-  document.getElementById("mEndlessSub").textContent=unlockedModes
-    ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
-    :t("menu.needlevel");
+  document.getElementById("mEndlessScore").textContent=unlockedModes?(eBest?`${t("result.best")} ${eBest}`:"—"):"";
+  document.getElementById("mEndless").title=t("mi.endless");
   const sBest=save.best["Survival"];
   document.getElementById("mSurvival").classList.toggle("locked",!unlockedModes);
-  document.getElementById("mSurvivalSub").textContent=unlockedModes
-    ?(sBest?`${t("result.best")}: ${sBest}`:t("menu.survivalnew"))
-    :t("menu.needlevel");
+  document.getElementById("mSurvivalScore").textContent=unlockedModes?(sBest?`${t("result.best")} ${sBest}`:"—"):"";
+  document.getElementById("mSurvival").title=t("mi.survival");
   document.getElementById("menuScreen").classList.add("on");
 }
 function LEVELS_done(){
@@ -2326,27 +2361,34 @@ document.getElementById("menuScreen").addEventListener("click",e=>{
 });
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
-document.getElementById("mDaily").onclick=()=>{
-  if(save.lUnlocked<MODE_UNLOCK) return;
-  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
-  document.getElementById("menuScreen").classList.remove("on");
-  startDaily();
-};
-document.getElementById("mEndless").onclick=()=>{
-  if(save.lUnlocked<MODE_UNLOCK) return;
-  document.getElementById("menuScreen").classList.remove("on");
-  startEndless();
-};
-document.getElementById("mSurvival").onclick=()=>{
-  if(save.lUnlocked<MODE_UNLOCK) return;
-  document.getElementById("menuScreen").classList.remove("on");
-  startSurvival();
-};
+function modeIntro(mode){
+  if(save.lUnlocked<MODE_UNLOCK){ toast(t("menu.needlevel")); return; }
+  if(mode==="daily"&&save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
+  const info={
+    endless:{tt:t("menu.endless"),best:save.best["Oneindig"]?`${t("result.best")}: ${save.best["Oneindig"]}`:"—",go:startEndless},
+    daily:{tt:t("menu.daily"),best:`${t("result.today")}: ${save.dailyBest[todayKey()]||0}`,go:startDaily},
+    survival:{tt:t("menu.survival"),best:save.best["Survival"]?`${t("result.best")}: ${save.best["Survival"]}`:"—",go:startSurvival},
+  }[mode];
+  document.getElementById("miTitle").textContent=info.tt;
+  document.getElementById("miText").textContent=t("mi."+mode);
+  document.getElementById("miBest").textContent=info.best;
+  const btns=document.getElementById("miBtns"); btns.innerHTML="";
+  const go=document.createElement("button"); go.className="btn primary"; go.textContent=t("mi.start");
+  go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); info.go(); };
+  const back=document.createElement("button"); back.className="btn ghost"; back.textContent=t("mi.back");
+  back.onclick=()=>document.getElementById("modeIntro").classList.remove("on");
+  btns.append(go,back);
+  document.getElementById("modeIntro").classList.add("on");
+}
+document.getElementById("mDaily").onclick=()=>modeIntro("daily");
+document.getElementById("mEndless").onclick=()=>modeIntro("endless");
+document.getElementById("mSurvival").onclick=()=>modeIntro("survival");
 document.getElementById("mContinue").onclick=()=>{
   document.getElementById("menuScreen").classList.remove("on");
   startLink(LEVELS_done());
 };
 document.getElementById("mLevels").onclick=()=>showMenuView("levels");
+document.getElementById("mBook").onclick=openBook;
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mSettings").onclick=openSettings;
