@@ -57,6 +57,8 @@ gamified-learning/
 
 ## 当前状态(2026-10-05)
 
+- **link-match-demo v1.19(2026-10-05,档案页+显示名+排行榜+落地页)**:菜单 Profiel 档案页(显示名可改**不查重**、登录态区:未登录三种登录/已登录 Uitloggen+删除账号两步确认,DELETE /api/account 连带删云端数据);显示名=形容词32×名词32 荷兰语随机组合,登录用户按 user id 确定性生成存 users.display_name(**前后端各一份词库,改动需同步**),游客本地 save.displayName;每日排行榜 `daily_scores(date,user_id,score)` 服务器按 UTC 分桶自然翻日,POST /api/score 保留当日最高、GET /api/leaderboard top50+自己名次;**游客可看不可上榜**,榜单内联登录入口,登录/启动自动补报当天成绩(游客分登录后当场上榜,save.lbSent 去重);每日挑战介绍弹窗加 Klassement 按钮;根 index.html 改公开落地页(Koppelen+Link Match 别名,修 Google 发布验证三连拒)。Google 侧待办:同意屏幕应用名改 Koppelen、homepage 改根路径、Search Console 验证+24h 重试。详见 DEVLOG。
+
 - **link-match-demo v1.18(2026-10-05,欢迎页+Google 登录)**:首次进入未登录的新玩家全屏欢迎页(登录优先:用户名/密码+Inloggen/Nieuw account、Met Google doorgaan、游客兜底"Direct als gast spelen";老档/已登录/选过游客永不弹,welcomeDone 存档标记);Google OAuth 授权码流程(`functions/api/auth/google.js`+`callback.js`,users.google_sub 列,**存量远程库需 ALTER TABLE users ADD COLUMN google_sub TEXT**);GOOGLE_CLIENT_ID/SECRET 走 Dashboard Variables and Secrets,未配置时接口 501;cloudDoAuth 重构为 (isNew,uEl,pEl,after) 供设置面板+欢迎页共用。待办:用户建 Google OAuth 客户端+配 secrets+远程加列后,线上实测 Google 流程。详见 DEVLOG。
 
 - 版本 v0.8(见 DEVLOG):**85 词 / 17 关**(A1 3 + A2 6 + B1 8,每关 5 词)、**无尽模式 + 每日挑战**(通过第 1 关解锁,已收集词池抽样 6 词;每日=日期种子+180s 倒计时+当日最佳;无尽=离场记最佳)、计分+连击(教学横幅 10s 倒计时)、三区 HUD(宽度 JS 与棋盘同步)、新词插画为首字母纹章 fallback(深浅主题感知)。
