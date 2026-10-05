@@ -1,5 +1,15 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-01 · v1.15(link-match-demo)固定布局 + 统一词卡 + 叶形磁贴(发布前五项;主版冻结)
+
+- **主版冻结政策(用户拍板)**:本轮起只改 demo,demo 定稿发布后再同步回 link-match 主版;下一里程碑=Cloudflare 登录+云存档,**此后更新不得让玩家进度清零**(增量迁移纪律,先例 lvOrder v2/缺口盘)。
+- **模式介绍弹窗**:点"开始"现在同步关主菜单(`menuScreen` 移除 on)——不再出现"弹窗开局了、菜单还开着"。
+- **统一词卡组件**:新 `wordCardHTML(vi, activeF)`——`.word-card` = 插画 + 四形态(原形带环弧线下划线、当前盘词型高亮)+ 定宽 80px 可换行释义。横幅(`showLearnBanner`)、图鉴详情(`#cardBody`)、(结算)共用同一组件,**不再维护两套词卡**。闯关槽 64→72px(挑战 64px),词/插画整体放大;释义定宽换行,给左侧四词让位。
+- **顶栏固定顶部**:HUD `position:fixed; top:calc(env(safe-area-inset-top)+10px)`,三列 grid(1fr auto 1fr),菜单钮+关卡数(贴菜单钮右侧)/进度条/分数等高 36px、纵向居中;`boardWrap` margin-top 64px。
+- **底部固定**:词卡槽 `#bannerSlot` 移出 dock、紧贴桌盘文档流(闯关 72px);提示/词典 `#dock` 固定 `bottom:calc(env(safe-area-inset-bottom)+10px)`(留空隙);body `justify-content:center→flex-start`(修固定布局后顶栏与桌盘间 ~200px 空隙)。`syncSize` 改按 槽位+dock+10px 底隙+14px 余量 扣可用高;所有模式收起态统一在槽内收成 13px 底条(连击窗口继续)。
+- **k-pp 叶子形**:切角矩形修补两轮仍缺角(clip-path 裁坏 outline / drop-shadow 观感不对)→ 用户拍板换形:**纯 `border-radius: 24px 4px 24px 4px`**(grug 26/6/27/5)对角大圆角=叶子;描边、选中虚线框、暗色全部原生跟随,删除全部特殊选中规则。
+- QA:bot 149 对(=18 关全部词对)全清、0 重排、0 错误;几何断言(hudTop 10/词卡贴盘 0px/dock 底隙 10/lvlNextToMenu)全过;介绍弹窗关菜单、统一词卡(四形态+swu+插画+释义)、收起 18px 贴槽底、连对重展开断言;**首教演示 QA 坑**:清档后 L0 `maybeStartDemo` 置 busy=true 挡掉 attemptPair——bot 前先 `save.demoDone=true`;存档键 `L0..L17`(显示 1–18);视觉验收:pp 关叶形+虚线选中、闯关大词卡、无尽 36 块固定布局三图 pass(无尽顶栏无中央 0/18 属设计:挑战模式按 v1.10/v1.14 要求改为右侧"得分填向最高分"分数条)。
+
 ## 2026-10-05 · v1.14(link-match + demo)幽灵块根因修复 + 模式介绍弹窗 + 菜单改版(用户五轮反馈十项)
 
 - **幽灵块(致命,demo L3/L4 实测)**:`buildPairsFrom` 把全部空位 forEach 放块——8 词关 16 块放进 18 空位,末尾 2 位写入 `{...undefined}`=**空对象幽灵块**(truthy)→ buildBoardDOM 渲染 `VERBS[undefined].hue` 抛错 → **棋盘半成品/计数 stale/一点就"通关"/无法通关**(9 词关 18=18 恰好不触发,故"前两关不错")。修复:洗牌后 `pos.length=tiles.length` 只取实块数;兜底路径同雷(tiles.forEach)。demo 与主版同步。
