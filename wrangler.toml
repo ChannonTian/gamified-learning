@@ -2,6 +2,9 @@ name = "gamified-learning"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 
+[vars]
+GOOGLE_CLIENT_ID = "473099991309-nnkveer5hum9tmf2ql15gt5aojc747lg.apps.googleusercontent.com"  # 公开标识(每次跳转 Google 都携带);SECRET 走 Dashboard,不入库
+
 [assets]
 directory = "."
 binding = "ASSETS"
