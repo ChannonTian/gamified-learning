@@ -231,7 +231,7 @@
     transition:filter .15s, scale .15s;
   }
   .tile.k-pl .face{border-radius:6%;}
-  .tile.k-pp .face{border-radius:24px 4px 24px 4px;}   /* 叶子形(对角大圆角):纯 border-radius,描边/选中原生跟随 */
+  .tile.k-pp .face{border-radius:24px 4px 24px 4px; line-height:1.0;}   /* 叶子形(对角大圆角):纯 border-radius,描边/选中原生跟随;双行 "is + 分词" 行距收紧 */
   .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:4px; border-radius:2px; background:var(--accent);
@@ -315,7 +315,7 @@
     position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
     background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:0 10px 30px rgba(20,30,50,.28);
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:16px;   /* 模块间隙 16px(用户 2.1);与 .word-card 一致 */
     padding:8px 12px; cursor:pointer; overflow:hidden;
     opacity:0; visibility:hidden; transform:translateY(16px);
     transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s, top .3s cubic-bezier(.3,1.2,.5,1), height .3s cubic-bezier(.3,1.2,.5,1);
@@ -326,15 +326,16 @@
   #learnBanner.collapsed .wc-art, #learnBanner.collapsed .wc-main, #learnBanner.collapsed .wc-gloss{ opacity:0; }
   .wc-art, .wc-main, .wc-gloss{ transition:opacity .18s ease; }
   /* ---- 统一词卡:横幅与图鉴详情共用同一种卡 ---- */
-  .word-card{ display:flex; align-items:center; gap:12px; width:100%; }
+  .word-card{ display:flex; align-items:center; gap:16px; width:100%; }   /* 模块间隙:插画|词形|释义(用户 2.1:太挤) */
   .wc-art{ width:50px; height:50px; flex:none; }
   .wc-main{ flex:1; min-width:0; }
-  .wc-forms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px; font-size:17px; font-weight:700; line-height:1.3; }
+  .wc-forms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font-size:17px; font-weight:700; line-height:1.3; }
   .wc-forms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
   .wc-forms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
   body.theme-grug.dark .wc-forms .bf.on{ color:hsl(var(--h) 45% 66%); }
   .wc-gloss{
     flex:none; width:80px; margin-left:auto;
+    padding-left:12px; border-left:1.5px dashed color-mix(in srgb, currentColor 30%, transparent);
     font-size:12.5px; line-height:1.4; text-align:right;
     color:var(--ink); opacity:.65; word-break:break-word;
   }
@@ -408,6 +409,13 @@
   .lv-btn.locked{opacity:.4; pointer-events:none;}
   .lv-btn.done{border-color:#bcd9c8; background:#eef7f1;}
   body.dark .lv-btn.done{background:#243529; border-color:#2f4a3a;}
+  /* 关卡按钮形状=游戏内对应词型的磁贴形状(用户 #7);grug 规则须排在其后覆盖上面 :not(.dark) 的统一圆角 */
+  .lv-btn.k-sg{border-radius:16px;}
+  .lv-btn.k-pl{border-radius:7px;}
+  .lv-btn.k-pp{border-radius:20px 4px 20px 4px;}
+  body.theme-grug .lv-btn.k-sg{border-radius:20px 16px 21px 15px;}
+  body.theme-grug .lv-btn.k-pl{border-radius:4px 7px 3px 6px;}
+  body.theme-grug .lv-btn.k-pp{border-radius:26px 6px 27px 5px;}
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
   #cardModal .word-card{ margin-top:8px; }
@@ -787,7 +795,7 @@ LINK_TYPES.forEach((ty,fi)=>{
     LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"demo", type:ty, num:LINK_LEVELS.length+1, verbs});
   });
 });
-const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
+const FORM_KEY={sg:"band.sg", pl:"band.pl", pp:"band.pp"};   // 关卡分组标题=词表原文(用户 #8)
 const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
 
 /* ================= i18n ================= */
@@ -799,6 +807,7 @@ const I18N={
     "menu.help":"Speluitleg","menu.settings":"Instellingen","dock.hint":"Hint","dock.book":"Verzameling",
     "mi.endless":"Jacht punten met je verzamelde vormen: elke keer 18 paren, de combo loopt door na een schoon bord.","mi.daily":"180 seconden, één keer per dag. Iedereen krijgt dezelfde puzzel.","mi.survival":"Elke koppel binnen 15 seconden — anders is het voorbij. Fout klikken mag.","mi.start":"Start","mi.back":"Terug",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
+    "band.sg":"Imperfectum (enk.)","band.pl":"Imperfectum (mv.)","band.pp":"Perfectum",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Sketch","theme.papier":"Post-it",
@@ -828,6 +837,7 @@ const I18N={
     "menu.help":"玩法介绍","menu.settings":"设置","dock.hint":"提示","dock.book":"词典图鉴",
     "mi.endless":"用已收集的动词刷分:每盘 18 对,清盘后连击延续。","mi.daily":"180 秒,每天一次,所有玩家同一盘面。","mi.survival":"每次配对须在 15 秒内完成,超时即结束;点错不失败。","mi.start":"开始","mi.back":"返回",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
+    "band.sg":"Imperfectum (enk.)","band.pl":"Imperfectum (mv.)","band.pp":"Perfectum",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手绘","theme.papier":"便签",
@@ -857,6 +867,7 @@ const I18N={
     "menu.help":"How to play","menu.settings":"Settings","dock.hint":"Hint","dock.book":"Collection",
     "mi.endless":"Chase points with your collected forms: 18 pairs per board, the combo carries over.","mi.daily":"180 seconds, once per day. Everyone gets the same puzzle.","mi.survival":"Each pair within 15 seconds — or it is over. Wrong taps are fine.","mi.start":"Start","mi.back":"Back",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
+    "band.sg":"Imperfectum (enk.)","band.pl":"Imperfectum (mv.)","band.pp":"Perfectum",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Sketch","theme.papier":"Post-it",
@@ -1323,7 +1334,11 @@ let layout={ring:RING, tw:80, th:60};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
-const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
+/* 词表 Perfectum 栏标 'is' 的词 → 游戏内显示/朗读 "is + 分词"(如 is gegaan;lopen/rijden 词表注 (is)**、vergeten (is)*)
+   Let op 原文:de werkwoorden met 'is' in de derde kolom krijgen het hulpwerkwoord 'zijn' in perfectum */
+const PP_ZIJN=new Set(["zijn","gaan","komen","beginnen","blijven","lopen","rijden","worden","vergeten"]);
+const ppLabel=V=>V.pp&&PP_ZIJN.has(V.inf)?"is "+V.pp:V.pp;
+const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : (t.f==="pp" ? ppLabel(VERBS[t.v]) : VERBS[t.v][t.f]);
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
@@ -1347,8 +1362,11 @@ function syncSize(){
   // 逐块测字(用户反馈:一个长词不再拖小整盘字号);长词单独缩,短词保持可读字号
   for(const t of tiles){
     if(!t.el) continue;
-    const word=t.k==="inf"?VERBS[t.v].inf:(VERBS[t.v][t.f]||VERBS[t.v].sg);
-    const fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
+    const disp=t.k==="inf"?VERBS[t.v].inf:(t.f==="pp"?ppLabel(VERBS[t.v]):(VERBS[t.v][t.f]||VERBS[t.v].sg));   // pp="is + 分词":按最长单词测宽(is 允许换行)
+    const ws=disp.split(" ");
+    const word=ws.length>1?ws.reduce((a,b)=>ctx.measureText(b).width>ctx.measureText(a).width?b:a):disp;
+    let fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
+    if(ws.length>1) fs=Math.min(fs, th*0.42);   // 双行 pp:高度方向也要放得下(挑战模式小盘)
     t.el.firstChild.style.fontSize=fs+"px";
     positionTile(t);
   }
@@ -1539,7 +1557,7 @@ function buildBoardDOM(){
     el.style.setProperty("--h",VERBS[t.v].hue);
     const face=document.createElement("div");
     face.className="face";
-    face.textContent=t.k==="inf"?VERBS[t.v].inf:VERBS[t.v][t.f];
+    face.textContent=t.k==="inf"?VERBS[t.v].inf:(t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f]);
     face.style.fontSize=levelFont+"px";
     el.appendChild(face);
     el._t=t; t.el=el;
@@ -1954,7 +1972,7 @@ function collapseBanner(){
 }
 function wordCardHTML(vi,activeF){
   const V=VERBS[vi];
-  const forms=[["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]].filter(([,w])=>w)
+    const forms=[["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppLabel(V)]].filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
 }
@@ -2238,7 +2256,7 @@ function renderLevelGrid(){
       if(lv.type!==ty) return;
       const b=document.createElement("button");
       const locked=i>save.lUnlocked-1;
-      b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
+      b.className="lv-btn k-"+lv.type+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型(用户 #7)
       b.innerHTML=`${lv.num}<small>${t(SHORT_KEY[lv.type])}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
       g.appendChild(b);
@@ -2302,7 +2320,7 @@ function openBook(){
       row.className="book-row"+(got?" viewable":"");
       row.innerHTML=got
         ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg>
-          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp?ppLabel(V):"-"}</small></div>
           <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
           <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;

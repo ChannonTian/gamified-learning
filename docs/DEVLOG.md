@@ -1,5 +1,14 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-01 · v1.16(link-match-demo)is+perfectum + 关卡列表形状/标题 + 词卡间隙(追加四项)
+
+- **is + perfectum(#6)**:词表 Perfectum 栏标 'is' 的 9 词(zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten;lopen/rijden 词表注 (is)**、vergeten (is)*)在游戏内显示/朗读 **"is + 分词"**(is gegaan)——`PP_ZIJN` 集合 + `ppLabel(V)`,磁贴(buildBoardDOM)、四形态卡(wordCardHTML)、图鉴行、朗读(wordOf→speakPair)同一数据源;pp 磁贴双行放得下:syncSize 改按**最长单词**测宽(is 换行)、双行时字号受高度约束(≤th×0.42)、叶子块行距 1.0。顺修图鉴 zullen 行渲染 "null" → "-"。
+- **词卡间隙(2.1)**:横幅容器与 `.word-card` gap 10/12→16px,词形组行距 4px、字距 12px,释义加虚线左分隔(padding-left 12px)——插画|词形|释义三模块不再挤。
+- **关卡按钮形状随词型(#7)**:renderLevelGrid 给按钮加 k-sg/k-pl/k-pp 类,CSS 镜像磁贴圆角(grug 20/16/21/15、4/7/3/6、叶子 26/6/27/5;基础主题 16px/7px/叶子 20px 4px)——菜单里看形状就知道本关练哪种词型。
+- **分组标题用词表原文(#8)**:FORM_KEY 改指新 band.* 键(nl/zh/en 同文):"Imperfectum (enk.) / Imperfectum (mv.) / Perfectum",替换 legend.*(legend.* 保留未删)。
+- QA:9 词 ppLabel 断言(staan/doen 不加 is、zullen 仍 null)、分组标题三行、三组按钮计算圆角=磁贴值、pp 磁贴 "is gegaan" 双行 hOK、横幅/图鉴卡 gap 16px+虚线分隔、图鉴 zullen "-"、bot 149 对全清零错误;视觉验收两图(关卡列表形状+标题、is gegaan 横幅+双行磁贴)4 倍放大确认。
+- **QA 环境新坑**:超时的截图调用会留**僵尸续跑**(cell 被 abort 但 JS 继续,清理/点击在后台污染后续状态)——重截前先读状态,不行就完整重建;goto 后的 evaluate 必须等 `typeof startLink==="function"` 就绪(否则静默失败、seed 白做);screenshot 偶发 "surface preparation timed out"(3s),间隔重试即可。
+
 ## 2026-10-01 · v1.15(link-match-demo)固定布局 + 统一词卡 + 叶形磁贴(发布前五项;主版冻结)
 
 - **主版冻结政策(用户拍板)**:本轮起只改 demo,demo 定稿发布后再同步回 link-match 主版;下一里程碑=Cloudflare 登录+云存档,**此后更新不得让玩家进度清零**(增量迁移纪律,先例 lvOrder v2/缺口盘)。
