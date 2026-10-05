@@ -459,6 +459,23 @@
   }
   .cloud-btn:disabled{opacity:.5;}
   .cloud-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  /* 欢迎页(登录前置;首次进入且未登录、没选过游客时弹出) */
+  .welcome{ text-align:center; }
+  .wl-title{ margin:2px 0 2px; font-size:26px; letter-spacing:.5px; }
+  .wl-sub{ margin:0 0 10px; font-size:12.5px; }
+  .welcome input{
+    width:100%; box-sizing:border-box; margin-top:8px; padding:10px 12px;
+    border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-size:14px; font-weight:600; font-family:inherit;
+  }
+  .welcome input:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+  .wl-google{ flex:none; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; color:#3c4043; }
+  .wl-divider{ border-top:1px dashed var(--line); margin:14px 0 6px; }
+  .wl-guest{
+    background:none; border:none; color:var(--accent); font-size:14.5px; font-weight:800;
+    text-decoration:underline dashed 1.6px; text-underline-offset:4px; padding:8px 10px;
+  }
+  .wl-guestsub{ font-size:11px; color:#98a1b0; margin:0 0 2px; }
   .book-group{
     display:flex; align-items:center; width:100%; text-align:left;
     background:none; border:none; color:var(--ink);
@@ -645,6 +662,25 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Welkom (login vooraf) -->
+<div class="overlay" id="welcomeModal" style="z-index:80;">
+  <div class="panel welcome">
+    <h1 class="wl-title">Koppelen</h1>
+    <p class="wl-sub" data-i18n="wl.sub"></p>
+    <div class="lang-row" id="wlLang" style="margin:0 0 10px;"></div>
+    <input id="wlUser" type="text" autocomplete="username" enterkeyhint="next">
+    <input id="wlPass" type="password" autocomplete="current-password" enterkeyhint="go">
+    <div style="display:flex; gap:8px;">
+      <button id="wlLogin" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+      <button id="wlSignup" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+    </div>
+    <button id="wlGoogle" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01 2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
+    <div class="wl-divider"></div>
+    <button id="wlGuest" class="wl-guest" data-i18n="wl.guest">Direct als gast spelen</button>
+    <p class="wl-guestsub" data-i18n="wl.guestsub"></p>
   </div>
 </div>
 
@@ -871,6 +907,7 @@ const I18N={
     "card.tip":"Tik voor de betekenis",
     "set.cloud":"Cloudopslag","cloud.user":"Gebruikersnaam","cloud.pass":"Wachtwoord","cloud.in":"Inloggen","cloud.new":"Nieuw account","cloud.as":"Ingelogd als","cloud.out":"Uitloggen","cloud.sync":"Nu synchroniseren",
     "cloud.ok":"✓ gesynchroniseerd","cloud.fail":"synchroniseren mislukt","cloud.busy":"synchroniseren…","cloud.err.taken":"Deze naam bestaat al","cloud.err.creds":"Onjuiste naam of wachtwoord","cloud.err.net":"Server niet bereikbaar — probeer later opnieuw","cloud.err.short":"Naam minstens 2 tekens, wachtwoord minstens 4",
+    "wl.sub":"Leer Nederlandse werkwoorden: koppel elk werkwoord aan zijn vormen.","wl.google":"Met Google doorgaan","wl.guest":"Direct als gast spelen","wl.guestsub":"Voortgang blijft op dit toestel — je kunt later altijd een account maken.",
   },
   zh:{
     "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
@@ -903,6 +940,7 @@ const I18N={
     "card.tip":"点击查看释义",
     "set.cloud":"云存档","cloud.user":"用户名","cloud.pass":"密码","cloud.in":"登录","cloud.new":"注册新账号","cloud.as":"已登录","cloud.out":"退出登录","cloud.sync":"立即同步",
     "cloud.ok":"✓ 已同步","cloud.fail":"同步失败","cloud.busy":"同步中…","cloud.err.taken":"用户名已存在","cloud.err.creds":"用户名或密码错误","cloud.err.net":"无法连接服务器，请稍后再试","cloud.err.short":"用户名至少 2 个字符，密码至少 4 位",
+    "wl.sub":"荷兰语动词连连看：把动词和它的变位连起来。","wl.google":"使用 Google 登录","wl.guest":"游客身份直接玩","wl.guestsub":"进度只保存在本机，之后随时可以注册同步。",
   },
   en:{
     "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
@@ -935,6 +973,7 @@ const I18N={
     "card.tip":"Tap for the meaning",
     "set.cloud":"Cloud save","cloud.user":"Username","cloud.pass":"Password","cloud.in":"Sign in","cloud.new":"Create account","cloud.as":"Signed in as","cloud.out":"Sign out","cloud.sync":"Sync now",
     "cloud.ok":"✓ synced","cloud.fail":"sync failed","cloud.busy":"syncing…","cloud.err.taken":"That name is already taken","cloud.err.creds":"Wrong username or password","cloud.err.net":"Can't reach the server — try again later","cloud.err.short":"Name needs at least 2 characters, password at least 4",
+    "wl.sub":"Learn Dutch verbs: match each verb with its forms.","wl.google":"Continue with Google","wl.guest":"Play as guest","wl.guestsub":"Progress stays on this device — you can create an account anytime.",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -1037,11 +1076,13 @@ function cloudMerge(a,b){
 function cloudSaveAuth(){
   try{ localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudAuth)); }catch(e){}
 }
-async function cloudDoAuth(isNew){
-  const u=document.getElementById("cloudUser").value.trim();
-  const p=document.getElementById("cloudPass").value;
+async function cloudDoAuth(isNew, uEl, pEl, after){
+  const u=(uEl.value||"").trim();
+  const p=pEl.value||"";
   if(u.length<2||p.length<4){ toast(t("cloud.err.short")); return; }
-  const btns=[document.getElementById("cloudLoginBtn"),document.getElementById("cloudSignupBtn")];
+  const btns=after
+    ?[document.getElementById("wlLogin"),document.getElementById("wlSignup")]
+    :[document.getElementById("cloudLoginBtn"),document.getElementById("cloudSignupBtn")];
   btns.forEach(b=>b.disabled=true);
   try{
     const r=await fetch("/api/"+(isNew?"signup":"login"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({username:u,password:p})});
@@ -1049,14 +1090,23 @@ async function cloudDoAuth(isNew){
     if(r.ok&&j&&j.token){
       cloudAuth={token:j.token,username:j.username};
       cloudSaveAuth();
-      document.getElementById("cloudPass").value="";
+      pEl.value="";
       renderCloud();
       cloudPull();
+      if(after) after();
     }else{
       toast(t((j&&j.error==="username already taken")?"cloud.err.taken":(r.status===401?"cloud.err.creds":"cloud.err.net")));
     }
   }catch(e){ toast(t("cloud.err.net")); }
   btns.forEach(b=>b.disabled=false);
+}
+function welcomeDoneNow(){ save.welcomeDone=true; persist(); const w=document.getElementById("welcomeModal"); if(w) w.classList.remove("on"); openMenu(); }
+function welcomeNeeded(){   // 只挡全新玩家:老档/已登录/选过游客的直接进
+  return !cloudAuth && !save.welcomeDone && Object.keys(save.done).length===0 && (save.lUnlocked||1)<=1;
+}
+function renderWelcome(){
+  document.getElementById("wlUser").placeholder=t("cloud.user");
+  document.getElementById("wlPass").placeholder=t("cloud.pass");
 }
 function cloudSyncNow(){ if(cloudAuth) cloudPull().then(()=>cloudPush()); }
 function cloudLogout(){
@@ -2370,16 +2420,18 @@ function finishLevel(){
 function hideResult(){ document.getElementById("resultModal").classList.remove("on"); }
 
 /* ================= 菜单 ================= */
-function renderMenuLang(){
-  const el=document.getElementById("menuLang"); if(!el) return;
+function buildLangRow(el){
   el.innerHTML="";
   for(const [v,label] of [["nl","Nederlands"],["zh","中文"],["en","English"]]){
     const b=document.createElement("button");
     b.className="lang-btn"+(save.settings.uiLang===v?" sel":"");
     b.textContent=label;
-    b.onclick=()=>{ save.settings.uiLang=v; persist(); applyI18n(); openMenu(); };
+    b.onclick=()=>{ save.settings.uiLang=v; persist(); applyI18n(); buildLangRow(el); renderWelcome(); };
     el.appendChild(b);
   }
+}
+function renderMenuLang(){
+  const el=document.getElementById("menuLang"); if(el) buildLangRow(el);
 }
 function openMenu(){
   if(curLevel){ stopSpeech(); hideBanner(); }   // 会话保活:棋盘保留
@@ -2576,8 +2628,14 @@ document.getElementById("mBook").onclick=openBook;
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mSettings").onclick=openSettings;
-document.getElementById("cloudLoginBtn").onclick=()=>cloudDoAuth(false);
-document.getElementById("cloudSignupBtn").onclick=()=>cloudDoAuth(true);
+document.getElementById("cloudLoginBtn").onclick=()=>cloudDoAuth(false,document.getElementById("cloudUser"),document.getElementById("cloudPass"));
+document.getElementById("cloudSignupBtn").onclick=()=>cloudDoAuth(true,document.getElementById("cloudUser"),document.getElementById("cloudPass"));
+document.getElementById("wlLogin").onclick=()=>cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
+document.getElementById("wlSignup").onclick=()=>cloudDoAuth(true,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
+document.getElementById("wlGoogle").onclick=()=>{ location.href="/api/auth/google"; };
+document.getElementById("wlGuest").onclick=welcomeDoneNow;
+document.getElementById("wlUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("wlPass").focus(); });
+document.getElementById("wlPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow); });
 document.getElementById("cloudSyncBtn").onclick=cloudSyncNow;
 document.getElementById("cloudOutBtn").onclick=cloudLogout;
 document.getElementById("cloudUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("cloudPass").focus(); });
@@ -2622,6 +2680,8 @@ window.NLM3={
   skipDemo:()=>{ if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); busy=false; save.demoDone=true; persist(); } },
   save:()=>save,
   cloud:()=>({auth:!!cloudAuth,user:cloudAuth&&cloudAuth.username,status:cloudStatus,inFlight:cloudInFlight}),
+  skipWelcome:()=>{ save.welcomeDone=true; persist(); document.getElementById("welcomeModal").classList.remove("on"); },
+  welcomeNeeded:()=>welcomeNeeded(),
 };
 
 /* ================= 启动 ================= */
@@ -2630,6 +2690,12 @@ applySettings();
 syncSize();
 openMenu();
 if(cloudAuth) cloudPull();
+if(welcomeNeeded()){
+  renderWelcome();
+  buildLangRow(document.getElementById("wlLang"));
+  document.getElementById("menuScreen").classList.remove("on");
+  document.getElementById("welcomeModal").classList.add("on");
+}
 </script>
 </body>
 </html>

@@ -57,6 +57,8 @@ gamified-learning/
 
 ## 当前状态(2026-10-05)
 
+- **link-match-demo v1.18(2026-10-05,欢迎页+Google 登录)**:首次进入未登录的新玩家全屏欢迎页(登录优先:用户名/密码+Inloggen/Nieuw account、Met Google doorgaan、游客兜底"Direct als gast spelen";老档/已登录/选过游客永不弹,welcomeDone 存档标记);Google OAuth 授权码流程(`functions/api/auth/google.js`+`callback.js`,users.google_sub 列,**存量远程库需 ALTER TABLE users ADD COLUMN google_sub TEXT**);GOOGLE_CLIENT_ID/SECRET 走 Dashboard Variables and Secrets,未配置时接口 501;cloudDoAuth 重构为 (isNew,uEl,pEl,after) 供设置面板+欢迎页共用。待办:用户建 Google OAuth 客户端+配 secrets+远程加列后,线上实测 Google 流程。详见 DEVLOG。
+
 - 版本 v0.8(见 DEVLOG):**85 词 / 17 关**(A1 3 + A2 6 + B1 8,每关 5 词)、**无尽模式 + 每日挑战**(通过第 1 关解锁,已收集词池抽样 6 词;每日=日期种子+180s 倒计时+当日最佳;无尽=离场记最佳)、计分+连击(教学横幅 10s 倒计时)、三区 HUD(宽度 JS 与棋盘同步)、新词插画为首字母纹章 fallback(深浅主题感知)。
 - 已部署:https://channontian.github.io/gamified-learning/(push 即自动更新)。
 - **任务线转向(2026-10-02 用户拍板)**:只做 link-match;tile-match 冻结于 v0.87(在线可用,不再迭代)。下一波=link-match 内容铺量(B2/C1 词池、关卡扩容、插画补齐)+ 候选模式(每日/无尽、排行榜接口、PWA 等)待拍板;四消对照分支封存(见 ROADMAP)。

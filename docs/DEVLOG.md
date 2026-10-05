@@ -1,5 +1,11 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · v1.18(link-match-demo)欢迎页登录前置 + Google 登录
+
+- **欢迎页(登录优先,用户拍板;Google/游客兜底)**:首次进入且未登录的新玩家全屏弹出——`welcomeNeeded(): !cloudAuth && !save.welcomeDone && done为空 && lUnlocked<=1`,老档/已登录/选过游客的永不打扰;内容=标题+副标题+语言行+用户名/密码(Inloggen/Nieuw account 主位)+Met Google doorgaan+虚线"Direct als gast spelen"兜底(注明进度仅存本机,随时可注册)。`cloudDoAuth` 重构为 `(isNew, uEl, pEl, after)` 签名,设置面板与欢迎页共用;`buildLangRow` 从 renderMenuLang 抽出供欢迎页复用(欢迎页可切三语)。`welcomeDoneNow`=welcomeDone:true+persist+关欢迎页+**openMenu()(修:不重开菜单玩家会落在空屏,复测捕获)**。NLM3 增 skipWelcome/welcomeNeeded。
+- **Google OAuth(授权码流程)**:`GET /api/auth/google` 302→accounts.google.com(client_id/redirect_uri/scope=openid email profile/state)+HttpOnly SameSite=Lax state cookie(10min);`GET /api/auth/google/callback` 校验 state→code 换 token→userinfo→users 表 find-or-create(`google_sub` 唯一;用户名取邮箱前缀 ≤20 字符,撞名追加 sub 尾四位;pass_hash='google'=不可密码登录)→newSession→返回小 HTML 写 localStorage 后 location.replace 回游戏(token 不进 URL)。env.GOOGLE_CLIENT_ID/SECRET 未配置时 501 JSON 优雅降级;`</script>` 转义防注入。worker.js 增两路由。**存量库需迁移**:`ALTER TABLE users ADD COLUMN google_sub TEXT`(schema.sql 建表已含,远程/本地存量库手动执行)。
+- QA:本地全错误路径(302 参数+state cookie ✓/state 不匹配拒 ✓/缺 code 拒 ✓/假 code→Google 兑换失败优雅页 ✓);浏览器 390×844:fresh 弹欢迎页 ✓、切中文即时生效 ✓、欢迎页注册→登录态+落菜单 ✓、刷新不再弹+uiLang 保持 ✓、游客→落菜单+刷新不再弹 ✓、已登录玩家(含旧 token 401 清除后)不弹 ✓;**修了一个复测捕获的 bug**:welcomeDoneNow 不重开菜单,游客/注册后落空屏。全程零错误。
+
 ## 2026-10-05 · v1.17(link-match-demo)Cloudflare 登录 + 云存档(下一里程碑落地)
 
 - **后端(Cloudflare Pages + Pages Functions + D1,全免费档)**:仓库根新增 `functions/api/` 五接口(signup/login/logout/load/save)+ `_lib.js` 共享层——密码 PBKDF2-SHA256 **1 万次迭代**(免费档单请求 10ms CPU 预算,10 万次会 1102 超限)+随机盐、登录发 32B 随机 token 存 `sessions` 表、比较用常量时间异或;`schema.sql` 三表 users/saves/saves(updated_at)幂等建表,**远程与本地 D1 均已应用**;`wrangler.toml` 声明 D1 绑定(linkmatch-db,203f0b16-…)与 `pages_build_output_dir="."`。存档为整包 JSON blob 按 user_id upsert,≤200KB 校验。
