@@ -1,5 +1,10 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-01 · 试玩 UX 追加二(词卡弹窗提示拆除 + 盘卡间隙)
+
+- **词卡弹窗"点击查看释义"拆除(用户实测仍在)**:上一轮只删了图鉴行的悬停提示,漏了词卡弹窗的两段式解锁(cardTip 文案→"…"→再点关)。全清:#cardTip 元素+CSS、三语 card.tip 键、gloss-open 逻辑;释义**常显**(0.65 灰度为原设计),点卡任意处即关(cardPanel.onclick=closeCard)。
+- **盘卡间隙**:bannerSlot 76/84→**86/94**、#learnBanner top:0→**10px**——卡与桌盘间实测 26px(原 8px),卡体 76/84 不变;syncSize 按 slot.offsetHeight 自动适配。
+- QA:bot 18 关 149 对+每日 2 盘+无尽 2 盘零错误(与 v1.18 欢迎门共存,welcomeDone 种子绕行);弹窗无提示文案/点卡即关/间隙 26px 断言;截图验收(弹窗 pass;间隙图倒计时条不可见为后台标签动画冻结伪影,DOM 3px 橙条在,先前轮次已验过渲染)。
 ## 2026-10-05 · v1.18(link-match-demo)欢迎页登录前置 + Google 登录
 
 - **欢迎页(登录优先,用户拍板;Google/游客兜底)**:首次进入且未登录的新玩家全屏弹出——`welcomeNeeded(): !cloudAuth && !save.welcomeDone && done为空 && lUnlocked<=1`,老档/已登录/选过游客的永不打扰;内容=标题+副标题+语言行+用户名/密码(Inloggen/Nieuw account 主位)+Met Google doorgaan+虚线"Direct als gast spelen"兜底(注明进度仅存本机,随时可注册)。`cloudDoAuth` 重构为 `(isNew, uEl, pEl, after)` 签名,设置面板与欢迎页共用;`buildLangRow` 从 renderMenuLang 抽出供欢迎页复用(欢迎页可切三语)。`welcomeDoneNow`=welcomeDone:true+persist+关欢迎页+**openMenu()(修:不重开菜单玩家会落在空屏,复测捕获)**。NLM3 增 skipWelcome/welcomeNeeded。

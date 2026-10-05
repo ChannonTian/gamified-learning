@@ -295,9 +295,9 @@
   }
 
   /* ---------- 底部操作坞 + 教学横幅 ---------- */
-  /* 词卡槽:文档流、紧贴桌盘下沿;按钮行固定屏幕底部(留空隙) */
-  #bannerSlot{ position:relative; height:76px; width:100%; margin:0 auto; }
-  body.in-levels #bannerSlot{ height:84px; }
+  /* 词卡槽:文档流、桌盘下沿留 10px 空隙(槽高含空隙,词卡本体 76/84 不变);按钮行固定屏幕底部 */
+  #bannerSlot{ position:relative; height:86px; width:100%; margin:0 auto; }
+  body.in-levels #bannerSlot{ height:94px; }
   #dock{
     position:fixed; bottom:calc(env(safe-area-inset-bottom) + 10px); left:50%; transform:translateX(-50%);
     z-index:20;
@@ -313,7 +313,7 @@
   }
   .dock-btn:active{transform:scale(.95);}
   #learnBanner{
-    position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
+    position:absolute; left:0; right:0; top:10px; bottom:0; z-index:5;
     background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:0 10px 30px rgba(20,30,50,.28);
     display:flex; align-items:center; gap:16px;   /* 模块间隙 16px(用户 2.1);与 .word-card 一致 */
@@ -420,7 +420,6 @@
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
   #cardModal .word-card{ margin-top:8px; }
-  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
   #resultModal .panel{text-align:center;}
   .btn{
     display:inline-block; border:none; border-radius:12px;
@@ -689,7 +688,6 @@
   <div class="panel" id="cardPanel">
     <button class="close-x" id="cardClose">✕</button>
     <div class="word-card" id="cardBody"></div>
-    <div id="cardTip"></div>
   </div>
 </div>
 
@@ -904,7 +902,6 @@ const I18N={
     "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
     "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
-    "card.tip":"Tik voor de betekenis",
     "set.cloud":"Cloudopslag","cloud.user":"Gebruikersnaam","cloud.pass":"Wachtwoord","cloud.in":"Inloggen","cloud.new":"Nieuw account","cloud.as":"Ingelogd als","cloud.out":"Uitloggen","cloud.sync":"Nu synchroniseren",
     "cloud.ok":"✓ gesynchroniseerd","cloud.fail":"synchroniseren mislukt","cloud.busy":"synchroniseren…","cloud.err.taken":"Deze naam bestaat al","cloud.err.creds":"Onjuiste naam of wachtwoord","cloud.err.net":"Server niet bereikbaar — probeer later opnieuw","cloud.err.short":"Naam minstens 2 tekens, wachtwoord minstens 4",
     "wl.sub":"Leer Nederlandse werkwoorden: koppel elk werkwoord aan zijn vormen.","wl.google":"Met Google doorgaan","wl.guest":"Direct als gast spelen","wl.guestsub":"Voortgang blijft op dit toestel — je kunt later altijd een account maken.",
@@ -937,7 +934,6 @@ const I18N={
     "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
     "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
-    "card.tip":"点击查看释义",
     "set.cloud":"云存档","cloud.user":"用户名","cloud.pass":"密码","cloud.in":"登录","cloud.new":"注册新账号","cloud.as":"已登录","cloud.out":"退出登录","cloud.sync":"立即同步",
     "cloud.ok":"✓ 已同步","cloud.fail":"同步失败","cloud.busy":"同步中…","cloud.err.taken":"用户名已存在","cloud.err.creds":"用户名或密码错误","cloud.err.net":"无法连接服务器，请稍后再试","cloud.err.short":"用户名至少 2 个字符，密码至少 4 位",
     "wl.sub":"荷兰语动词连连看：把动词和它的变位连起来。","wl.google":"使用 Google 登录","wl.guest":"游客身份直接玩","wl.guestsub":"进度只保存在本机，之后随时可以注册同步。",
@@ -970,7 +966,6 @@ const I18N={
     "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
     "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
-    "card.tip":"Tap for the meaning",
     "set.cloud":"Cloud save","cloud.user":"Username","cloud.pass":"Password","cloud.in":"Sign in","cloud.new":"Create account","cloud.as":"Signed in as","cloud.out":"Sign out","cloud.sync":"Sync now",
     "cloud.ok":"✓ synced","cloud.fail":"sync failed","cloud.busy":"syncing…","cloud.err.taken":"That name is already taken","cloud.err.creds":"Wrong username or password","cloud.err.net":"Can't reach the server — try again later","cloud.err.short":"Name needs at least 2 characters, password at least 4",
     "wl.sub":"Learn Dutch verbs: match each verb with its forms.","wl.google":"Continue with Google","wl.guest":"Play as guest","wl.guestsub":"Progress stays on this device — you can create an account anytime.",
@@ -2562,8 +2557,6 @@ function showCard(vi){
     const V=VERBS[vi];
     document.getElementById("cardBody").innerHTML=wordCardHTML(vi,null);
     document.getElementById("cardPanel").style.setProperty("--h",V.hue);
-    document.getElementById("cardTip").textContent=t("card.tip");
-    document.getElementById("cardModal").classList.remove("gloss-open");
     document.getElementById("cardModal").classList.add("on");
     stopSpeech(); speakWords([V.inf,V.sg,V.pl,ppLabel(V)].filter(Boolean));   // 开卡朗读完整四形态(用户 #2)
   });
@@ -2653,11 +2646,7 @@ document.getElementById("setBanner").oninput=e=>{
 };
 document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
-document.getElementById("cardPanel").onclick=()=>{
-  const m=document.getElementById("cardModal");
-  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="…"; }
-  else closeCard();
-};
+document.getElementById("cardPanel").onclick=closeCard;   // 点卡即关(释义常显,不再两段式解锁)
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
 ["bookDrawer","helpModal","settingsModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
