@@ -180,7 +180,8 @@
   @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
   .combo-tag{
     background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
-    padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
+    height:36px;   /* 与顶栏其他胶囊等高对齐(用户截图2) */
+    padding:0 13px; border-radius:999px; font-size:14px; font-weight:800;
     animation:comboPop .25s ease, comboGlow 1.6s ease-in-out infinite;
   }
   @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
@@ -198,7 +199,7 @@
   body.mode-hud .goal-pill{min-width:0; padding:6px 9px;}
   body.mode-hud .tag{padding:6px 9px;}
   body.mode-hud .score-bar{min-width:88px;}
-    .combo-tag{padding:5px 11px; font-size:13px;}
+    .combo-tag{padding:0 11px; font-size:13px;}
     #hud{padding-top:8px; gap:6px;}
   }
 
@@ -295,8 +296,8 @@
 
   /* ---------- 底部操作坞 + 教学横幅 ---------- */
   /* 词卡槽:文档流、紧贴桌盘下沿;按钮行固定屏幕底部(留空隙) */
-  #bannerSlot{ position:relative; height:64px; width:100%; margin:0 auto; }
-  body.in-levels #bannerSlot{ height:72px; }
+  #bannerSlot{ position:relative; height:76px; width:100%; margin:0 auto; }
+  body.in-levels #bannerSlot{ height:84px; }
   #dock{
     position:fixed; bottom:calc(env(safe-area-inset-bottom) + 10px); left:50%; transform:translateX(-50%);
     z-index:20;
@@ -329,7 +330,7 @@
   .word-card{ display:flex; align-items:center; gap:16px; width:100%; }   /* 模块间隙:插画|词形|释义(用户 2.1:太挤) */
   .wc-art{ width:50px; height:50px; flex:none; }
   .wc-main{ flex:1; min-width:0; }
-  .wc-forms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font-size:17px; font-weight:700; line-height:1.3; }
+  .wc-forms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font-size:17px; font-weight:700; line-height:1.2; }
   .wc-forms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
   .wc-forms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
   body.theme-grug.dark .wc-forms .bf.on{ color:hsl(var(--h) 45% 66%); }
@@ -630,6 +631,7 @@
 <!-- Verzameling -->
 <div class="overlay" id="bookDrawer">
   <div class="panel">
+    <button class="close-x" id="bookClose" aria-label="Sluit">✕</button>
     <h2 data-i18n="book.title">Verzameling</h2>
     <div id="bookList"></div>
   </div>
@@ -981,7 +983,7 @@ function warnTtsBlocked(){
   ttsBlockedWarned=true;
   toast(t("tts.blocked"));   // 语音引擎瘫(如内嵌测试窗):utterance 永远排队、不 onstart 也不 onerror
 }
-function speakPair(V,form){
+function speakWords(seq){
   const gen=++speakGen;   // 代数令牌:新横幅接管后,旧链的延迟回调与 onend 链全部失效
   return new Promise(res=>{
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
@@ -989,7 +991,6 @@ function speakPair(V,form){
       const ss=window.speechSynthesis;
       const busyS=ss.speaking||ss.pending;
       if(busyS) ss.cancel();   // 空队列不要 cancel:Chrome cancel() 后同步 speak() 会被静默吞掉
-      const seq=[V.inf,form];
       let i=0, startedAny=false;
       const next=()=>{
         if(gen!==speakGen){ res(); return; }
@@ -1006,6 +1007,7 @@ function speakPair(V,form){
     }catch(e){ res(); }
   });
 }
+function speakPair(V,form){ return speakWords([V.inf,form]); }
 function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
 
 /* ================= SVG 插画(与 tile-match 同源) ================= */
@@ -1362,7 +1364,7 @@ function syncSize(){
   // 逐块测字(用户反馈:一个长词不再拖小整盘字号);长词单独缩,短词保持可读字号
   for(const t of tiles){
     if(!t.el) continue;
-    const disp=t.k==="inf"?VERBS[t.v].inf:(t.f==="pp"?ppLabel(VERBS[t.v]):(VERBS[t.v][t.f]||VERBS[t.v].sg));   // pp="is + 分词":按最长单词测宽(is 允许换行)
+    const disp=t.k==="inf"?VERBS[t.v].inf:((t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f])||VERBS[t.v].sg);   // pp="is + 分词":按最长单词测宽(is 允许换行);无 pp 词兜底 sg
     const ws=disp.split(" ");
     const word=ws.length>1?ws.reduce((a,b)=>ctx.measureText(b).width>ctx.measureText(a).width?b:a):disp;
     let fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
@@ -1557,7 +1559,7 @@ function buildBoardDOM(){
     el.style.setProperty("--h",VERBS[t.v].hue);
     const face=document.createElement("div");
     face.className="face";
-    face.textContent=t.k==="inf"?VERBS[t.v].inf:(t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f]);
+    face.textContent=t.k==="inf"?VERBS[t.v].inf:((t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f])||VERBS[t.v].sg);
     face.style.fontSize=levelFont+"px";
     el.appendChild(face);
     el._t=t; t.el=el;
@@ -1650,6 +1652,7 @@ function sampleModeVerbs(pool,n,r){   // 一屏只一种词型搭配(用户反�
   const picks=[], seenStr=new Set();
   const tryPush=(vi)=>{
     if(picks.length>=n) return;
+    if(f==="pp"&&!VERBS[vi].pp) return;   // zullen 无分词:pp 盘跳过(与关卡构建同规则;v1.16 ppLabel(null) 回归)
     const s=VERBS[vi][f];
     if(seenStr.has(s)) return;
     seenStr.add(s); picks.push({v:vi,f});
@@ -1818,6 +1821,7 @@ function attemptPair(a,b){
       setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320); }
     blip(180,.08,"sine",.05);
     if(streak>0){ streak=0; updateHUD(); }
+    reshuffleIfStuck();   // 失败尝试后同样查死局(用户 #5)
     return false;
   }
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
@@ -1857,14 +1861,18 @@ function attemptPair(a,b){
       if(mode==="levels"){ if(curLevel) finishLevel(); }
       else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
     },480);
-  }else if(!findAnyPairNow()){
-    setTimeout(()=>{
-      if(!curLevel) return;
-      toast(t("toast.nopair"));
-      reshuffleRemaining();
-    },500);
-  }
+  }else reshuffleIfStuck();   // 成功一连后查死局(原有行为,抽成共用)
   return true;
+}
+/* ---- 死局检测:成功一连后或一次失败尝试后都要查(此前只在成功路径查——玩家点不出对时永远不洗牌,每日实测卡死) ---- */
+function reshuffleIfStuck(){
+  if(findAnyPairNow()) return;
+  setTimeout(()=>{
+    if(!curLevel) return;                 // 对局已结束
+    if(findAnyPairNow()) return;          // 500ms 内局面可能已变(背靠背连点)
+    toast(t("toast.nopair"));
+    reshuffleRemaining();
+  },500);
 }
 function drawPath(path){
   const svg=document.getElementById("pathSvg");
@@ -1981,6 +1989,15 @@ function showLearnBanner(v,formWord,activeF){
   const V=VERBS[v];
   bannerVerb=v;
   bannerEl.innerHTML=wordCardHTML(v,activeF)+`<div class="b-progress"><i></i></div>`;
+  // 词卡字号自适应:四形态换行超过槽高就逐级缩小(中文/长动词 3 行也放得下,截图1)
+  const formsEl=bannerEl.querySelector(".wc-forms");
+  if(formsEl){
+    let fs=document.body.classList.contains("in-levels")?19:17;
+    formsEl.style.fontSize=fs+"px";
+    const availH=bannerEl.clientHeight-18;   // 上下 padding 8×2 + 底部进度条余量
+    let guard=0;
+    while(guard++<12 && formsEl.scrollHeight>availH && fs>11){ fs-=1; formsEl.style.fontSize=fs+"px"; }
+  }
   bannerEl.style.setProperty("--h",V.hue);
   bannerEl.style.setProperty("--bdur",(save.settings.bannerMs||BANNER_DEFAULT_S)+"s");   // 倒计时条时长=真实窗口(此前默认 10s 与 15s 窗口不符)
   bannerEl.classList.remove("show");
@@ -2324,7 +2341,7 @@ function openBook(){
           <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
           <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
-      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(vi); }
+      if(got){ row.onclick=()=>showCard(vi); }
       list.appendChild(row);
     }
   }
@@ -2340,7 +2357,7 @@ function showCard(vi){
     document.getElementById("cardTip").textContent=t("card.tip");
     document.getElementById("cardModal").classList.remove("gloss-open");
     document.getElementById("cardModal").classList.add("on");
-    stopSpeech(); speakVerb(V.inf);
+    stopSpeech(); speakWords([V.inf,V.sg,V.pl,ppLabel(V)].filter(Boolean));   // 开卡朗读完整四形态(用户 #2)
   });
 }
 function closeCard(){
@@ -2371,6 +2388,7 @@ document.getElementById("menuScreen").addEventListener("click",e=>{
 });
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
+document.getElementById("bookClose").onclick=e=>{ e.stopPropagation(); document.getElementById("bookDrawer").classList.remove("on"); };
 function modeIntro(mode){
   if(save.lUnlocked<MODE_UNLOCK){ toast(t("menu.needlevel")); return; }
   if(mode==="daily"&&save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
