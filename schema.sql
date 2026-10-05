@@ -3,7 +3,8 @@
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  pass_hash TEXT NOT NULL,          -- 格式 salt$hash（PBKDF2-SHA256，hex）
+  pass_hash TEXT NOT NULL,          -- 格式 salt$hash（PBKDF2-SHA256，hex）；Google 账号存 'google'（不可密码登录）
+  google_sub TEXT UNIQUE,           -- Google 登录身份（存量库执行 ALTER TABLE users ADD COLUMN google_sub TEXT 迁移）
   created_at TEXT DEFAULT (datetime('now'))
 );
 

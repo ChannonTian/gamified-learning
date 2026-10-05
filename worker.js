@@ -5,6 +5,8 @@ import * as login from "./functions/api/login.js";
 import * as logout from "./functions/api/logout.js";
 import * as load from "./functions/api/load.js";
 import * as save from "./functions/api/save.js";
+import * as googleStart from "./functions/api/auth/google.js";
+import * as googleCallback from "./functions/api/auth/google/callback.js";
 
 const routes = {
   "POST /api/signup": signup.onRequestPost,
@@ -12,6 +14,8 @@ const routes = {
   "POST /api/logout": logout.onRequestPost,
   "GET /api/load": load.onRequestGet,
   "POST /api/save": save.onRequestPost,
+  "GET /api/auth/google": googleStart.onRequestGet,
+  "GET /api/auth/google/callback": googleCallback.onRequestGet,
 };
 
 export default {
