@@ -59,7 +59,10 @@ export async function onRequestGet(ctx) {
   }
   const token = await newSession(env, user.id);
 
-  // JSON.stringify 防注入再兜一层 </script> 转义
-  const payload = JSON.stringify({ token, username: user.username, display_name: user.display_name || '' }).replace(/<\//g, '<\\/');
-  return page(`<script>localStorage.setItem("linkmatchdemo.auth",${payload});location.replace("/link-match-demo/");</script>`);
+  // setItem 的第二个参数必须是字符串字面量:双重 stringify 生成带引号的 JSON 字面量,
+  // 再把 <>/、&、行分隔符转成 unicode 转义,防内联脚本注入(此前直接内插对象,setItem 存成了 "[object Object]",Google 登录永远不生效)
+  const authLiteral = JSON.stringify(JSON.stringify({ token, username: user.username, display_name: user.display_name || '' }))
+    .replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  return page(`<script>localStorage.setItem("linkmatchdemo.auth",${authLiteral});location.replace("/link-match-demo/");</script>`);
 }
