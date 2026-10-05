@@ -1,5 +1,12 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · v1.17(link-match-demo)Cloudflare 登录 + 云存档(下一里程碑落地)
+
+- **后端(Cloudflare Pages + Pages Functions + D1,全免费档)**:仓库根新增 `functions/api/` 五接口(signup/login/logout/load/save)+ `_lib.js` 共享层——密码 PBKDF2-SHA256 **1 万次迭代**(免费档单请求 10ms CPU 预算,10 万次会 1102 超限)+随机盐、登录发 32B 随机 token 存 `sessions` 表、比较用常量时间异或;`schema.sql` 三表 users/saves/saves(updated_at)幂等建表,**远程与本地 D1 均已应用**;`wrangler.toml` 声明 D1 绑定(linkmatch-db,203f0b16-…)与 `pages_build_output_dir="."`。存档为整包 JSON blob 按 user_id upsert,≤200KB 校验。
+- **前端(仅 demo,主版冻结)**:设置面板底部新增 **Cloudopslag 区块**——未登录:用户名/密码+Inloggen/Nieuw account;已登录:Ingelogd als + Nu synchroniseren/Uitloggen + 状态角标(✓ gesynchroniseerd/synchroniseren…/mislukt);i18n 三语 `cloud.*`/`set.cloud` 共 16 键。登录态存 `linkmatchdemo.auth`(`{token, username}`)。**localStorage 仍是唯一主存档**:persist() → 4s 去抖上传(cloudQueueSave);visibilitychange hidden 时 keepalive 补发;一切请求失败静默(fail 角标,下次 persist 自动重试)——离线照玩。登录成功/启动时 cloudPull:拉云端 → `cloudMerge` 合并(**数值取大、布尔取或、数组并集、对象递归、其余本地优先**;本地无进度的新设备不覆盖 settings/style/lvOrder——注意新设备的字符串偏好如 uiLang 也不跟随云端,属有意行为)→ persist 去抖回推;401 静默登出。`NLM3.cloud()` 钩子(auth/user/status/inFlight)。
+- **⚠️ wrangler 坑(本地开发)**:`wrangler pages dev`(4.147)**不读 wrangler.toml 的 D1 绑定**——启动必须 `wrangler pages dev --port N --d1 DB=linkmatch-db`;且 flag 建的本地库与 `wrangler d1 execute --local` **不是同一本地实例**,首次要对 `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite` 重灌 schema(IF NOT EXISTS 幂等)。线上绑定以 Dashboard 项目 Settings→Bindings 为准,连接 Git 后须核对。`.gitignore` 补 `.wrangler/`。
+- QA:curl 10 项全绿(注册/重复 409/用户名密码校验 400/错密码 401/正确登录/存读档往返逐字段一致/伪 token 401/logout 后原 token 失效/非法 body 400);浏览器 390×844(IAB):注册→"Ingelogd als qa_ui"、L0 skipDemo+连对→15 分→4s 后自动上传"✓ gesynchroniseerd"、刷新登录态保持+进度在、切中文文案全对且切语言触发同步、**清 localStorage 存档(保留 token)刷新→云端整档恢复**(demoDone/counts.eten 回来)、设置面板截图云区块融入手绘主题、全程 console 零错误。
+
 ## 2026-10-01 · v1.16(link-match-demo)is+perfectum + 关卡列表形状/标题 + 词卡间隙(追加四项)
 
 - **is + perfectum(#6)**:词表 Perfectum 栏标 'is' 的 9 词(zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten;lopen/rijden 词表注 (is)**、vergeten (is)*)在游戏内显示/朗读 **"is + 分词"**(is gegaan)——`PP_ZIJN` 集合 + `ppLabel(V)`,磁贴(buildBoardDOM)、四形态卡(wordCardHTML)、图鉴行、朗读(wordOf→speakPair)同一数据源;pp 磁贴双行放得下:syncSize 改按**最长单词**测宽(is 换行)、双行时字号受高度约束(≤th×0.42)、叶子块行距 1.0。顺修图鉴 zullen 行渲染 "null" → "-"。

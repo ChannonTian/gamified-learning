@@ -20,6 +20,9 @@ gamified-learning/
 │   ├── DESIGN.md       ← 设计决策与依据(改玩法前必读)
 │   ├── DEVLOG.md       ← 按日期的迭代日志(每次改动追加)
 │   └── ROADMAP.md      ← 路线图(优先级用户定)
+├── wrangler.toml       ← Cloudflare Pages 配置(D1 绑定 linkmatch-db;pages dev 不读其 D1,见 DEVLOG v1.17)
+├── schema.sql          ← 云存档建表 users/saves/sessions(幂等;改完跑 wrangler d1 execute --remote/--local)
+├── functions/api/      ← Pages Functions:signup/login/logout/load/save+_lib(仅 demo 云存档用)
 ├── tile-match/
 │   ├── index.html      ← 游戏本体:单文件、零依赖(原生 JS+CSS)
 │   └── README.md       ← 游戏说明
@@ -36,7 +39,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);改结构要保持向后兼容(merge 默认值);改关卡顺序要像 v1.5 一样做映射迁移。
+- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);demo 云登录态=`linkmatchdemo.auth`(`{token, username}`,云端整包档存 Cloudflare D1);改结构要保持向后兼容(merge 默认值+云端 cloudMerge:数值取大/布尔取或/数组并集/对象递归/其余本地优先);改关卡顺序要像 v1.5 一样做映射迁移。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -50,7 +53,7 @@ gamified-learning/
 - 按钮、触控目标要大;底部不贴屏幕边缘(iOS 误触)。
 - 难度宁易勿难:开局保底 ≥2 解、无步数限制(计分制)、闲置自动提示。
 
-## 当前状态(2026-10-01)
+## 当前状态(2026-10-05)
 
 - 版本 v0.8(见 DEVLOG):**85 词 / 17 关**(A1 3 + A2 6 + B1 8,每关 5 词)、**无尽模式 + 每日挑战**(通过第 1 关解锁,已收集词池抽样 6 词;每日=日期种子+180s 倒计时+当日最佳;无尽=离场记最佳)、计分+连击(教学横幅 10s 倒计时)、三区 HUD(宽度 JS 与棋盘同步)、新词插画为首字母纹章 fallback(深浅主题感知)。
 - 已部署:https://channontian.github.io/gamified-learning/(push 即自动更新)。
@@ -71,7 +74,8 @@ gamified-learning/
 - **link-match v1.7(2026-10-04,竞品调研试点)**:试验关 **A1.1/A1.2**(`TRIAL_LEVELS`)落地 P1 连击里程碑(大字感叹+盘面波纹+和弦)/P3 交互式首教学(3 步演示,demoDone 一次)/P5 分数飞行/P6 清盘彩带;其余关卡原样供对比。**两个实现坑**:演示点击拦截必须在 busy 守卫前(演示靠 busy=true 锁闲置提示);demoClick 参数不可叫 `t`(遮蔽全局 i18n 函数 → "t is not a function"、回调不排上)。全量铺开待用户试玩定夺。
 - 已否决/搁置:原形百搭块(易混淆);四消判定(match-4,中盘供给不足,2026-10-04 用户否掉)。
 - **⚠️ 主版冻结(2026-10-01 用户拍板)**:link-match 主版停止改动,新一轮试玩全部走 **link-match-demo**;demo 定稿发布后,再把通用修复/改进同步回主版(同步时逐项过一遍,demo 专属词表/关卡结构不带回去)。
-- **下一里程碑:Cloudflare 登录 + 云存档(2026-10-01 用户拍板)**:初步试玩结束后接入 Cloudflare,允许玩家登录和保存进度。**此后任何更新不得让玩家进度清零**——存档结构只做增量迁移(merge 默认值+键位映射,先例 v1.5 lvOrder v2 / v1.12 缺口盘),上线前必须用存量档验证不丢进度。
+- **下一里程碑:Cloudflare 登录 + 云存档(2026-10-01 用户拍板)**:初步试玩结束后接入 Cloudflare,允许玩家登录和保存进度。**此后任何更新不得让玩家进度清零**——存档结构只做增量迁移(merge 默认值+键位映射,先例 v1.5 lvOrder v2 / v1.12 缺口盘),上线前必须用存量档验证不丢进度。→ **2026-10-05 代码已落地(见下一条),待连接 Cloudflare Pages 上线**。
+- **link-match-demo v1.17(2026-10-05,Cloud 登录+云存档)**:`functions/api/` 五接口(signup/login/logout/load/save;PBKDF2-SHA256 1 万次迭代=免费档 10ms CPU 预算、32B token 会话表、常量时间比较)+ `schema.sql` 三表(远程 D1 已建)+ `wrangler.toml`。前端仅 demo:设置面板底部 Cloudopslag 区块(登录/注册、立即同步/退出、同步状态角标,i18n 三语);**localStorage 仍是主存档**,persist()→4s 去抖上传、hidden 时 keepalive 补发、失败静默离线照玩;登录/启动拉云端 cloudMerge 合并后自动回推;401 静默登出;`NLM3.cloud()` 钩子。**坑:`wrangler pages dev` 不读 wrangler.toml 的 D1 绑定,必须 `--d1 DB=linkmatch-db` 显式传,且 flag 本地库与 `d1 execute --local` 不同实例要重灌 schema**。待办:Dashboard 连接 Git 部署 + 核对项目 D1 绑定 + 线上真实档回归。QA:curl 10 项+浏览器全链路(注册/自动同步/刷新保持/清档云恢复/中文)全绿零错误,详见 DEVLOG。
 - **link-match-demo v1.16(2026-10-01,追加四项;仅 demo)**:①**is+perfectum**——词表标 'is' 的 9 词(zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten)显示/朗读 "is + 分词"(`PP_ZIJN`+`ppLabel`,磁贴/词卡/图鉴/朗读同源;syncSize pp 按**最长单词**测宽+双行高度约束,叶子块行距 1.0;顺修图鉴 zullen "null"→"-");②词卡模块间隙 16px+释义虚线分隔;③关卡按钮按词型带 k-sg/k-pl/k-pp 类,圆角镜像磁贴;④分组标题改词表原文 band.*:"Imperfectum (enk.)/(mv.)/Perfectum"(legend.* 保留)。QA:bot 149 对全清零错误+视觉验收两图。
 - **link-match-demo v1.15(2026-10-01,发布前布局五项;仅改 demo,主版冻结)**:①模式介绍弹窗点"开始"自动关主菜单;②**统一词卡组件 `wordCardHTML`**——横幅/图鉴/结算共用一种卡(四形态+原形弧线+当前词型高亮+定宽 80px 可换行释义),横幅即图鉴卡不再维护两套,闯关槽 72px 大卡(挑战 64px);③顶栏**固定屏幕顶部下一格**(safe-area+10px,三列 grid、元素等高 36px 纵向居中),关卡数贴菜单按钮右侧、进度条中/分数右;④提示/词典 **dock 固定屏幕底部上一格**(10px 空隙),词卡槽(bannerSlot)移出 dock 紧贴桌盘文档流——body `justify-content:center` 遗留会造成顶栏与桌盘 ~200px 空隙,已改 flex-start;⑤**k-pp 弃 clip-path 改叶子形**(纯 `border-radius` 对角大圆角,描边/选中虚线框原生跟随——切角+补线、drop-shadow 两轮修补失败后的换形拍板);syncSize 按槽位+dock+底隙扣高度。QA:bot 149 对 18 关全清零错误、布局几何断言全过、介绍弹窗关菜单/词卡统一/收起态贴槽底断言、视觉验收三图。
 - **link-match v1.14(2026-10-05,五轮反馈十项;demo+主版同步)**:**幽灵块致命坑**——buildPairsFrom 按全部空位 forEach 放块,块数<空位时越界写 `{...undefined}`={} 幽灵块(truthy)→ 渲染崩/盘面残/计数 stale(9 词关恰好 18=18 不触发,8 词关必炸);修复=洗牌后 pos.length=tiles.length,兜底 tiles.forEach。--bdur 一直没设(动画默认 10s≠15s 窗口);k-pp 选中=随形 inset accent 环+剪影光晕(outline/drop-shadow 观感均不对);菜单加语言行(nl/中文/en)、模式按钮去副标题改右侧分数+虚线名+title 气泡、**点模式先弹介绍弹窗(说明+最高分+开始)**;每日去 0/18 胶囊(levels 保留);词卡放大(闯关槽 64px/18px 字)。demo 专属:关卡列表按三形态分组、图鉴修好(NIG 四组)+菜单入口。

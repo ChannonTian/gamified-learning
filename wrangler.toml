@@ -1,0 +1,8 @@
+name = "gamified-learning"
+pages_build_output_dir = "."
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "linkmatch-db"
+database_id = "203f0b16-53c4-4b99-8be5-51e63db6b034"

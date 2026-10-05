@@ -442,6 +442,23 @@
   }
   .seg button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
   .set-row input[type=range]{width:140px; accent-color:var(--accent);}
+  /* Cloud 存档(设置面板底部) */
+  #cloudBox{padding:12px 0 2px; border-top:1px dashed var(--line); margin-top:10px;}
+  .cloud-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+  .cloud-head label{font-weight:700; font-size:13.5px;}
+  #cloudStatus{font-size:11px; font-weight:700; color:#98a1b0; white-space:nowrap;}
+  #cloudBox input{
+    width:100%; box-sizing:border-box; margin-top:9px; padding:10px 12px;
+    border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-size:14px; font-weight:600; font-family:inherit;
+  }
+  #cloudBox input:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+  .cloud-btn{
+    flex:1; margin-top:9px; padding:10px 10px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:13px; font-weight:700;
+  }
+  .cloud-btn:disabled{opacity:.5;}
+  .cloud-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
   .book-group{
     display:flex; align-items:center; width:100%; text-align:left;
     background:none; border:none; color:var(--ink);
@@ -606,6 +623,27 @@
     <div class="set-row">
       <label data-i18n="set.dark">Donkere modus</label>
       <div class="seg" id="setDark"></div>
+    </div>
+    <div id="cloudBox">
+      <div class="cloud-head">
+        <label data-i18n="set.cloud">Cloudopslag</label>
+        <span id="cloudStatus"></span>
+      </div>
+      <div id="cloudLoggedOut">
+        <input id="cloudUser" type="text" autocomplete="username" enterkeyhint="next">
+        <input id="cloudPass" type="password" autocomplete="current-password" enterkeyhint="go">
+        <div style="display:flex; gap:8px;">
+          <button id="cloudLoginBtn" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+          <button id="cloudSignupBtn" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+        </div>
+      </div>
+      <div id="cloudLoggedIn" style="display:none;">
+        <div id="cloudAs" style="font-size:13px; font-weight:700; margin-top:9px;"></div>
+        <div style="display:flex; gap:8px;">
+          <button id="cloudSyncBtn" class="cloud-btn" data-i18n="cloud.sync">Nu synchroniseren</button>
+          <button id="cloudOutBtn" class="cloud-btn" data-i18n="cloud.out">Uitloggen</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -831,6 +869,8 @@ const I18N={
     "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
     "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
     "card.tip":"Tik voor de betekenis",
+    "set.cloud":"Cloudopslag","cloud.user":"Gebruikersnaam","cloud.pass":"Wachtwoord","cloud.in":"Inloggen","cloud.new":"Nieuw account","cloud.as":"Ingelogd als","cloud.out":"Uitloggen","cloud.sync":"Nu synchroniseren",
+    "cloud.ok":"✓ gesynchroniseerd","cloud.fail":"synchroniseren mislukt","cloud.busy":"synchroniseren…","cloud.err.taken":"Deze naam bestaat al","cloud.err.creds":"Onjuiste naam of wachtwoord","cloud.err.net":"Server niet bereikbaar — probeer later opnieuw","cloud.err.short":"Naam minstens 2 tekens, wachtwoord minstens 4",
   },
   zh:{
     "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
@@ -861,6 +901,8 @@ const I18N={
     "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
     "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
     "card.tip":"点击查看释义",
+    "set.cloud":"云存档","cloud.user":"用户名","cloud.pass":"密码","cloud.in":"登录","cloud.new":"注册新账号","cloud.as":"已登录","cloud.out":"退出登录","cloud.sync":"立即同步",
+    "cloud.ok":"✓ 已同步","cloud.fail":"同步失败","cloud.busy":"同步中…","cloud.err.taken":"用户名已存在","cloud.err.creds":"用户名或密码错误","cloud.err.net":"无法连接服务器，请稍后再试","cloud.err.short":"用户名至少 2 个字符，密码至少 4 位",
   },
   en:{
     "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
@@ -891,6 +933,8 @@ const I18N={
     "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
     "card.tip":"Tap for the meaning",
+    "set.cloud":"Cloud save","cloud.user":"Username","cloud.pass":"Password","cloud.in":"Sign in","cloud.new":"Create account","cloud.as":"Signed in as","cloud.out":"Sign out","cloud.sync":"Sync now",
+    "cloud.ok":"✓ synced","cloud.fail":"sync failed","cloud.busy":"syncing…","cloud.err.taken":"That name is already taken","cloud.err.creds":"Wrong username or password","cloud.err.net":"Can't reach the server — try again later","cloud.err.short":"Name needs at least 2 characters, password at least 4",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -928,7 +972,118 @@ if(save.lvOrder!=="v3"){
 // 设置默认值迁移:v1.12 及之前横幅默认 10s、提示等待 12s → 统一 15s(用户自定义值保留)
 if(save.settings.bannerMs===10) save.settings.bannerMs=15;
 if(save.settings.hintWait===12) save.settings.hintWait=15;
-function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); cloudQueueSave(); }catch(e){} }
+
+/* ================= Cloud 存档(Cloudflare Pages Functions + D1) ================= */
+/* 本地 localStorage 始终是主存档;云端只在登录后做备份与跨设备合并,所有请求失败一律静默(离线照玩) */
+const CLOUD_KEY="linkmatchdemo.auth";
+let cloudAuth=null;
+try{ cloudAuth=JSON.parse(localStorage.getItem(CLOUD_KEY)||"null"); }catch(e){}
+let cloudTimer=null, cloudInFlight=false, cloudStatus="";
+function cloudHeaders(){ return {"content-type":"application/json","authorization":"Bearer "+cloudAuth.token}; }
+function cloudSetStatus(k){
+  cloudStatus=k;
+  const el=document.getElementById("cloudStatus"); if(el) el.textContent=k?t("cloud."+k):"";
+}
+function cloudQueueSave(delay){   // 去抖:最后一次改动 4s 后才上传
+  if(!cloudAuth) return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>{ cloudTimer=null; cloudPush(); }, delay||4000);
+}
+async function cloudPush(keepalive){
+  if(!cloudAuth) return;
+  clearTimeout(cloudTimer); cloudTimer=null;
+  if(cloudInFlight){ cloudQueueSave(8000); return; }
+  cloudInFlight=true; cloudSetStatus("busy");
+  try{
+    const r=await fetch("/api/save",{method:"POST",headers:cloudHeaders(),keepalive:!!keepalive,body:JSON.stringify({data:save})});
+    if(r.status===401) cloudLost();
+    else if(r.ok) cloudSetStatus("ok");
+    else cloudSetStatus("fail");
+  }catch(e){ cloudSetStatus("fail"); }
+  cloudInFlight=false;
+}
+async function cloudPull(){       // 登录后/启动时:拉云端 → 合并 → 写本地(去抖自动回推)
+  if(!cloudAuth) return;
+  try{
+    const r=await fetch("/api/load",{headers:{authorization:"Bearer "+cloudAuth.token}});
+    if(r.status===401){ cloudLost(); return; }
+    if(!r.ok) return;
+    const j=await r.json();
+    if(j&&j.data){
+      const fresh=!Object.keys(save.done).length&&save.lUnlocked<=1;   // 新设备:整体接管云端档
+      const merged=cloudMerge(save,j.data);
+      if(!fresh){ merged.settings=save.settings; merged.style=save.style; merged.lvOrder=save.lvOrder; }
+      save=merged;
+      applySettings(); persist();
+      renderCloud();
+    }
+  }catch(e){}
+}
+// 合并规则:数值取大、布尔取或、数组并集、对象递归、其余本地优先(老设备设置/画风不被动)
+function cloudMerge(a,b){
+  if(b==null) return a;
+  if(a==null) return b;
+  if(typeof a==="number"&&typeof b==="number") return Math.max(a,b);
+  if(typeof a==="boolean"&&typeof b==="boolean") return a||b;
+  if(Array.isArray(a)&&Array.isArray(b)) return [...new Set([...a,...b])];
+  if(typeof a==="object"&&typeof b==="object"){
+    const out={...a};
+    for(const k in b) out[k]=cloudMerge(a[k],b[k]);
+    return out;
+  }
+  return a;
+}
+function cloudSaveAuth(){
+  try{ localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudAuth)); }catch(e){}
+}
+async function cloudDoAuth(isNew){
+  const u=document.getElementById("cloudUser").value.trim();
+  const p=document.getElementById("cloudPass").value;
+  if(u.length<2||p.length<4){ toast(t("cloud.err.short")); return; }
+  const btns=[document.getElementById("cloudLoginBtn"),document.getElementById("cloudSignupBtn")];
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch("/api/"+(isNew?"signup":"login"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const j=await r.json().catch(()=>null);
+    if(r.ok&&j&&j.token){
+      cloudAuth={token:j.token,username:j.username};
+      cloudSaveAuth();
+      document.getElementById("cloudPass").value="";
+      renderCloud();
+      cloudPull();
+    }else{
+      toast(t((j&&j.error==="username already taken")?"cloud.err.taken":(r.status===401?"cloud.err.creds":"cloud.err.net")));
+    }
+  }catch(e){ toast(t("cloud.err.net")); }
+  btns.forEach(b=>b.disabled=false);
+}
+function cloudSyncNow(){ if(cloudAuth) cloudPull().then(()=>cloudPush()); }
+function cloudLogout(){
+  const h=cloudAuth?cloudHeaders():null;
+  cloudAuth=null;
+  try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+  clearTimeout(cloudTimer); cloudTimer=null;
+  renderCloud();
+  if(h) fetch("/api/logout",{method:"POST",headers:h}).catch(()=>{});
+}
+function cloudLost(){   // 会话失效(401):静默退出登录态
+  cloudAuth=null;
+  try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+  clearTimeout(cloudTimer); cloudTimer=null;
+  renderCloud();
+}
+function renderCloud(){
+  const out=document.getElementById("cloudLoggedOut"); if(!out) return;
+  const inn=document.getElementById("cloudLoggedIn");
+  out.style.display=cloudAuth?"none":"";
+  inn.style.display=cloudAuth?"":"none";
+  document.getElementById("cloudUser").placeholder=t("cloud.user");
+  document.getElementById("cloudPass").placeholder=t("cloud.pass");
+  if(cloudAuth) document.getElementById("cloudAs").textContent=t("cloud.as")+" "+cloudAuth.username;
+  const el=document.getElementById("cloudStatus");
+  if(el) el.textContent=cloudStatus?t("cloud."+cloudStatus):"";
+}
 
 function applySettings(){
   const S=save.settings;
@@ -1340,7 +1495,7 @@ const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.cl
    Let op 原文:de werkwoorden met 'is' in de derde kolom krijgen het hulpwerkwoord 'zijn' in perfectum */
 const PP_ZIJN=new Set(["zijn","gaan","komen","beginnen","blijven","lopen","rijden","worden","vergeten"]);
 const ppLabel=V=>V.pp&&PP_ZIJN.has(V.inf)?"is "+V.pp:V.pp;
-const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : (t.f==="pp" ? ppLabel(VERBS[t.v]) : VERBS[t.v][t.f]);
+const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : ((t.f==="pp" ? ppLabel(VERBS[t.v]) : VERBS[t.v][t.f])||VERBS[t.v].sg);
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
@@ -2309,6 +2464,7 @@ function renderSettings(){
   document.getElementById("bannerVal").textContent=`${S.bannerMs||15} s`;
   seg(document.getElementById("setTheme"),[["grug",t("theme.grug")],["papier",t("theme.papier")]],S.theme||"grug",v=>{S.theme=v; applyTileRotations();});
   seg(document.getElementById("setDark"),[[true,t("opt.on")],[false,t("opt.off")]],S.dark,v=>S.dark=(v===true||v==="true"));
+  renderCloud();
 }
 
 /* ================= 图鉴 ================= */
@@ -2420,6 +2576,13 @@ document.getElementById("mBook").onclick=openBook;
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
 document.getElementById("mSettings").onclick=openSettings;
+document.getElementById("cloudLoginBtn").onclick=()=>cloudDoAuth(false);
+document.getElementById("cloudSignupBtn").onclick=()=>cloudDoAuth(true);
+document.getElementById("cloudSyncBtn").onclick=cloudSyncNow;
+document.getElementById("cloudOutBtn").onclick=cloudLogout;
+document.getElementById("cloudUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("cloudPass").focus(); });
+document.getElementById("cloudPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false); });
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"&&cloudAuth&&cloudTimer) cloudPush(true); });
 document.getElementById("setVolume").oninput=e=>{ save.settings.volume=+e.target.value; persist(); };
 document.getElementById("setTts").oninput=e=>{ save.settings.ttsVolume=+e.target.value; persist(); };
 document.getElementById("setHintWait").oninput=e=>{
@@ -2458,6 +2621,7 @@ window.NLM3={
   forceSurvivalEnd:()=>{ if(survivalDeadline) survivalDeadline=Date.now()-1; },
   skipDemo:()=>{ if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); busy=false; save.demoDone=true; persist(); } },
   save:()=>save,
+  cloud:()=>({auth:!!cloudAuth,user:cloudAuth&&cloudAuth.username,status:cloudStatus,inFlight:cloudInFlight}),
 };
 
 /* ================= 启动 ================= */
@@ -2465,6 +2629,7 @@ initVoices();
 applySettings();
 syncSize();
 openMenu();
+if(cloudAuth) cloudPull();
 </script>
 </body>
 </html>
