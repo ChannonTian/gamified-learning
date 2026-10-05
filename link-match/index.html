@@ -42,16 +42,7 @@
   body.theme-grug .tile.k-inf .face{ border-radius:15px 18px 14px 19px; }
   body.theme-grug .tile.k-sg .face{ border-radius:20px 16px 21px 15px; }
   body.theme-grug .tile.k-pl .face{ border-radius:4px 7px 3px 6px; }
-  body.theme-grug .tile.k-pp .face{ border-radius:18px 0 19px 0; clip-path:polygon(0 0, 76% 0, 100% 24%, 100% 100%, 24% 100%, 0 76%); }
-  /* 切角的两条斜边补上墨线(块面固定 4:3,斜边角度恒为 atan(0.75)=36.87°);
-     切角处圆角归零 + 斜条两端各加长 ~2.5% 压过接缝,消除小缺口(用户二轮反馈) */
-  body.theme-grug .tile.k-pp .face::before,
-  body.theme-grug .tile.k-pp .face::after{
-    content:""; position:absolute; width:34%; height:2.2px; background:var(--grug-ink);
-    transform-origin:0 0; transform:rotate(36.87deg);
-  }
-  body.theme-grug .tile.k-pp .face::before{ left:73.5%; top:0; }
-  body.theme-grug .tile.k-pp .face::after{ left:0; top:73.5%; }
+  body.theme-grug .tile.k-pp .face{ border-radius:26px 6px 27px 5px; }   /* 叶子形(手绘感对角圆角) */
   body.theme-grug:not(.dark) .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:10px; border-radius:0; background:none;
@@ -66,13 +57,7 @@
   }
   body.theme-grug .tile.k-inf .face::before{ display:none; }
   body.theme-grug .tile.sel .face{ scale:1.05; filter:none; outline:3px dashed var(--accent); outline-offset:3px; }
-  /* 切角块的选中外框:outline 会被 clip-path 裁掉(用户截图),改随形 drop-shadow 光晕 */
-  body.theme-grug .tile.sel.k-pp .face{
-    outline:none;
-    box-shadow:inset 0 0 0 3px var(--accent), 3px 4px 0 rgba(59,51,42,.14);
-    filter:drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent));
-  }
-  body.theme-grug.dark .tile.sel.k-pp .face{ box-shadow:inset 0 0 0 3px var(--accent), 3px 4px 0 rgba(0,0,0,.3); }
+  /* k-pp 已改叶子形(纯 border-radius):选中态走通用虚线框 */
   body.theme-grug.dark .face{
     background:color-mix(in srgb, hsl(var(--h) 20% 40%) 15%, #26282e);
     color:#e7ddc4;
@@ -92,7 +77,7 @@
   body.theme-grug:not(.dark) .lv-btn{ border:2px solid var(--ink); border-radius:14px 11px 16px 12px; font-size:14px; }
   body.theme-grug:not(.dark) .lv-btn.done{ background:#e4e6cf; border-color:var(--ink); }
   body.theme-grug:not(.dark) .btn{ border:2.2px solid var(--ink); border-radius:14px 12px 16px 13px; }
-  .theme-grug #bannerArt svg,.theme-grug #cardArt svg,.theme-grug .book-art svg{ filter:url(#grugRough); }
+  .theme-grug .wc-art svg,.theme-grug .book-art svg{ filter:url(#grugRough); }
   body.theme-grug.dark{
     --tile-s:14%; --hot:#c9563c;
     --grug-ink:#d8cdb2;
@@ -122,7 +107,7 @@
   body{
     font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
     background:var(--paper); color:var(--ink);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;   /* 顶部对齐:固定 HUD 后 center 会留 ~200px 空隙 */
     user-select:none; -webkit-user-select:none;
     overflow:hidden;
   }
@@ -130,10 +115,14 @@
 
   /* ---------- HUD ---------- */
   #hud{
+    position:fixed; top:calc(env(safe-area-inset-top) + 10px); left:10px; right:10px; z-index:20;
     display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
-    padding:10px 2px 8px;
+    padding:0;
   }
-  .hud-btn{justify-self:start;}
+  .hud-left{ display:flex; align-items:center; gap:8px; justify-self:start; }
+  .hud-center .tag, .hud-center .goal-pill{ height:36px; display:inline-flex; align-items:center; }
+  .hud-right .score-bar{ height:36px; }
+  .hud-right .score-tag{ height:36px; display:inline-flex; align-items:center; }
   .hud-btn{
     width:46px; height:46px; border-radius:14px; border:1px solid var(--line);
     background:var(--card); color:var(--ink);
@@ -191,7 +180,8 @@
   @keyframes scoreBump{ 0%{scale:1;} 40%{scale:1.22;} 100%{scale:1;} }
   .combo-tag{
     background:linear-gradient(135deg,#ff9d2e,#e8554a); color:#fff; border:none;
-    padding:6px 13px; border-radius:999px; font-size:14px; font-weight:800;
+    height:36px;   /* 与顶栏其他胶囊等高对齐 */
+    padding:0 13px; border-radius:999px; font-size:14px; font-weight:800;
     animation:comboPop .25s ease, comboGlow 1.6s ease-in-out infinite;
   }
   @keyframes comboPop{ 0%{scale:.6;} 70%{scale:1.15;} 100%{scale:1;} }
@@ -209,7 +199,7 @@
   body.mode-hud .goal-pill{min-width:0; padding:6px 9px;}
   body.mode-hud .tag{padding:6px 9px;}
   body.mode-hud .score-bar{min-width:88px;}
-    .combo-tag{padding:5px 11px; font-size:13px;}
+    .combo-tag{padding:0 11px; font-size:13px;}
     #hud{padding-top:8px; gap:6px;}
   }
 
@@ -219,7 +209,7 @@
     background:var(--card);
     border:1px solid var(--line);
     border-radius:18px;
-    margin:2px 0 10px;
+    margin:64px auto 0;
     box-shadow:0 6px 24px rgba(51,65,92,.06);
   }
   #grid{ position:absolute; }
@@ -242,7 +232,7 @@
     transition:filter .15s, scale .15s;
   }
   .tile.k-pl .face{border-radius:6%;}
-  .tile.k-pp .face{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+  .tile.k-pp .face{border-radius:24px 4px 24px 4px; line-height:1.0;}   /* 叶子形(对角大圆角):描边/选中原生跟随;双行词距收紧 */
   .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:4px; border-radius:2px; background:var(--accent);
@@ -305,20 +295,16 @@
   }
 
   /* ---------- 底部操作坞 + 教学横幅 ---------- */
+  /* 词卡槽:文档流、桌盘下沿留 10px 空隙(槽高含空隙,词卡本体 76/84 不变);按钮行固定屏幕底部 */
+  #bannerSlot{ position:relative; height:86px; width:100%; margin:0 auto; }
+  body.in-levels #bannerSlot{ height:94px; }
   #dock{
-    position:relative;
-    display:flex; flex-direction:column; align-items:center; gap:8px;
-    margin-top:10px;
-    padding:2px 14px calc(24px + env(safe-area-inset-bottom));
+    position:fixed; bottom:calc(env(safe-area-inset-bottom) + 10px); left:50%; transform:translateX(-50%);
+    z-index:20;
+    display:flex; justify-content:center;
+    margin:0; padding:0;
   }
   .dock-row{ display:flex; gap:12px; justify-content:center; }
-  /* 横幅槽位:闯关模式固定高度——按钮固定下移,横幅+倒计时条位置不变;挑战模式保持覆盖式 */
-  #bannerSlot{ position:static; height:0; width:100%; }
-  body.in-levels #bannerSlot{ position:relative; height:64px; }
-  body.in-levels #bannerForms{ font-size:18px; }
-  body.in-levels #bannerGloss{ font-size:13.5px; max-width:38%; }
-  body.in-levels #bannerArt{ width:52px; height:52px; }
-  body.in-levels #learnBanner.collapsed{ transform:none !important; top:auto; height:13px; }
   .dock-btn{
     display:flex; align-items:center; gap:8px;
     border:1px solid var(--line); background:var(--card); color:var(--ink);
@@ -327,31 +313,41 @@
   }
   .dock-btn:active{transform:scale(.95);}
   #learnBanner{
-    position:absolute; left:0; right:0; top:0; bottom:0; z-index:5;
+    position:absolute; left:0; right:0; top:10px; bottom:0; z-index:5;
     background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:0 10px 30px rgba(20,30,50,.28);
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:16px;   /* 模块间隙 16px(用户 2.1);与 .word-card 一致 */
     padding:8px 12px; cursor:pointer; overflow:hidden;
     opacity:0; visibility:hidden; transform:translateY(16px);
     transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s, top .3s cubic-bezier(.3,1.2,.5,1), height .3s cubic-bezier(.3,1.2,.5,1);
   }
   #learnBanner.show{opacity:1; visibility:visible; transform:none;}
-  /* 手动点掉:卡片下滑只剩底部倒计时条;连击窗口继续走(用户反馈) */
-  #learnBanner.collapsed{ transform:translateY(calc(100% - 13px)) !important; cursor:default; }
-  #learnBanner.collapsed #bannerArt, #learnBanner.collapsed .b-main, #learnBanner.collapsed #bannerGloss{ opacity:0; }
-  #bannerArt, .b-main, #bannerGloss{ transition:opacity .18s ease; }
-  #bannerArt{width:46px; height:46px; flex:none;}
-  .b-main{flex:1; min-width:0;}
-  /* 四形态词卡:原形/单过去/复过去/分词;当前词型加粗高亮,其余浅灰;原形同字号+下划线 */
-  #bannerForms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:1px 10px; font-size:16px; font-weight:700; line-height:1.3; }
-  #bannerForms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
-  #bannerForms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
-  body.theme-grug.dark #bannerForms .bf.on{ color:hsl(var(--h) 45% 66%); }
-  #bannerGloss{
-    margin-left:auto; flex:none; max-width:34%;
-    font-size:12.5px; line-height:1.35; text-align:right;
-    color:var(--ink); opacity:.6;
+  /* 手动点掉:槽内收成 13px 底条;连击窗口继续走(用户反馈) */
+  #learnBanner.collapsed{ transform:none !important; top:auto; height:13px; cursor:default; }
+  #learnBanner.collapsed .wc-art, #learnBanner.collapsed .wc-main, #learnBanner.collapsed .wc-gloss{ opacity:0; }
+  .wc-art, .wc-main, .wc-gloss{ transition:opacity .18s ease; }
+  /* ---- 统一词卡:横幅与图鉴详情共用同一种卡 ---- */
+  .word-card{ display:flex; align-items:center; gap:16px; width:100%; }   /* 模块间隙:插画|词形|释义(用户 2.1) */
+  .wc-art{ width:50px; height:50px; flex:none; }
+  .wc-main{ flex:1; min-width:0; }
+  .wc-forms{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font-size:17px; font-weight:700; line-height:1.2; }
+  .wc-forms .bf{ color:var(--ink); opacity:.42; white-space:nowrap; }
+  .wc-forms .bf.on{ font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%); }
+  body.theme-grug.dark .wc-forms .bf.on{ color:hsl(var(--h) 45% 66%); }
+  .wc-gloss{
+    flex:none; width:80px; margin-left:auto;
+    padding-left:12px; border-left:1.5px dashed color-mix(in srgb, currentColor 30%, transparent);
+    font-size:12.5px; line-height:1.4; text-align:right;
+    color:var(--ink); opacity:.65; word-break:break-word;
   }
+  body.in-levels #bannerSlot .wc-forms{ font-size:19px; }
+  body.in-levels #bannerSlot .wc-art{ width:56px; height:56px; }
+  body.in-levels #bannerSlot .wc-gloss{ font-size:13.5px; width:86px; }
+  #cardModal .wc-art{ width:88px; height:88px; }
+  #cardModal .wc-forms{ font-size:21px; justify-content:center; }
+  #cardModal .wc-gloss{ width:auto; max-width:60%; font-size:14px; }
+  #cardModal .word-card{ flex-direction:column; gap:8px; margin:6px 0 2px; }
+  #cardModal .wc-main{ width:100%; }
   /* 卡片/横幅里的原形下划线:与磁贴同一款手绘弧线(Papier 主题用色条) */
   .swu{
     display:inline-block; padding-bottom:3px;
@@ -414,18 +410,16 @@
   .lv-btn.locked{opacity:.4; pointer-events:none;}
   .lv-btn.done{border-color:#bcd9c8; background:#eef7f1;}
   body.dark .lv-btn.done{background:#243529; border-color:#2f4a3a;}
+  /* 关卡按钮形状=游戏内对应词型的磁贴形状;grug 规则须排在其后覆盖统一圆角 */
+  .lv-btn.k-sg{border-radius:16px;}
+  .lv-btn.k-pl{border-radius:7px;}
+  .lv-btn.k-pp{border-radius:20px 4px 20px 4px;}
+  body.theme-grug .lv-btn.k-sg{border-radius:20px 16px 21px 15px;}
+  body.theme-grug .lv-btn.k-pl{border-radius:4px 7px 3px 6px;}
+  body.theme-grug .lv-btn.k-pp{border-radius:26px 6px 27px 5px;}
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
-  #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
-  #cardInf{display:none;}
-  #cardForms{ display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:2px 10px; font-size:15px; font-weight:700; margin-top:12px; }
-  #cardForms .cf{ color:var(--ink); white-space:nowrap; }
-  #cardGloss{
-    margin-top:12px; padding:10px 12px; border-radius:12px;
-    background:var(--paper); font-size:14px; color:var(--ink); display:none;
-  }
-  #cardModal.gloss-open #cardGloss{display:block;}
-  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
+  #cardModal .word-card{ margin-top:8px; }
   #resultModal .panel{text-align:center;}
   .btn{
     display:inline-block; border:none; border-radius:12px;
@@ -487,7 +481,7 @@
   }
   body.dark .rule-legend .leg i{background:#3a465a; box-shadow:inset 0 -2px 0 #2c3648;}
   .rule-legend .leg i.s-pl{border-radius:6%;}
-  .rule-legend .leg i.s-pp{border-radius:0; clip-path:polygon(0 0, 74% 0, 100% 26%, 100% 100%, 26% 100%, 0 74%);}
+  .rule-legend .leg i.s-pp{border-radius:9px 2px 9px 2px;}   /* 叶子形 */
 </style>
 </head>
 <body>
@@ -495,9 +489,11 @@
 
 <div id="app">
   <header id="hud">
-    <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
-    <div class="hud-center">
+    <div class="hud-left">
+      <button class="hud-btn" id="btnMenu" title="Menu"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>
       <span class="tag" id="lvlTag">A1.2</span>
+    </div>
+    <div class="hud-center" style="display:none">
       <span class="goal-pill" id="goalTag"><i id="goalBar"></i><span id="goalTxt">0/18</span></span>
       <span class="tag" id="timerTag" style="display:none;"></span>
       <span class="tag" id="bestTag" style="display:none;"></span>
@@ -513,17 +509,12 @@
     <svg id="pathSvg"></svg>
   </div>
 
-  <div id="dock">
-    <div id="bannerSlot">
+  <div id="bannerSlot">
     <div id="learnBanner">
-      <svg id="bannerArt" viewBox="0 0 120 120"></svg>
-      <div class="b-main">
-        <div id="bannerForms"></div>
-      </div>
-      <div id="bannerGloss"></div>
       <div class="b-progress"><i></i></div>
     </div>
-    </div>
+  </div>
+  <div id="dock">
     <div class="dock-row">
       <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
       <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
@@ -622,11 +613,7 @@
 <div class="overlay" id="cardModal">
   <div class="panel" id="cardPanel">
     <button class="close-x" id="cardClose">✕</button>
-    <svg id="cardArt" viewBox="0 0 120 120"></svg>
-    <div id="cardInf"></div>
-    <div id="cardForms"></div>
-    <div id="cardGloss"></div>
-    <div id="cardTip"></div>
+    <div class="word-card" id="cardBody"></div>
   </div>
 </div>
 
@@ -642,6 +629,7 @@
 <!-- Verzameling -->
 <div class="overlay" id="bookDrawer">
   <div class="panel">
+    <button class="close-x" id="bookClose" aria-label="Sluit">✕</button>
     <h2 data-i18n="book.title">Verzameling</h2>
     <div id="bookList"></div>
   </div>
@@ -835,7 +823,6 @@ const I18N={
     "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
     "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
-    "card.tip":"Tik voor de betekenis",
   },
   zh:{
     "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
@@ -864,7 +851,6 @@ const I18N={
     "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
     "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
-    "card.tip":"点击查看释义",
   },
   en:{
     "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
@@ -893,7 +879,6 @@ const I18N={
     "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
     "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
-    "card.tip":"Tap for the meaning",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -986,7 +971,7 @@ function warnTtsBlocked(){
   ttsBlockedWarned=true;
   toast(t("tts.blocked"));   // 语音引擎瘫(如内嵌测试窗):utterance 永远排队、不 onstart 也不 onerror
 }
-function speakPair(V,form){
+function speakWords(seq){
   const gen=++speakGen;   // 代数令牌:新横幅接管后,旧链的延迟回调与 onend 链全部失效
   return new Promise(res=>{
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
@@ -994,7 +979,6 @@ function speakPair(V,form){
       const ss=window.speechSynthesis;
       const busyS=ss.speaking||ss.pending;
       if(busyS) ss.cancel();   // 空队列不要 cancel:Chrome cancel() 后同步 speak() 会被静默吞掉
-      const seq=[V.inf,form];
       let i=0, startedAny=false;
       const next=()=>{
         if(gen!==speakGen){ res(); return; }
@@ -1011,6 +995,7 @@ function speakPair(V,form){
     }catch(e){ res(); }
   });
 }
+function speakPair(V,form){ return speakWords([V.inf,form]); }
 function stopSpeech(){ if("speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
 
 /* ================= SVG 插画(与 tile-match 同源) ================= */
@@ -1333,9 +1318,9 @@ const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : VERBS[t.v][t.f];
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
-  const hud=document.getElementById("hud"), dock=document.getElementById("dock");
-  const usedH=hud.offsetHeight + dock.offsetHeight + 30;
-  const availH=Math.max(240, window.innerHeight - usedH) - RING*2;   // 网格可用高(扣外圈)
+  const dock=document.getElementById("dock"), slot=document.getElementById("bannerSlot");
+  const usedH=64 /*固定顶区*/ + slot.offsetHeight + dock.offsetHeight + 10 /*底部空隙*/ + 14;
+  const availH=Math.max(220, window.innerHeight - usedH) - RING*2;   // 网格可用高(扣外圈)
   const th=Math.min(availH/ROWS, (window.innerWidth*0.94 - RING*2)/COLS*0.75);
   const tw=th*4/3;
   layout={ring:RING, tw, th};
@@ -1344,7 +1329,7 @@ function syncSize(){
   boardEl.style.left=RING+"px"; boardEl.style.top=RING+"px";
   wrapEl.style.width=(gridW+RING*2)+"px";
   wrapEl.style.height=(gridH+RING*2)+"px";
-  document.getElementById("hud").style.width=(gridW+RING*2)+"px";
+  document.getElementById("bannerSlot").style.width=(gridW+RING*2)+"px";
   document.getElementById("dock").style.width=(gridW+RING*2)+"px";
   // 字号:canvas 实测最长词(原形+形式);模式盘直接量当前块;Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
@@ -1638,6 +1623,7 @@ function sampleModeVerbs(pool,n,r){   // 一屏只一种词型搭配(用户反�
   const picks=[], seenStr=new Set();
   const tryPush=(vi)=>{
     if(picks.length>=n) return;
+    if(f==="pp"&&!VERBS[vi].pp) return;   // 无分词的词(如 zullen):pp 盘跳过
     const s=VERBS[vi][f];
     if(seenStr.has(s)) return;
     seenStr.add(s); picks.push({v:vi,f});
@@ -1806,6 +1792,7 @@ function attemptPair(a,b){
       setTimeout(()=>{a.el.classList.remove("shake"); b.el.classList.remove("shake");},320); }
     blip(180,.08,"sine",.05);
     if(streak>0){ streak=0; updateHUD(); }
+    reshuffleIfStuck();   // 失败尝试后同样查死局
     return false;
   }
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
@@ -1845,14 +1832,18 @@ function attemptPair(a,b){
       if(mode==="levels"){ if(curLevel) finishLevel(); }
       else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
     },480);
-  }else if(!findAnyPairNow()){
-    setTimeout(()=>{
-      if(!curLevel) return;
-      toast(t("toast.nopair"));
-      reshuffleRemaining();
-    },500);
-  }
+  }else reshuffleIfStuck();   // 成功一连后查死局
   return true;
+}
+/* ---- 死局检测:成功一连后或一次失败尝试后都要查(此前只在成功路径查——玩家点不出对时永远不洗牌) ---- */
+function reshuffleIfStuck(){
+  if(findAnyPairNow()) return;
+  setTimeout(()=>{
+    if(!curLevel) return;                 // 对局已结束
+    if(findAnyPairNow()) return;          // 500ms 内局面可能已变(背靠背连点)
+    toast(t("toast.nopair"));
+    reshuffleRemaining();
+  },500);
 }
 function drawPath(path){
   const svg=document.getElementById("pathSvg");
@@ -1958,15 +1949,26 @@ function collapseBanner(){
   if(!bannerEl.classList.contains("show")) return;
   bannerEl.classList.add("collapsed");   // 手动点掉:只收词面,连击窗口与倒计时条继续(用户反馈);朗读不打断
 }
+function wordCardHTML(vi,activeF){
+  const V=VERBS[vi];
+  const forms=[["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]].filter(([,w])=>w)
+    .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
+  return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
+}
 function showLearnBanner(v,formWord,activeF){
   clearTimeout(bannerTimer);
   const V=VERBS[v];
   bannerVerb=v;
-  document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
-  document.getElementById("bannerForms").innerHTML=
-    [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]]
-      .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
-  document.getElementById("bannerGloss").textContent=glossOf(V);
+  bannerEl.innerHTML=wordCardHTML(v,activeF)+`<div class="b-progress"><i></i></div>`;
+  // 词卡字号自适应:四形态换行超过槽高就逐级缩小(中文/长动词 3 行也放得下)
+  const formsEl=bannerEl.querySelector(".wc-forms");
+  if(formsEl){
+    let fs=document.body.classList.contains("in-levels")?19:17;
+    formsEl.style.fontSize=fs+"px";
+    const availH=bannerEl.clientHeight-18;
+    let guard=0;
+    while(guard++<12 && formsEl.scrollHeight>availH && fs>11){ fs-=1; formsEl.style.fontSize=fs+"px"; }
+  }
   bannerEl.style.setProperty("--h",V.hue);
   bannerEl.style.setProperty("--bdur",(save.settings.bannerMs||BANNER_DEFAULT_S)+"s");   // 倒计时条时长=真实窗口(此前默认 10s 与 15s 窗口不符)
   bannerEl.classList.remove("show");
@@ -2242,7 +2244,7 @@ function renderLevelGrid(){
       if(lv.band!==tr.band) return;
       const b=document.createElement("button");
       const locked=i>save.lUnlocked-1;
-      b.className="lv-btn"+(locked?" locked":"")+(save.done[lv.id]?" done":"");
+      b.className="lv-btn k-"+lv.type+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型
       b.innerHTML=`${lv.band}.${lv.num}<small>${t(SHORT_KEY[lv.type])}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
       g.appendChild(b);
@@ -2306,11 +2308,11 @@ function openBook(){
       row.className="book-row"+(got?" viewable":"");
       row.innerHTML=got
         ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg>
-          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp||"-"}</small></div>
           <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
           <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
-      if(got){ row.title=t("book.view"); row.onclick=()=>showCard(vi); }
+      if(got){ row.onclick=()=>showCard(vi); }
       list.appendChild(row);
     }
   }
@@ -2321,16 +2323,10 @@ function showCard(vi){
   return new Promise(res=>{
     cardResolve=res;
     const V=VERBS[vi];
-    document.getElementById("cardArt").innerHTML=artSVG(vi,save.style);
-    document.getElementById("cardInf").innerHTML="";
-    document.getElementById("cardForms").innerHTML=
-      [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]]
-        .map(([k,w])=>`<span class="cf${k==="inf"?" swu":""}">${w}</span>`).join("");
-    document.getElementById("cardGloss").textContent=glossOf(V);
-    document.getElementById("cardTip").textContent=t("card.tip");
-    document.getElementById("cardModal").classList.remove("gloss-open");
+    document.getElementById("cardBody").innerHTML=wordCardHTML(vi,null);
+    document.getElementById("cardPanel").style.setProperty("--h",V.hue);
     document.getElementById("cardModal").classList.add("on");
-    stopSpeech(); speakVerb(V.inf);
+    stopSpeech(); speakWords([V.inf,V.sg,V.pl,V.pp].filter(Boolean));   // 开卡朗读完整四形态
   });
 }
 function closeCard(){
@@ -2361,6 +2357,7 @@ document.getElementById("menuScreen").addEventListener("click",e=>{
 });
 document.getElementById("btnHint").onclick=()=>{ lastAction=Date.now(); hint(); };
 document.getElementById("btnBook").onclick=openBook;
+document.getElementById("bookClose").onclick=e=>{ e.stopPropagation(); document.getElementById("bookDrawer").classList.remove("on"); };
 function modeIntro(mode){
   if(save.lUnlocked<MODE_UNLOCK){ toast(t("menu.needlevel")); return; }
   if(mode==="daily"&&save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
@@ -2374,7 +2371,7 @@ function modeIntro(mode){
   document.getElementById("miBest").textContent=info.best;
   const btns=document.getElementById("miBtns"); btns.innerHTML="";
   const go=document.createElement("button"); go.className="btn primary"; go.textContent=t("mi.start");
-  go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); info.go(); };
+  go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); document.getElementById("menuScreen").classList.remove("on"); info.go(); };
   const back=document.createElement("button"); back.className="btn ghost"; back.textContent=t("mi.back");
   back.onclick=()=>document.getElementById("modeIntro").classList.remove("on");
   btns.append(go,back);
@@ -2404,11 +2401,7 @@ document.getElementById("setBanner").oninput=e=>{
 };
 document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
-document.getElementById("cardPanel").onclick=()=>{
-  const m=document.getElementById("cardModal");
-  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent="…"; }
-  else closeCard();
-};
+document.getElementById("cardPanel").onclick=closeCard;   // 点卡即关(释义常显,不再两段式解锁)
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
 ["bookDrawer","helpModal","settingsModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });

@@ -1,5 +1,18 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · 主版同步(demo→link-match;冻结解除第一波)
+
+demo 定稿发布,按 AGENTS 冻结政策把**通用改进**同步回主版(demo 专属的 50 词表/18 关结构/分组标题/云登录/排行榜不带)。逐块从 demo 最终版移植,锚点法:
+
+- **固定布局(v1.15 同款)**:HUD `position:fixed` 顶部下一格(三列 grid、菜单钮+关卡数贴左、等高 36px);dock 固定屏幕底部上一格(10px 空隙);bannerSlot 移出 dock 紧贴桌盘文档流(86/94px,卡顶偏移 10px=实测 26px 盘卡间隙);boardWrap margin-top 64;body `justify-content:flex-start`;syncSize 按 槽+dock+底隙 扣高、宽度给槽。
+- **统一词卡 `wordCardHTML`**:横幅/图鉴详情/弹窗共用一种卡(.word-card=插画+四形态+定宽释义+虚线分隔,gap 16px);旧 bannerArt/bannerForms/bannerGloss 与 cardArt/cardForms/cardGloss 结构全部退役;**出卡实测缩字号**(17/19 起步逐级降,中文+长动词都放得下);collapsed 统一槽内收 13px。
+- **叶子形 k-pp**:grug 26/6/27/5、基础 24px 4px 24px 4px(行距 1.0)、图例 9px 2px——切角 clip-path/补斜线/特殊选中光晕全部删除,选中走通用虚线框。
+- **死局洗牌**:`reshuffleIfStuck()`——成功与**失败尝试**路径都查,500ms 复查再 toast+洗牌(此前点不出对永不洗牌会卡死)。
+- **图鉴/词卡弹窗**:行 title 提示移除、抽屉加 ✕、开卡朗读四形态(speakPair→通用 speakWords);词卡弹窗拆两段式"点击查看释义"(cardTip/card.tip/gloss-open 全清,释义常显、点卡即关)。
+- **其他**:介绍弹窗"开始"自动关主菜单;关卡按钮加 k-sg/k-pl/k-pp 形状类(镜像磁贴圆角);combo-tag 固定 36px;**模式采样排除无 pp 词**(zullen 空磁贴既有 bug,demo v1.16 同款修复)。
+- QA:bot **42/42 关 378 对**、每日/无尽各 2 盘+生存 1 盘、死局注入 toast、几何断言(hudTop 10/卡隙 26/dockGap 10/slotH 94/关卡数贴菜单钮)、统一词卡+弹窗+图鉴断言、视觉验收三图 pass。零错误。**存档结构零改动**(UI/布局层移植,老玩家进度不动)。
+- 待用户拍板(未同步):is+perfectum 显示(需核 main 108 词助动词)、云登录/欢迎门/Google OAuth/排行榜/资料页(主版存量 linkmatch.v1 迁移方案)。
+
 ## 2026-10-05 · tile-match v0.95 同步 link-match-demo:云存档+账号 + 界面三项(用户:连连看更新了,同步过来)
 
 - **范围**:对照 demo v1.14–v1.19 排同步清单。**做**:云存档+账号栈、模式介绍弹窗、菜单语言行。**不做**:排行榜(daily_scores 无 game 维度,要重建表迁移,单独立项记 ROADMAP)、demo 专属词表/关卡结构、统一词卡组件(三消横幅是条形非卡片,产品形态不同)。
