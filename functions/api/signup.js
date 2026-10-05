@@ -1,4 +1,4 @@
-import { json, bad, readJson, validUsername, validPassword, makePasswordRecord, newSession } from './_lib.js';
+import { json, bad, readJson, validUsername, validPassword, makePasswordRecord, newSession, genDisplayName } from './_lib.js';
 
 export async function onRequestPost(ctx) {
   const { request, env } = ctx;
@@ -10,6 +10,8 @@ export async function onRequestPost(ctx) {
   if (dup) return bad('username already taken', 409);
   const rec = await makePasswordRecord(body.password);
   const ins = await env.DB.prepare('INSERT INTO users (username, pass_hash) VALUES (?, ?)').bind(username, rec).run();
-  const token = await newSession(env, ins.meta.last_row_id);
-  return json({ token, username });
+  const id = ins.meta.last_row_id;
+  await env.DB.prepare('UPDATE users SET display_name = ? WHERE id = ?').bind(genDisplayName(id), id).run();
+  const token = await newSession(env, id);
+  return json({ token, username, display_name: genDisplayName(id) });
 }

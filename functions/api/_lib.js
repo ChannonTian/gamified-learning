@@ -54,14 +54,23 @@ export function bearerToken(req) {
   return m ? m[1] : null;
 }
 
-// Bearer token → {id, username}；未带 token 或会话失效返回 null
+// Bearer token → {id, username, display_name}；未带 token 或会话失效返回 null
 export async function authUser(ctx) {
   const token = bearerToken(ctx.request);
   if (!token) return null;
   const row = await ctx.env.DB.prepare(
-    'SELECT u.id AS id, u.username AS username FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?'
+    'SELECT u.id AS id, u.username AS username, u.display_name AS display_name FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?'
   ).bind(token).first();
   return row || null;
+}
+
+// 显示名:随机形容词+名词(荷兰语,类似 Google Docs 匿名名),按 id 确定性生成——两台设备看到同一个默认名
+const NAME_ADJ = ["Flinke","Moedige","Blije","Wijze","Snelle","Lieve","Sterke","Vrolijke","Dappere","Nieuwsgierige","Zonnige","Vlotte","Eigenzinnige","Vriendelijke","Muzikale","Nuchtere","Eerlijke","Dromende","Dansende","Denkende","Reizende","Lezende","Zingende","Stoere","Keurige","Fleurige","Zachte","Stoute","Grote","Kleine","Originele","Edele"];
+const NAME_NOUN = ["Vos","Mees","Uil","Haas","Reiger","Eend","Kikker","Egel","Eekhoorn","Zwaan","Spreeuw","Vink","Konijn","Bever","Otter","Mus","Wolk","Ster","Maan","Weide","Dijk","Toren","Brug","Zeil","Boek","Kompas","Lantaarn","Molen","Tulp","Kers","Peer","Appel"];
+
+export function genDisplayName(id) {
+  const n = Math.abs(Number(id) || 0);
+  return NAME_ADJ[n % 32] + ' ' + NAME_NOUN[Math.floor(n / 7) % 32];
 }
 
 export async function newSession(env, userId) {

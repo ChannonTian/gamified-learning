@@ -5,8 +5,8 @@ export async function onRequestPost(ctx) {
   const body = await readJson(request);
   const username = typeof body?.username === 'string' ? body.username.trim() : '';
   if (!username || typeof body?.password !== 'string') return bad('wrong credentials', 401);
-  const row = await env.DB.prepare('SELECT id, pass_hash FROM users WHERE username = ?').bind(username).first();
+  const row = await env.DB.prepare('SELECT id, pass_hash, display_name FROM users WHERE username = ?').bind(username).first();
   if (!row || !(await verifyPassword(body.password, row.pass_hash))) return bad('wrong credentials', 401);
   const token = await newSession(env, row.id);
-  return json({ token, username });
+  return json({ token, username, display_name: row.display_name || '' });
 }

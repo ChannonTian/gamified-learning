@@ -1,5 +1,13 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · v1.19(link-match-demo)档案页+显示名 + 每日排行榜 + 落地页
+
+- **档案页(菜单 Profiel 按钮)**:显示名(输入框+Opslaan,不查重——设计拍板:显示名只是昵称,身份靠账号;撞名无实际危害)+登录态区(未登录=用户名/密码+Google;已登录=Ingelogd als+Uitloggen+**Verwijder account 两步确认**,3 秒内再点才执行,服务端连带删 daily_scores/sessions/saves/users)。显示名规则:登录用户建号时按 user id 确定性生成(形容词32×名词32,存 users.display_name 新列,两设备同默认名);游客本地生成即落盘(**修:genDisplayName 曾只写后端,前端未定义启动即崩,复测捕获;两份词库需同步**);改登录用户的名走 PATCH /api/profile。
+- **每日排行榜(UTC 0:00 自然翻日)**:新表 daily_scores(date,user_id,score,PK(date,user_id));POST /api/score(登录,保留当日最高,`ON CONFLICT DO UPDATE SET score=MAX(...)`)、GET /api/leaderboard(当日 top50,COALESCE(display_name,username),带 token 附自己名次);**游客可看不可上榜**(无服务器身份,匿名上榜引刷分),榜单内联"Inloggen om mee te doen"→档案页;前端:每日挑战介绍弹窗加 Klassement 按钮、结算 cloudSubmitDaily() 自动提交(save.lbSent=UTC 日期去重)、登录/启动 cloudPull 后自动补报当天成绩=**游客打的分数登录后当场上榜**。
+- **落地页(根 index.html 重写)**:原 tile-match 跳转页改为公开落地页——Koppelen(+Link Match 别名文案)标题、Speel 按钮、三游戏链接、隐私/条款链接。起因:Google OAuth 发布验证三连拒(homepage 未验证/在登录墙后/应用名不匹配)。**Google 侧待办**:同意屏幕应用名改 "Koppelen"、homepage URL 改 `https://play.channon-tian.com/`、Search Console 验证域名后等 24h 重试。
+- QA:后端 10 项(signup 自动显示名/GET/PATCH/分数提交+当日最高保留/榜单带 token 有 me 游客 me=null/非法分 400/超长名 400)全绿;浏览器:Profiel 按钮/游客改名存本地+toast/排行榜渲染(行+游客提示)/显示名启动崩 bug 修复复测/零错误;本地页面 200(落地页含 Koppelen、privacy-policy、terms)。远程迁移已完成(users.display_name、daily_scores)。
+- 另:Google Auth Platform 指标面板 0 traffic 0 users 为正常延迟(1-2 天批量更新),以 D1 数据为准。
+
 ## 2026-10-01 · 试玩 UX 追加二(词卡弹窗提示拆除 + 盘卡间隙)
 
 - **词卡弹窗"点击查看释义"拆除(用户实测仍在)**:上一轮只删了图鉴行的悬停提示,漏了词卡弹窗的两段式解锁(cardTip 文案→"…"→再点关)。全清:#cardTip 元素+CSS、三语 card.tip 键、gloss-open 逻辑;释义**常显**(0.65 灰度为原设计),点卡任意处即关(cardPanel.onclick=closeCard)。

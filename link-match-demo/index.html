@@ -475,6 +475,25 @@
     text-decoration:underline dashed 1.6px; text-underline-offset:4px; padding:8px 10px;
   }
   .wl-guestsub{ font-size:11px; color:#98a1b0; margin:0 0 2px; }
+  /* Profiel + Klassement */
+  #profileModal .panel, #leaderboardModal .panel{ text-align:center; }
+  .pf-label{ font-size:13px; font-weight:700; margin-top:14px; text-align:left; }
+  .pf-row{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; }
+  .pf-row input{
+    flex:1; min-width:0; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:14px; font-weight:600; font-family:inherit;
+  }
+  .pf-row input:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+  #leaderboardModal .panel p{margin:4px 0;}
+  #lbDate{ font-size:11.5px; color:#98a1b0; font-weight:700; }
+  #lbList{ max-height:44vh; overflow:auto; margin:10px 0 4px; }
+  .lb-row{ display:flex; align-items:center; gap:10px; padding:8px 8px; border-bottom:1px dashed var(--line); font-size:14px; font-weight:700; }
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{ width:28px; text-align:right; color:#98a1b0; font-weight:800; flex:none; }
+  .lb-name{ flex:1; min-width:0; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lb-score{ font-weight:800; flex:none; }
+  .lb-row.me{ background:var(--paper); border-radius:10px; }
+  .lb-empty{ font-size:13px; color:#8b93a3; padding:18px 0; }
   .book-group{
     display:flex; align-items:center; width:100%; text-align:left;
     background:none; border:none; color:var(--ink);
@@ -571,6 +590,7 @@
       <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-name" data-i18n="menu.endless">Oneindig</span><span class="m-score" id="mEndlessScore"></span></button>
       <button class="menu-btn" id="mSurvival"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M6.8 12h2.6l1.4-3.2 2.4 6.4 1.4-3.2h2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="m-name" data-i18n="menu.survival">Overleven</span><span class="m-score" id="mSurvivalScore"></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
+      <button class="menu-btn ghost" id="mProfile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M4.8 19.6c1.6-3.3 4.2-5 7.2-5s5.6 1.7 7.2 5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg><span data-i18n="menu.profile">Profiel</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
     </div>
     <div id="menuLevels" style="display:none;">
@@ -681,6 +701,52 @@
     <div class="wl-divider"></div>
     <button id="wlGuest" class="wl-guest" data-i18n="wl.guest">Direct als gast spelen</button>
     <p class="wl-guestsub" data-i18n="wl.guestsub"></p>
+  </div>
+</div>
+
+<!-- Profiel -->
+<div class="overlay" id="profileModal" style="z-index:70;">
+  <div class="panel welcome">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="pf.title">Profiel</h2>
+    <div class="pf-label" data-i18n="pf.name">Weergavenaam</div>
+    <div class="pf-row">
+      <input id="pfName" type="text" maxlength="24" enterkeyhint="done">
+      <button id="pfSave" class="cloud-btn primary" style="flex:none; margin-top:0;" data-i18n="pf.save">Opslaan</button>
+    </div>
+    <div id="pfAuthOut">
+      <div class="wl-divider"></div>
+      <div class="pf-label" data-i18n="pf.login">Log in om je voortgang te bewaren</div>
+      <input id="pfUser" type="text" autocomplete="username" enterkeyhint="next" style="margin-top:8px;">
+      <input id="pfPass" type="password" autocomplete="current-password" enterkeyhint="go">
+      <div style="display:flex; gap:8px;">
+        <button id="pfLogin" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+        <button id="pfSignup" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+      </div>
+      <button id="pfGoogle" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01 2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
+    </div>
+    <div id="pfAuthIn" style="display:none;">
+      <div class="wl-divider"></div>
+      <div id="pfAs" style="font-size:13.5px; font-weight:700;"></div>
+      <div style="display:flex; gap:8px; margin-top:9px;">
+        <button id="pfLogout" class="cloud-btn" data-i18n="cloud.out">Uitloggen</button>
+        <button id="pfDelete" class="cloud-btn" data-i18n="pf.del">Verwijder account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Klassement -->
+<div class="overlay" id="leaderboardModal" style="z-index:70;">
+  <div class="panel welcome">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="lb.title">Klassement</h2>
+    <div id="lbDate"></div>
+    <div id="lbList"></div>
+    <div id="lbHint" style="display:none;">
+      <div class="wl-divider"></div>
+      <button id="lbLogin" class="cloud-btn primary" data-i18n="lb.join">Inloggen om mee te doen</button>
+    </div>
   </div>
 </div>
 
@@ -906,6 +972,8 @@ const I18N={
     "set.cloud":"Cloudopslag","cloud.user":"Gebruikersnaam","cloud.pass":"Wachtwoord","cloud.in":"Inloggen","cloud.new":"Nieuw account","cloud.as":"Ingelogd als","cloud.out":"Uitloggen","cloud.sync":"Nu synchroniseren",
     "cloud.ok":"✓ gesynchroniseerd","cloud.fail":"synchroniseren mislukt","cloud.busy":"synchroniseren…","cloud.err.taken":"Deze naam bestaat al","cloud.err.creds":"Onjuiste naam of wachtwoord","cloud.err.net":"Server niet bereikbaar — probeer later opnieuw","cloud.err.short":"Naam minstens 2 tekens, wachtwoord minstens 4",
     "wl.sub":"Leer Nederlandse werkwoorden: koppel elk werkwoord aan zijn vormen.","wl.google":"Met Google doorgaan","wl.guest":"Direct als gast spelen","wl.guestsub":"Voortgang blijft op dit toestel — je kunt later altijd een account maken.",
+    "menu.profile":"Profiel","pf.title":"Profiel","pf.name":"Weergavenaam","pf.save":"Opslaan","pf.saved":"✓ opgeslagen","pf.login":"Log in om je voortgang te bewaren","pf.del":"Verwijder account","pf.delSure":"Zeker weten? Nog eens tikken","pf.deleted":"Account verwijderd",
+    "lb.title":"Klassement","lb.join":"Inloggen om mee te doen","lb.empty":"Nog geen scores vandaag — wees de eerste!",
   },
   zh:{
     "menu.back":"回到当前游戏","menu.continue":"下一关","menu.levels":"关卡选择",
@@ -938,6 +1006,8 @@ const I18N={
     "set.cloud":"云存档","cloud.user":"用户名","cloud.pass":"密码","cloud.in":"登录","cloud.new":"注册新账号","cloud.as":"已登录","cloud.out":"退出登录","cloud.sync":"立即同步",
     "cloud.ok":"✓ 已同步","cloud.fail":"同步失败","cloud.busy":"同步中…","cloud.err.taken":"用户名已存在","cloud.err.creds":"用户名或密码错误","cloud.err.net":"无法连接服务器，请稍后再试","cloud.err.short":"用户名至少 2 个字符，密码至少 4 位",
     "wl.sub":"荷兰语动词连连看：把动词和它的变位连起来。","wl.google":"使用 Google 登录","wl.guest":"游客身份直接玩","wl.guestsub":"进度只保存在本机，之后随时可以注册同步。",
+    "menu.profile":"个人档案","pf.title":"个人档案","pf.name":"显示名","pf.save":"保存","pf.saved":"✓ 已保存","pf.login":"登录以保存你的进度","pf.del":"删除账号","pf.delSure":"确认删除？再点一次","pf.deleted":"账号已删除",
+    "lb.title":"排行榜","lb.join":"登录后上榜","lb.empty":"今天还没有人上榜——来当第一名！",
   },
   en:{
     "menu.back":"Back to game","menu.continue":"Next level","menu.levels":"Levels",
@@ -970,6 +1040,8 @@ const I18N={
     "set.cloud":"Cloud save","cloud.user":"Username","cloud.pass":"Password","cloud.in":"Sign in","cloud.new":"Create account","cloud.as":"Signed in as","cloud.out":"Sign out","cloud.sync":"Sync now",
     "cloud.ok":"✓ synced","cloud.fail":"sync failed","cloud.busy":"syncing…","cloud.err.taken":"That name is already taken","cloud.err.creds":"Wrong username or password","cloud.err.net":"Can't reach the server — try again later","cloud.err.short":"Name needs at least 2 characters, password at least 4",
     "wl.sub":"Learn Dutch verbs: match each verb with its forms.","wl.google":"Continue with Google","wl.guest":"Play as guest","wl.guestsub":"Progress stays on this device — you can create an account anytime.",
+    "menu.profile":"Profile","pf.title":"Profile","pf.name":"Display name","pf.save":"Save","pf.saved":"✓ saved","pf.login":"Sign in to keep your progress","pf.del":"Delete account","pf.delSure":"Sure? Tap again","pf.deleted":"Account deleted",
+    "lb.title":"Leaderboard","lb.join":"Sign in to join","lb.empty":"No scores today yet — be the first!",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -1008,6 +1080,11 @@ if(save.lvOrder!=="v3"){
 if(save.settings.bannerMs===10) save.settings.bannerMs=15;
 if(save.settings.hintWait===12) save.settings.hintWait=15;
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); cloudQueueSave(); }catch(e){} }
+
+// 显示名生成(与后端 functions/api/_lib.js 同源拷贝,改动需两边同步):随机形容词+名词
+const NAME_ADJ=["Flinke","Moedige","Blije","Wijze","Snelle","Lieve","Sterke","Vrolijke","Dappere","Nieuwsgierige","Zonnige","Vlotte","Eigenzinnige","Vriendelijke","Muzikale","Nuchtere","Eerlijke","Dromende","Dansende","Denkende","Reizende","Lezende","Zingende","Stoere","Keurige","Fleurige","Zachte","Stoute","Grote","Kleine","Originele","Edele"];
+const NAME_NOUN=["Vos","Mees","Uil","Haas","Reiger","Eend","Kikker","Egel","Eekhoorn","Zwaan","Spreeuw","Vink","Konijn","Bever","Otter","Mus","Wolk","Ster","Maan","Weide","Dijk","Toren","Brug","Zeil","Boek","Kompas","Lantaarn","Molen","Tulp","Kers","Peer","Appel"];
+function genDisplayName(seed){ const n=Math.abs(Number(seed)||Math.floor(Math.random()*1e9)); return NAME_ADJ[n%32]+" "+NAME_NOUN[Math.floor(n/7)%32]; }
 
 /* ================= Cloud 存档(Cloudflare Pages Functions + D1) ================= */
 /* 本地 localStorage 始终是主存档;云端只在登录后做备份与跨设备合并,所有请求失败一律静默(离线照玩) */
@@ -1052,6 +1129,8 @@ async function cloudPull(){       // 登录后/启动时:拉云端 → 合并 �
       save=merged;
       applySettings(); persist();
       renderCloud();
+      if(j.display_name){ cloudAuth.display_name=j.display_name; cloudSaveAuth(); }
+      cloudSubmitDaily();   // 登录后当场上榜:今天玩过的每日成绩自动补报
     }
   }catch(e){}
 }
@@ -1084,7 +1163,7 @@ async function cloudDoAuth(isNew, uEl, pEl, after){
     const r=await fetch("/api/"+(isNew?"signup":"login"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({username:u,password:p})});
     const j=await r.json().catch(()=>null);
     if(r.ok&&j&&j.token){
-      cloudAuth={token:j.token,username:j.username};
+      cloudAuth={token:j.token,username:j.username,display_name:j.display_name||""};
       cloudSaveAuth();
       pEl.value="";
       renderCloud();
@@ -1118,6 +1197,85 @@ function cloudLost(){   // 会话失效(401):静默退出登录态
   try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
   clearTimeout(cloudTimer); cloudTimer=null;
   renderCloud();
+}
+
+/* ---- Profiel(显示名 + 登录态;显示名不查重,身份靠账号) ---- */
+function utcKey(){ return new Date().toISOString().slice(0,10); }
+function cloudSubmitDaily(){   // 登录后把今天的每日成绩报给排行榜(服务器保留当日最高)
+  if(!cloudAuth) return;
+  const best=save.dailyBest[todayKey()]||0;
+  if(best<=0 || save.lbSent===utcKey()) return;
+  fetch("/api/score",{method:"POST",headers:cloudHeaders(),body:JSON.stringify({score:best})})
+    .then(r=>{ if(r.ok){ save.lbSent=utcKey(); persist(); } })
+    .catch(()=>{});
+}
+function myDisplayName(){
+  if(cloudAuth && cloudAuth.display_name) return cloudAuth.display_name;
+  if(!save.displayName){ save.displayName=genDisplayName(Date.now()); persist(); }
+  return save.displayName;
+}
+function openProfile(){
+  document.getElementById("pfName").value=myDisplayName();
+  renderProfileAuth();
+  document.getElementById("profileModal").classList.add("on");
+}
+function renderProfileAuth(){
+  const out=document.getElementById("pfAuthOut"), inn=document.getElementById("pfAuthIn");
+  out.style.display=cloudAuth?"none":"";
+  inn.style.display=cloudAuth?"":"none";
+  if(cloudAuth) document.getElementById("pfAs").textContent=t("cloud.as")+" "+cloudAuth.username;
+  document.getElementById("pfUser").placeholder=t("cloud.user");
+  document.getElementById("pfPass").placeholder=t("cloud.pass");
+}
+async function saveDisplayName(){
+  const v=document.getElementById("pfName").value.trim().replace(/\s+/g," ");
+  if(v.length<2||v.length>24){ toast(t("cloud.err.short")); return; }
+  if(cloudAuth){
+    try{
+      const r=await fetch("/api/profile",{method:"PATCH",headers:cloudHeaders(),body:JSON.stringify({display_name:v})});
+      if(r.status===401){ cloudLost(); return; }
+      if(!r.ok){ toast(t("cloud.err.net")); return; }
+      cloudAuth.display_name=v; cloudSaveAuth();
+    }catch(e){ toast(t("cloud.err.net")); return; }
+  }else{
+    save.displayName=v;
+  }
+  persist(); toast(t("pf.saved"));
+}
+async function deleteAccount(){   // 两步确认:第一次点变成"确定?"文案,3 秒内再点才执行
+  const b=document.getElementById("pfDelete");
+  if(b.dataset.armed!=="1"){
+    b.dataset.armed="1"; b.textContent=t("pf.delSure");
+    setTimeout(()=>{ b.dataset.armed=""; b.textContent=t("pf.del"); },3000);
+    return;
+  }
+  b.dataset.armed=""; b.textContent=t("pf.del");
+  try{
+    const r=await fetch("/api/account",{method:"DELETE",headers:cloudHeaders()});
+    if(r.ok||r.status===401){
+      cloudAuth=null;
+      try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+      renderCloud(); renderProfileAuth();
+      toast(t("pf.deleted"));
+    }else toast(t("cloud.err.net"));
+  }catch(e){ toast(t("cloud.err.net")); }
+}
+/* ---- Klassement(游客可看不可上榜;登录/注册后当场的每日成绩自动补报) ---- */
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function openLeaderboard(){
+  document.getElementById("leaderboardModal").classList.add("on");
+  document.getElementById("lbDate").textContent=utcKey();
+  document.getElementById("lbList").innerHTML='<div class="lb-empty">…</div>';
+  document.getElementById("lbHint").style.display=cloudAuth?"none":"";
+  try{
+    const r=await fetch("/api/leaderboard",{headers:cloudAuth?{authorization:"Bearer "+cloudAuth.token}:{}});
+    const j=await r.json();
+    document.getElementById("lbDate").textContent=j.date;
+    const rows=(j.board||[]).map((row,i)=>
+      `<div class="lb-row${(j.me&&j.me.rank===i+1)?" me":""}"><span class="lb-rank">${i+1}</span><span class="lb-name">${escHtml(row.name)}</span><span class="lb-score">${row.score}</span></div>`);
+    document.getElementById("lbList").innerHTML=rows.join("")||`<div class="lb-empty">${t("lb.empty")}</div>`;
+    if(j.me) toast(`${t("lb.you")} #${j.me.rank} · ${j.me.score}`);
+  }catch(e){ document.getElementById("lbList").innerHTML=`<div class="lb-empty">${t("cloud.err.net")}</div>`; }
 }
 function renderCloud(){
   const out=document.getElementById("cloudLoggedOut"); if(!out) return;
@@ -2241,6 +2399,7 @@ function updateHUD(){
   if(scoreRun!==lastScoreShown){
     if(mode==="endless" && scoreRun>(save.best["Oneindig"]||0)){ save.best["Oneindig"]=scoreRun; persist(); }
     if(mode==="daily"){ const k=todayKey(); if(scoreRun>(save.dailyBest[k]||0)){ save.dailyBest[k]=scoreRun; persist(); } }
+    cloudSubmitDaily();
   }
   const bt=document.getElementById("bestTag");
   bt.style.display="none";   // 个人最佳移入右侧分数条的目标位(模式)
@@ -2607,7 +2766,13 @@ function modeIntro(mode){
   go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); document.getElementById("menuScreen").classList.remove("on"); info.go(); };
   const back=document.createElement("button"); back.className="btn ghost"; back.textContent=t("mi.back");
   back.onclick=()=>document.getElementById("modeIntro").classList.remove("on");
-  btns.append(go,back);
+  btns.append(go);
+  if(mode==="daily"){
+    const lb=document.createElement("button"); lb.className="btn ghost"; lb.textContent=t("lb.title");
+    lb.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); openLeaderboard(); };
+    btns.append(lb);
+  }
+  btns.append(back);
   document.getElementById("modeIntro").classList.add("on");
 }
 document.getElementById("mDaily").onclick=()=>modeIntro("daily");
@@ -2628,6 +2793,16 @@ document.getElementById("wlLogin").onclick=()=>cloudDoAuth(false,document.getEle
 document.getElementById("wlSignup").onclick=()=>cloudDoAuth(true,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
 document.getElementById("wlGoogle").onclick=()=>{ location.href="/api/auth/google"; };
 document.getElementById("cloudGoogleBtn").onclick=()=>{ location.href="/api/auth/google"; };
+document.getElementById("mProfile").onclick=openProfile;
+document.getElementById("pfSave").onclick=saveDisplayName;
+document.getElementById("pfLogin").onclick=()=>cloudDoAuth(false,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth);
+document.getElementById("pfSignup").onclick=()=>cloudDoAuth(true,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth);
+document.getElementById("pfGoogle").onclick=()=>{ location.href="/api/auth/google"; };
+document.getElementById("pfLogout").onclick=()=>{ cloudLogout(); renderProfileAuth(); };
+document.getElementById("pfDelete").onclick=deleteAccount;
+document.getElementById("lbLogin").onclick=()=>{ document.getElementById("leaderboardModal").classList.remove("on"); openProfile(); };
+document.getElementById("pfUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("pfPass").focus(); });
+document.getElementById("pfPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth); });
 document.getElementById("wlGuest").onclick=welcomeDoneNow;
 document.getElementById("wlUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("wlPass").focus(); });
 document.getElementById("wlPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow); });
@@ -2650,7 +2825,7 @@ document.getElementById("btnVoiceTest").onclick=()=>speakVerb("lopen");
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
 document.getElementById("cardPanel").onclick=closeCard;   // 点卡即关(释义常显,不再两段式解锁)
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
-["bookDrawer","helpModal","settingsModal"].forEach(id=>{
+["bookDrawer","helpModal","settingsModal","profileModal","leaderboardModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
 });
 window.addEventListener("resize",()=>{ syncSize(); });
@@ -2673,12 +2848,15 @@ window.NLM3={
   cloud:()=>({auth:!!cloudAuth,user:cloudAuth&&cloudAuth.username,status:cloudStatus,inFlight:cloudInFlight}),
   skipWelcome:()=>{ save.welcomeDone=true; persist(); document.getElementById("welcomeModal").classList.remove("on"); },
   welcomeNeeded:()=>welcomeNeeded(),
+  profile:()=>myDisplayName(),
+  leaderboard:()=>openLeaderboard(),
 };
 
 /* ================= 启动 ================= */
 initVoices();
 applySettings();
 syncSize();
+if(!save.displayName){ save.displayName=genDisplayName(Date.now()); persist(); }   // 游客显示名:生成即落盘,刷新不变
 openMenu();
 if(cloudAuth) cloudPull();
 if(welcomeNeeded()){

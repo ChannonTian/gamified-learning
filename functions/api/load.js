@@ -6,5 +6,5 @@ export async function onRequestGet(ctx) {
   const row = await ctx.env.DB.prepare('SELECT data, updated_at FROM saves WHERE user_id = ?').bind(user.id).first();
   let data = null;
   if (row && row.data) { try { data = JSON.parse(row.data); } catch { data = null; } }
-  return json({ data, updated_at: row ? row.updated_at : null, username: user.username });
+  return json({ data, updated_at: row ? row.updated_at : null, username: user.username, display_name: user.display_name || '' });
 }
