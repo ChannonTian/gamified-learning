@@ -14,27 +14,29 @@
 
 ```
 gamified-learning/
-├── index.html          ← 根跳转页(Pages 根路径直达游戏)
+├── index.html          ← 公开落地页(Koppelen 总首页:游戏入口+隐私/条款链接;Google OAuth 发布验证依赖它)
 ├── AGENTS.md           ← 本文件(项目记忆)
 ├── docs/
 │   ├── DESIGN.md       ← 设计决策与依据(改玩法前必读)
 │   ├── DEVLOG.md       ← 按日期的迭代日志(每次改动追加)
 │   └── ROADMAP.md      ← 路线图(优先级用户定)
-├── wrangler.toml       ← Cloudflare Workers 配置(静态资产+D1 linkmatch-db;name 必须=项目名)
+├── wrangler.toml       ← Cloudflare Workers 配置(静态资产+D1 linkmatch-db+GOOGLE_CLIENT_ID vars;name 必须=项目名)
 ├── worker.js           ← Workers 入口:/api/* 路由到 handlers,其余路径走静态资产
 ├── .assetsignore       ← Workers 资产排除清单(源码/文档不对外)
-├── schema.sql          ← 云存档建表 users/saves/sessions(幂等;改完跑 wrangler d1 execute --remote/--local)
-├── functions/api/      ← API handlers(signup/login/logout/load/save+_lib;由 worker.js 复用)
+├── schema.sql          ← 云端建表 users/saves/sessions/daily_scores(幂等;存量库改列要手动 ALTER,见 DEVLOG)
+├── functions/api/      ← API handlers(signup/login/logout/load/save/profile/account/score/leaderboard/auth/google+_lib)
+├── privacy-policy/     ← 隐私政策页(nl/en/zh;Google OAuth 同意屏幕引用)
+├── terms/              ← 服务条款页(nl/en/zh)
 ├── tile-match/
 │   ├── index.html      ← 游戏本体:单文件、零依赖(原生 JS+CSS)
 │   └── README.md       ← 游戏说明
 ├── link-match/
-│   ├── index.html      ← 第二个产品:动词连连看(独立,不依赖 tile-match)
+│   ├── index.html      ← 完整版:动词连连看(独立,不依赖 tile-match)
 │   ├── README.md       ← 游戏说明
 │   └── test/
 │       └── path-engine.test.mjs ← 路径引擎回归(零依赖,node 直跑;改引擎必跑)
 ├── four-match/
-│   ├── index.html      ← 第三个产品:四消原型(原形+三变位同消;存档 nlm4.*、钩子 NLM4)
+│   ├── index.html      ← 四消原型(已否决留档;存档 nlm4.*、钩子 NLM4)
 │   └── README.md       ← 游戏说明
 └── LICENSE             ← PolyForm Noncommercial 1.0.0(公开但非商业)
 ```
@@ -62,7 +64,7 @@ gamified-learning/
 - **link-match-demo v1.18(2026-10-05,欢迎页+Google 登录)**:首次进入未登录的新玩家全屏欢迎页(登录优先:用户名/密码+Inloggen/Nieuw account、Met Google doorgaan、游客兜底"Direct als gast spelen";老档/已登录/选过游客永不弹,welcomeDone 存档标记);Google OAuth 授权码流程(`functions/api/auth/google.js`+`callback.js`,users.google_sub 列,**存量远程库需 ALTER TABLE users ADD COLUMN google_sub TEXT**);GOOGLE_CLIENT_ID/SECRET 走 Dashboard Variables and Secrets,未配置时接口 501;cloudDoAuth 重构为 (isNew,uEl,pEl,after) 供设置面板+欢迎页共用。待办:用户建 Google OAuth 客户端+配 secrets+远程加列后,线上实测 Google 流程。详见 DEVLOG。
 
 - 版本 v0.8(见 DEVLOG):**85 词 / 17 关**(A1 3 + A2 6 + B1 8,每关 5 词)、**无尽模式 + 每日挑战**(通过第 1 关解锁,已收集词池抽样 6 词;每日=日期种子+180s 倒计时+当日最佳;无尽=离场记最佳)、计分+连击(教学横幅 10s 倒计时)、三区 HUD(宽度 JS 与棋盘同步)、新词插画为首字母纹章 fallback(深浅主题感知)。
-- 已部署:https://channontian.github.io/gamified-learning/(push 即自动更新)。
+- **正式部署(2026-10-05 起)**:**https://play.channon-tian.com/**(Cloudflare Workers 自定义域名)= `gamified-learning.channon-tian.workers.dev`,push main 自动构建(`npx wrangler deploy`);后端=`worker.js`+`functions/api/`+D1 `linkmatch-db`。GitHub Pages 为同仓静态镜像(无后端,登录降级提示,不影响游玩)。
 - **任务线转向(2026-10-02 用户拍板)**:只做 link-match;tile-match 冻结于 v0.87(在线可用,不再迭代)。下一波=link-match 内容铺量(B2/C1 词池、关卡扩容、插画补齐)+ 候选模式(每日/无尽、排行榜接口、PWA 等)待拍板;四消对照分支封存(见 ROADMAP)。
 - **link-match(v0.1,2026-10-02)**:独立连连看产品——原形↔单一变位的经典连连看(≤2 折角+外圈路径),9 关(A1/A2/B1 × sg/pl/pp),每关 7 词×2 对=14 对;复用 tile-match 的数据/插画/i18n(拷贝式复用,解耦)。
 - ⚠️ **双产品同步维护点**:VERBS 词形/释义、插画元素库(person/PROP/SCENES)、i18n 框架在两个文件中是拷贝——改动需同步 tile-match/index.html 与 link-match/index.html。
@@ -80,7 +82,7 @@ gamified-learning/
 - **link-match v1.7(2026-10-04,竞品调研试点)**:试验关 **A1.1/A1.2**(`TRIAL_LEVELS`)落地 P1 连击里程碑(大字感叹+盘面波纹+和弦)/P3 交互式首教学(3 步演示,demoDone 一次)/P5 分数飞行/P6 清盘彩带;其余关卡原样供对比。**两个实现坑**:演示点击拦截必须在 busy 守卫前(演示靠 busy=true 锁闲置提示);demoClick 参数不可叫 `t`(遮蔽全局 i18n 函数 → "t is not a function"、回调不排上)。全量铺开待用户试玩定夺。
 - 已否决/搁置:原形百搭块(易混淆);四消判定(match-4,中盘供给不足,2026-10-04 用户否掉)。
 - **⚠️ 主版冻结(2026-10-01 用户拍板)**:link-match 主版停止改动,新一轮试玩全部走 **link-match-demo**;demo 定稿发布后,再把通用修复/改进同步回主版(同步时逐项过一遍,demo 专属词表/关卡结构不带回去)。
-- **下一里程碑:Cloudflare 登录 + 云存档(2026-10-01 用户拍板)**:初步试玩结束后接入 Cloudflare,允许玩家登录和保存进度。**此后任何更新不得让玩家进度清零**——存档结构只做增量迁移(merge 默认值+键位映射,先例 v1.5 lvOrder v2 / v1.12 缺口盘),上线前必须用存量档验证不丢进度。→ **2026-10-05 已落地并经 PR #1 并入 main**。
+- **✅ Cloudflare 里程碑完成(2026-10-05,v1.17–v1.19 九个 PR 全部合并上线)**:登录(用户名密码+Google OAuth 已 Publish)+云存档+欢迎页+档案页/显示名+每日排行榜+落地页+域名。**此后任何更新不得让玩家进度清零**(增量迁移纪律不变)。剩余候选(密码找回/账号关联/榜单防刷/PWA/内容铺量)见 ROADMAP"下一波"。
 - **link-match-demo v1.17(2026-10-05,Cloud 登录+云存档)**:`functions/api/` 五接口(signup/login/logout/load/save;PBKDF2-SHA256 1 万次迭代=免费档 10ms CPU 预算、32B token 会话表、常量时间比较)+ `schema.sql` 三表(远程 D1 已建)+ `wrangler.toml`。前端仅 demo:设置面板底部 Cloudopslag 区块(登录/注册、立即同步/退出、同步状态角标,i18n 三语);**localStorage 仍是主存档**,persist()→4s 去抖上传、hidden 时 keepalive 补发、失败静默离线照玩;登录/启动拉云端 cloudMerge 合并后自动回推;401 静默登出;`NLM3.cloud()` 钩子。**部署形态=新版 Workers 项目(静态资产+worker.js 路由;用户建的项目是 Workers 而非 Pages,Pages 格式配置会 0s 构建失败)**:`wrangler.toml` 用 Workers 格式([assets]+run_worker_first=["/api/*"]),`worker.js` 五路由复用 functions/api/ 实现,`.assetsignore` 排除源码/文档;D1 绑定经 `wrangler deploy` 自动生效。**本地 dev=`npx wrangler dev --persist-to 仓库外目录`(状态目录在仓库内会被资产监视→无限重载)**。待办:核对 Cloudflare Workers 构建产物(deploy 命令=`npx wrangler deploy`)+ 线上真实档回归。QA:curl 10 项+浏览器全链路(注册/自动同步/刷新保持/清档云恢复/中文)全绿零错误,详见 DEVLOG。
 - **link-match-demo 试玩 UX 追加二(2026-10-01)**:词卡弹窗两段式"点击查看释义"拆除(cardTip/card.tip/gloss-open 全清,释义常显、点卡即关——首修只删了列表行 title,弹窗内残留被用户抓到);盘卡间隙(slot 86/94+banner top:10px,实测 26px,卡体不变)。
 - **link-match-demo 试玩 UX 六项(2026-10-01,截图反馈)**:图鉴(去"点击查看"提示/开卡朗读四形态 `speakWords` 通用化/✕ 关闭钮);词卡槽 76/84px+**出卡实测缩字号**(中文+is begonnen 双词都放得下,行距 1.2);**死局检测补失败尝试路径**(`reshuffleIfStuck`:成功/失败后都查,500ms 复查——原先点不出对永不洗牌会卡死);`.combo-tag` 固定 36px 等高;顺修 pp null 回归(采样跳过无 pp 词+三处兜底)。QA:18 关+每日/无尽各 3 盘零错误,视觉验收三图。
@@ -97,6 +99,20 @@ gamified-learning/
 - **tile-match v0.9(2026-10-04,一次性解冻做美术,功能仍冻结)**:移植 link-match v1.8/v1.9 风格——Grug 主题(Thema 设置,Grug 默认/Papier 切回)+ 字号按主题手写字体测量 ×0.93/字重500 + emoji 全清换手绘 SVG(ICO_STAR/FLAME/CLOCK/TARGET)+ 分数真胶囊(**渐变字会吞 SVG 描边**,两主题都改实底)+ grugRough 滤镜 + --hot + 菜单 ✕/点外 + TTS=0 确认音;**与 link-match 实现差异:三消词块移动走 transform translate,歪斜必须合并进同一 transform(tileRot),不能独立 rotate**;hint 开关作用域到主题圆角/色染(no-shape/no-color);顺修弹窗后兜底自愈 pickRefillTile 读 level.verbs 崩(加空回退)。
 
 ## 已踩过的坑(别再踩)
+
+## 云端/部署类(v1.17–v1.19 新增)
+
+- **Cloudflare 项目类型**:用户在 Dashboard 建的是**新版 Workers 项目**(现在的默认),不是经典 Pages——Pages 专用配置(`pages_build_output_dir`)在 Workers 项目下 **0 秒构建失败**;纯静态 Worker 也不能加绑定("Bindings cannot be added to a Worker that only has static assets")。现状:Workers 格式(assets+worker.js 路由),别改回 Pages。
+- **`wrangler dev` 状态目录必须在仓库外**(`--persist-to /tmp/xxx`):默认 `.wrangler/` 在资产目录 `.` 内,dev 自己写状态触发自己重载→**无限 reload 循环**。附带好处:--persist-to 后 D1 与 `d1 execute --local` 同实例,不存在 pages dev 时代的双实例坑。
+- **wrangler 登录态会过期/切账号**:报"In a non-interactive environment..."(要 CLOUDFLARE_API_TOKEN)或 7403 "account is not valid"→ 让用户跑一次 `npx wrangler login`(浏览器授权);自动化环境可设 CLOUDFLARE_API_TOKEN。
+- **内联 `<script>` 给 `localStorage.setItem` 传值必须是字符串字面量**:传对象会隐式 `toString()` 存成 `"[object Object]"`→启动解析失败→登录墙死循环(Google 回调致命 bug,PR #7)。正确写法:`JSON.stringify(JSON.stringify(obj))` + `<>&`/行分隔符 unicode 转义。用户名密码登录走前端 JSON.stringify 不经过这条路,所以只在 OAuth 出现——**修登录 bug 先分清走哪条路径**。
+- **排行榜去重不能按"每天一次"闸**:会把当天后来打出的更高分永久挡在服务器外(用户实测 5235 vs 榜上 15)。正确姿势:记录"已上报分数",本地最高>已上报就补报(服务器 `MAX()` 幂等,重复无害);启动时也补报一次,存量缺口自动修正。
+- **前端/后端同源函数是拷贝**:`genDisplayName`(显示名词库)在 `functions/api/_lib.js` 和 demo 前端各一份——**改动必须两边同步**(漏一边=前端启动 ReferenceError)。
+- **Google OAuth 三个硬知识**:①`workers.dev`/`github.io`/免费域名都在公共后缀名单,**无法通过 Google 域名验证**——发布(Publish)必须有自购域名+Search Console 验证+公开的 privacy/terms 页;②Testing 模式 Test users 上限 100 人,名单外 "Access blocked";③Auth Platform 的 metrics 面板有 1–2 天延迟,以 D1 数据为准。
+- **清理测试账号必须精确圈定**:DELETE 的 WHERE 里只放测试用户名;曾险些误伤真实用户数据(自查后手动补了 display_name)——动远程库前先 SELECT 确认影响行。
+- **QA 别留在本地服务器页面**:测完 `wrangler dev` 要停+提醒关掉 127.0.0.1 标签页——用户在死掉的本地页点登录("停留在登录界面"),排查半天其实是服务器没起。另外 Google 凭据在本地要用 `--var` 假值,真值只在生产 Secret。
+
+## 引擎与 QA 类(v1.17 之前)
 
 - **交叉消除去重**:行/列连段交叉共享同一块时,消除列表必须按格去重,否则二次置 null 后 t.el 崩、busy 卡死(tile-match v0.86 修复)。
 - **link-match 路径坐标约定(v1.2 坑)**:`findPathOcc(occ, r1, c1, r2, c2)` 收 **0 基棋盘坐标**,内部自己 +1 转外圈;调用方**禁止再 +1**(v1.1 双重偏移 → 有路判不能连/假提示/连线画偏一格,QA bot 因相邻对在偏移系也可连而漏测)。折线回溯的根父指针(dir=-1)处要显式 push 起点 A。改引擎必跑 `node link-match/test/path-engine.test.mjs`(异构参照实现对照+折线合法性+全消链路)。

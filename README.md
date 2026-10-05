@@ -8,9 +8,10 @@ Building a language learning game suite that really applies the latest learning 
 
 | 游戏 | 语言 | 内容 | 状态 |
 |---|---|---|---|
-| [link-match](./link-match/) | 荷兰语 | 原形 ↔ 变位形式连连看(形式分组 42 关)+ 无尽 / 每日 / 生存 |  **
-| [link-match-demo](./link-match-demo/) | 荷兰语 | 特别试玩版:Taalhuis NIG I–IV 词表 50 词,18 关纯序号 | **主线产品**,持续迭代 |
-| [tile-match](./tile-match/) | 荷兰语 | 强变化/不规则动词变位(过去式单复数 + 过去分词)三消 + 无尽/每日挑战 | 已上线,功能冻结(2026-10-02 起任务线集中到 link-match) |
+| [link-match-demo](./link-match-demo/) | 荷兰语 | 主线产品:Taalhuis NIG I–IV 词表 50 词 / 18 关 + 无尽 / 每日(排行榜)/ 生存;**账号登录 + 云存档 + 每日排行榜** | **主线**,持续迭代 |
+| [link-match](./link-match/) | 荷兰语 | 完整版连连看(108 词 / 51 关,A1–B1 形式分组)+ 无尽 / 每日 / 生存 | 已上线,冻结待 demo 定稿后同步 |
+| [tile-match](./tile-match/) | 荷兰语 | 强变化动词三消(过去式单复数 + 过去分词)+ 无尽/每日挑战 | 功能冻结(v0.87) |
+| [four-match](./four-match/) | 荷兰语 | 四消对照原型(原形+三变位同消) | 已否决,留档在线 |
 
 ## 文档
 
@@ -29,9 +30,17 @@ python3 -m http.server 8000
 # → http://localhost:8000/tile-match/
 ```
 
-## 在线部署(GitHub Pages)
+## 在线部署
 
-仓库公开后,进入 **Settings → Pages → Build and deployment → Source: Deploy from a branch**,选 `main` / `(root)` 保存即可,地址为 `https://<用户名>.github.io/gamified-learning/`(根目录的跳转页会直接进入游戏)。
+- **正式站(Cloudflare Workers,主部署)**:`https://play.channon-tian.com/`(自定义域名)= `https://gamified-learning.channon-tian.workers.dev/`。push 到 main 自动构建部署(`npx wrangler deploy`,配置见 `wrangler.toml`);`/api/*` 由 `worker.js` 路由到 `functions/api/`(登录/云存档/排行榜),数据在 Cloudflare D1(`linkmatch-db`,表结构见 `schema.sql`)。
+- **GitHub Pages(旧地址)**:`https://channontian.github.io/gamified-learning/` 同仓镜像,纯静态——页面可用但**没有后端**,登录会提示服务器不可达,属预期降级。
+
+## 本地开发(带后端)
+
+```bash
+npx wrangler dev --persist-to /tmp/任意目录   # 状态目录必须在仓库外,否则资产监视器无限重载
+# → http://localhost:8787/link-match-demo/(D1 绑定自动从 wrangler.toml 生效,首次需灌 schema)
+```
 
 ## License
 
