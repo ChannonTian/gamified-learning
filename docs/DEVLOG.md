@@ -7,6 +7,14 @@
 - **⚠️ wrangler 坑(本地开发)**:`wrangler pages dev`(4.147)**不读 wrangler.toml 的 D1 绑定**——启动必须 `wrangler pages dev --port N --d1 DB=linkmatch-db`;且 flag 建的本地库与 `wrangler d1 execute --local` **不是同一本地实例**,首次要对 `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite` 重灌 schema(IF NOT EXISTS 幂等)。线上绑定以 Dashboard 项目 Settings→Bindings 为准,连接 Git 后须核对。`.gitignore` 补 `.wrangler/`。
 - QA:curl 10 项全绿(注册/重复 409/用户名密码校验 400/错密码 401/正确登录/存读档往返逐字段一致/伪 token 401/logout 后原 token 失效/非法 body 400);浏览器 390×844(IAB):注册→"Ingelogd als qa_ui"、L0 skipDemo+连对→15 分→4s 后自动上传"✓ gesynchroniseerd"、刷新登录态保持+进度在、切中文文案全对且切语言触发同步、**清 localStorage 存档(保留 token)刷新→云端整档恢复**(demoDone/counts.eten 回来)、设置面板截图云区块融入手绘主题、全程 console 零错误。
 - **追记(同日,部署形态改为 Workers)**:用户在 Dashboard 建的是**新版 Workers 项目**(Cloudflare 现在的默认),不是经典 Pages——`pages_build_output_dir` 格式令 Git CI 构建 **0 秒失败**(此前"Bindings cannot be added to a Worker that only has static assets"同因:纯静态 Worker 不认 Functions)。改法:`wrangler.toml` 换 Workers 格式(`main="worker.js"` + `[assets] directory="." binding=ASSETS run_worker_first=["/api/*"]`)+ 新增 `worker.js`(5 条路由复用 functions/api/ 的 handlers,签名兼容)+ `.assetsignore`(源码/文档不进资产包,游戏 HTML 全保留);**前端零改动**(同 /api/* 路径)。**本地 dev=`npx wrangler dev --persist-to 仓库外目录`**——状态目录在仓库内会被资产监视器看到→无限重载循环;--persist-to 后消失,且 D1 绑定从此与 `d1 execute --local` 同实例(/pages dev 双实例坑一并消灭)。D1 绑定经 `wrangler deploy` 自动生效,无需 Dashboard 手动加。curl 10 项在 Workers 形态全绿,资产排除验证(functions/、AGENTS.md 对外 404)。
+## 2026-10-01 · 试玩 UX 六项(link-match-demo;截图反馈追加)
+
+- **图鉴三小项**:行上"点击查看"提示移除;**开卡朗读完整四形态**(speakPair 重构为通用 `speakWords(seq)`,代数令牌/防吞逻辑不变,showCard 朗读 inf/sg/pl/is+pp);抽屉加 **✕ 关闭按钮**(#bookClose)。
+- **词卡高度终修(截图1)**:槽位 64/72→**76/84px**;showLearnBanner 出卡后实测词形区 scrollHeight,超出槽高**逐级缩字号**(17/19 起步,-1 到放得下,下限 11)——中文释义+四形态(含 is begonnen 双词)任何组合都完整;wc-forms 行距 1.3→1.2。视觉验收确认顶栏等高 36px、词卡不截断。
+- **死局洗牌(不止每日)**:检测原来只挂在"成功一连后"——玩家点不出对永不洗牌会卡死;抽 `reshuffleIfStuck()`:成功与**失败尝试**路径都调,500ms 复查再 toast+洗牌。注入无解盘断言 toast 通过。
+- **连击框等高(截图2)**:`.combo-tag` padding 撑高→固定 **36px**(与顶栏胶囊一致)。
+- **顺修 pp null 回归(bot 抓到)**:sampleModeVerbs 抽 pp 盘没排除无分词的 zullen → ppLabel 返 null → syncSize `.split` 崩、磁贴空白;修=tryPush 跳过无 pp 词(与关卡构建同规则)+ syncSize/buildBoardDOM/wordOf 三处 `ppLabel(...)||sg` 兜底。
+- QA:闯关 18 关 149 对、每日连清 3 盘、无尽连清 3 盘零错误;视觉验收三图(顶栏等高/词卡自适应/图鉴抽屉)。同期 Cloudflare 登录+云存档由并行会话落地(见上条),已经 PR #1 并入 main。
 
 ## 2026-10-01 · v1.16(link-match-demo)is+perfectum + 关卡列表形状/标题 + 词卡间隙(追加四项)
 
