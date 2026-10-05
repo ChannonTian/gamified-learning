@@ -27,3 +27,13 @@ CREATE TABLE IF NOT EXISTS daily_scores (
   score INTEGER NOT NULL,
   PRIMARY KEY (date, user_id)
 );
+
+-- 多游戏通用存档表(tile-match v0.95 起):game 维度隔离各游戏存档包
+-- (saves 表保留给 linkmatchdemo.v1,不迁移;tile-match 写 saves_games,game='tilematch')
+CREATE TABLE IF NOT EXISTS saves_games (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  game TEXT NOT NULL,
+  data TEXT NOT NULL,               -- 存档整包 JSON(如 nlm3.prototype.v1)
+  updated_at TEXT DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, game)
+);

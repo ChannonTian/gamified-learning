@@ -340,6 +340,56 @@
   }
   .seg button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
   .set-row input[type=range]{width:140px; accent-color:var(--accent);}
+  /* Cloud 存档(设置面板底部;link-match-demo v1.17 同款) */
+  #cloudBox{padding:12px 0 2px; border-top:1px dashed var(--line); margin-top:10px;}
+  .cloud-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+  .cloud-head label{font-weight:700; font-size:13.5px;}
+  #cloudStatus{font-size:11px; font-weight:700; color:#98a1b0; white-space:nowrap;}
+  #cloudBox input{
+    width:100%; box-sizing:border-box; margin-top:9px; padding:10px 12px;
+    border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-size:14px; font-weight:600; font-family:inherit;
+  }
+  #cloudBox input:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+  .cloud-btn{
+    flex:1; margin-top:9px; padding:10px 10px; border-radius:10px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:13px; font-weight:700;
+  }
+  .cloud-btn:disabled{opacity:.5;}
+  .cloud-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  /* 欢迎页(登录前置;首次进入且未登录、没选过游客时弹出) */
+  .welcome{ text-align:center; }
+  .wl-title{ margin:2px 0 2px; font-size:26px; letter-spacing:.5px; }
+  .wl-sub{ margin:0 0 10px; font-size:12.5px; }
+  .welcome input{
+    width:100%; box-sizing:border-box; margin-top:8px; padding:10px 12px;
+    border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-size:14px; font-weight:600; font-family:inherit;
+  }
+  .welcome input:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+  .wl-google{ flex:none; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; color:#3c4043; }
+  .wl-divider{ border-top:1px dashed var(--line); margin:14px 0 6px; }
+  .wl-guest{
+    background:none; border:none; color:var(--accent); font-size:14.5px; font-weight:800;
+    text-decoration:underline dashed 1.6px; text-underline-offset:4px; padding:8px 10px;
+  }
+  .wl-guestsub{ font-size:11px; color:#98a1b0; margin:0 0 2px; }
+  /* 语言行(菜单/欢迎页) */
+  .lang-row{ display:flex; gap:6px; justify-content:center; margin:-2px 0 12px; }
+  .lang-row button{
+    padding:6px 12px; border-radius:9px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); font-size:12px; font-weight:700;
+  }
+  .lang-row button.sel{background:var(--accent); color:#fff; border-color:var(--accent);}
+  /* Profiel 档案页 */
+  #profileModal .panel{ text-align:center; }
+  .pf-label{ font-size:13px; font-weight:700; margin-top:14px; text-align:left; }
+  .pf-row{ display:flex; gap:8px; }
+  .pf-row input{
+    flex:1; box-sizing:border-box; padding:10px 12px;
+    border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-size:14px; font-weight:600; font-family:inherit;
+  }
   .set-row select{
     padding:7px 10px; border-radius:10px; border:1px solid var(--line);
     background:var(--paper); color:var(--ink); font-size:12.5px; font-weight:600;
@@ -504,6 +554,8 @@
       <button class="menu-btn" id="mEndless"><svg class="ic" viewBox="0 0 24 24"><path d="M8.4 15.6C6.5 15.6 5 14 5 12s1.5-3.6 3.4-3.6c3.6 0 3.6 7.2 7.2 7.2 1.9 0 3.4-1.6 3.4-3.6s-1.5-3.6-3.4-3.6c-3.6 0-3.6 7.2-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="2.1"/></svg><span class="m-label"><span data-i18n="menu.endless">Oneindig</span><small id="mEndlessSub"></small></span></button>
       <button class="menu-btn ghost" id="mHelp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M9.6 9.8a2.5 2.5 0 1 1 3.8 2.2c-.8.5-1.4 1-1.4 1.9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="currentColor"/></svg><span data-i18n="menu.help">Speluitleg</span></button>
       <button class="menu-btn ghost" id="mSettings"><svg class="ic" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" fill="none"/></g><circle cx="9.2" cy="7" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="15" cy="12" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/><circle cx="8.4" cy="17" r="2.3" fill="var(--card)" stroke="currentColor" stroke-width="2.1"/></svg><span data-i18n="menu.settings">Instellingen</span></button>
+      <button class="menu-btn ghost" id="mProfile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.6" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M4.8 19.4c1.3-3.4 4-5 7.2-5s5.9 1.6 7.2 5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg><span data-i18n="menu.profile">Profiel</span></button>
+      <div class="lang-row" id="menuLang"></div>
     </div>
     <div id="menuLevels" style="display:none;">
       <h2><button class="back-btn" id="mBack">←</button><span data-i18n="menu.levels">Levels</span></h2>
@@ -564,6 +616,28 @@
       <label data-i18n="set.dark">Donkere modus</label>
       <div class="seg" id="setDark"></div>
     </div>
+    <div id="cloudBox">
+      <div class="cloud-head">
+        <label data-i18n="set.cloud">Cloudopslag</label>
+        <span id="cloudStatus"></span>
+      </div>
+      <div id="cloudLoggedOut">
+        <input id="cloudUser" type="text" autocomplete="username" enterkeyhint="next">
+        <input id="cloudPass" type="password" autocomplete="current-password" enterkeyhint="go">
+        <div style="display:flex; gap:8px;">
+          <button id="cloudLoginBtn" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+          <button id="cloudSignupBtn" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+        </div>
+        <button id="cloudGoogleBtn" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01-2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
+      </div>
+      <div id="cloudLoggedIn" style="display:none;">
+        <div id="cloudAs" style="font-size:13px; font-weight:700; margin-top:9px;"></div>
+        <div style="display:flex; gap:8px;">
+          <button id="cloudSyncBtn" class="cloud-btn" data-i18n="cloud.sync">Nu synchroniseren</button>
+          <button id="cloudOutBtn" class="cloud-btn" data-i18n="cloud.out">Uitloggen</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -613,6 +687,67 @@
     </div>
     <p data-i18n="help.color"></p>
     <p data-i18n="help.stuck"></p>
+  </div>
+</div>
+
+<!-- Mode-intro(点模式先看说明+最高分,再开始;demo v1.14 定稿交互) -->
+<div class="overlay" id="modeIntro">
+  <div class="panel" style="text-align:center;">
+    <h2 id="miTitle" style="margin-bottom:8px;"></h2>
+    <p id="miText" style="font-size:13.5px; line-height:1.55; margin:6px 0 10px;"></p>
+    <p id="miBest" style="font-weight:800; font-size:14px; margin:0 0 6px;"></p>
+    <div id="miBtns" style="display:flex; gap:10px; justify-content:center; margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- Welkom(登录前置;首次进入且未登录、没选过游客时弹出) -->
+<div class="overlay" id="welcomeModal" style="z-index:80;">
+  <div class="panel welcome">
+    <h1 class="wl-title">Sterke werkwoorden</h1>
+    <p class="wl-sub" data-i18n="wl.sub"></p>
+    <div class="lang-row" id="wlLang" style="margin:0 0 10px;"></div>
+    <input id="wlUser" type="text" autocomplete="username" enterkeyhint="next">
+    <input id="wlPass" type="password" autocomplete="current-password" enterkeyhint="go">
+    <div style="display:flex; gap:8px;">
+      <button id="wlLogin" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+      <button id="wlSignup" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+    </div>
+    <button id="wlGoogle" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01-2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
+    <div class="wl-divider"></div>
+    <button id="wlGuest" class="wl-guest" data-i18n="wl.guest">Direct als gast spelen</button>
+    <p class="wl-guestsub" data-i18n="wl.guestsub"></p>
+  </div>
+</div>
+
+<!-- Profiel -->
+<div class="overlay" id="profileModal" style="z-index:70;">
+  <div class="panel welcome">
+    <button class="close-x" data-close>✕</button>
+    <h2 data-i18n="pf.title">Profiel</h2>
+    <div class="pf-label" data-i18n="pf.name">Weergavenaam</div>
+    <div class="pf-row">
+      <input id="pfName" type="text" maxlength="24" enterkeyhint="done">
+      <button id="pfSave" class="cloud-btn primary" style="flex:none; margin-top:0;" data-i18n="pf.save">Opslaan</button>
+    </div>
+    <div id="pfAuthOut">
+      <div class="wl-divider"></div>
+      <div class="pf-label" data-i18n="pf.login">Log in om je voortgang te bewaren</div>
+      <input id="pfUser" type="text" autocomplete="username" enterkeyhint="next" style="margin-top:8px;">
+      <input id="pfPass" type="password" autocomplete="current-password" enterkeyhint="go">
+      <div style="display:flex; gap:8px;">
+        <button id="pfLogin" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
+        <button id="pfSignup" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
+      </div>
+      <button id="pfGoogle" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01-2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
+    </div>
+    <div id="pfAuthIn" style="display:none;">
+      <div class="wl-divider"></div>
+      <div id="pfAs" style="font-size:13.5px; font-weight:700;"></div>
+      <div style="display:flex; gap:8px; margin-top:9px;">
+        <button id="pfLogout" class="cloud-btn" data-i18n="cloud.out">Uitloggen</button>
+        <button id="pfDelete" class="cloud-btn" data-i18n="pf.del">Verwijder account</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -749,7 +884,130 @@ try{
     if(save.settings.hintWait===7) save.settings.hintWait=12;   // 旧默认迁移:提示等待略长于连击窗口
   }
 }catch(e){}
-function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); cloudQueueSave(); }catch(e){} }
+
+/* ================= Cloud 存档(Cloudflare D1;link-match-demo v1.17 同款引擎,存档走 ?game=tilematch) ================= */
+/* 本地 localStorage 始终是主存档;云端只在登录后做备份与跨设备合并,所有请求失败一律静默(离线照玩) */
+const CLOUD_KEY="nlm3.auth";
+let cloudAuth=null;
+try{ cloudAuth=JSON.parse(localStorage.getItem(CLOUD_KEY)||"null"); }catch(e){}
+let cloudTimer=null, cloudInFlight=false, cloudStatus="";
+function cloudHeaders(){ return {"content-type":"application/json","authorization":"Bearer "+cloudAuth.token}; }
+function cloudSetStatus(k){
+  cloudStatus=k;
+  const el=document.getElementById("cloudStatus"); if(el) el.textContent=k?t("cloud."+k):"";
+}
+function cloudQueueSave(delay){   // 去抖:最后一次改动 4s 后才上传
+  if(!cloudAuth) return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>{ cloudTimer=null; cloudPush(); }, delay||4000);
+}
+async function cloudPush(keepalive){
+  if(!cloudAuth) return;
+  clearTimeout(cloudTimer); cloudTimer=null;
+  if(cloudInFlight){ cloudQueueSave(8000); return; }
+  cloudInFlight=true; cloudSetStatus("busy");
+  try{
+    const r=await fetch("/api/save?game=tilematch",{method:"POST",headers:cloudHeaders(),keepalive:!!keepalive,body:JSON.stringify({data:save})});
+    if(r.status===401) cloudLost();
+    else if(r.ok) cloudSetStatus("ok");
+    else cloudSetStatus("fail");
+  }catch(e){ cloudSetStatus("fail"); }
+  cloudInFlight=false;
+}
+async function cloudPull(){       // 登录后/启动时:拉云端 → 合并 → 写本地(去抖自动回推)
+  if(!cloudAuth) return;
+  try{
+    const r=await fetch("/api/load?game=tilematch",{headers:{authorization:"Bearer "+cloudAuth.token}});
+    if(r.status===401){ cloudLost(); return; }
+    if(!r.ok) return;
+    const j=await r.json();
+    if(j&&j.data){
+      const fresh=!Object.keys(save.done).length && (save.unlocked||1)<=1;   // 新设备:整体接管云端档
+      const merged=cloudMerge(save,j.data);
+      if(!fresh){ merged.settings=save.settings; merged.style=save.style; }  // 老设备设置/画风不被动
+      save=merged;
+      applySettings(); persist();
+      renderCloud();
+      if(j.display_name){ cloudAuth.display_name=j.display_name; cloudSaveAuth(); }
+    }
+  }catch(e){}
+}
+// 合并规则:数值取大、布尔取或、数组并集、对象递归、其余本地优先
+function cloudMerge(a,b){
+  if(b==null) return a;
+  if(a==null) return b;
+  if(typeof a==="number"&&typeof b==="number") return Math.max(a,b);
+  if(typeof a==="boolean"&&typeof b==="boolean") return a||b;
+  if(Array.isArray(a)&&Array.isArray(b)) return [...new Set([...a,...b])];
+  if(typeof a==="object"&&typeof b==="object"){
+    const out={...a};
+    for(const k in b) out[k]=cloudMerge(a[k],b[k]);
+    return out;
+  }
+  return a;
+}
+function cloudSaveAuth(){
+  try{ localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudAuth)); }catch(e){}
+}
+async function cloudDoAuth(isNew,uEl,pEl,after){
+  const u=(uEl.value||"").trim();
+  const p=pEl.value||"";
+  if(u.length<2||p.length<4){ toast(t("cloud.err.short")); return; }
+  const ids=after
+    ?(uEl.id==="pfUser"?["pfLogin","pfSignup"]:["wlLogin","wlSignup"])
+    :["cloudLoginBtn","cloudSignupBtn"];
+  const btns=ids.map(id=>document.getElementById(id));
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch("/api/"+(isNew?"signup":"login"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const j=await r.json().catch(()=>null);
+    if(r.ok&&j&&j.token){
+      cloudAuth={token:j.token,username:j.username,display_name:j.display_name||""};
+      cloudSaveAuth();
+      pEl.value="";
+      renderCloud();
+      cloudPull();
+      if(after) after();
+    }else{
+      toast(t((j&&j.error==="username already taken")?"cloud.err.taken":(r.status===401?"cloud.err.creds":"cloud.err.net")));
+    }
+  }catch(e){ toast(t("cloud.err.net")); }
+  btns.forEach(b=>b.disabled=false);
+}
+function renderCloud(){
+  const lo=document.getElementById("cloudLoggedOut"), li=document.getElementById("cloudLoggedIn");
+  if(!lo) return;
+  lo.style.display=cloudAuth?"none":"";
+  li.style.display=cloudAuth?"":"none";
+  document.getElementById("cloudAs").textContent=cloudAuth?(t("cloud.as")+" "+cloudAuth.username):"";
+  if(!cloudAuth) cloudSetStatus("");
+}
+function cloudSyncNow(){ if(cloudAuth) cloudPull().then(()=>cloudPush()); }
+function cloudLogout(){
+  const h=cloudAuth?cloudHeaders():null;
+  cloudAuth=null;
+  try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+  clearTimeout(cloudTimer); cloudTimer=null;
+  renderCloud();
+  if(h) fetch("/api/logout",{method:"POST",headers:h}).catch(()=>{});
+}
+function cloudLost(){   // 会话失效(401):静默退出登录态
+  cloudAuth=null;
+  try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+  clearTimeout(cloudTimer); cloudTimer=null;
+  renderCloud();
+}
+
+// 显示名生成(与后端 functions/api/_lib.js 同源拷贝,改动需两边同步):随机形容词+名词
+const NAME_ADJ=["Flinke","Moedige","Blije","Wijze","Snelle","Lieve","Sterke","Vrolijke","Dappere","Nieuwsgierige","Zonnige","Vlotte","Eigenzinnige","Vriendelijke","Muzikale","Nuchtere","Eerlijke","Dromende","Dansende","Denkende","Reizende","Lezende","Zingende","Stoere","Keurige","Fleurige","Zachte","Stoute","Grote","Kleine","Originele","Edele"];
+const NAME_NOUN=["Vos","Mees","Uil","Haas","Reiger","Eend","Kikker","Egel","Eekhoorn","Zwaan","Spreeuw","Vink","Konijn","Bever","Otter","Mus","Wolk","Ster","Maan","Weide","Dijk","Toren","Brug","Zeil","Boek","Kompas","Lantaarn","Molen","Tulp","Kers","Peer","Appel"];
+function genDisplayName(seed){ const n=Math.abs(Number(seed)||Math.floor(Math.random()*1e9)); return NAME_ADJ[n%32]+" "+NAME_NOUN[Math.floor(n/7)%32]; }
+function myDisplayName(){
+  if(cloudAuth && cloudAuth.display_name) return cloudAuth.display_name;
+  if(!save.displayName){ save.displayName=genDisplayName(Date.now()); persist(); }
+  return save.displayName;
+}
 
 /* ================= i18n ================= */
 const I18N={
@@ -782,6 +1040,11 @@ const I18N={
     "help.stuck":"Vastgelopen? Tik op de hintknop — of wacht even, dan komt er automatisch een. In de niveaumodus verschijnt na elke combinatie een leerkaart met voorlezen.",
     "set.voice":"Stem","set.voicetest":"Probeer",
     "set.novoice":"Geen NL-stem gevonden. Chrome: Instellingen → Talen → Nederlands toevoegen",
+    "set.cloud":"Cloudopslag","cloud.user":"Gebruikersnaam","cloud.pass":"Wachtwoord","cloud.in":"Inloggen","cloud.new":"Nieuw account","cloud.as":"Ingelogd als","cloud.out":"Uitloggen","cloud.sync":"Nu synchroniseren",
+    "cloud.ok":"✓ gesynchroniseerd","cloud.fail":"synchroniseren mislukt","cloud.busy":"synchroniseren…","cloud.err.taken":"Deze naam bestaat al","cloud.err.creds":"Onjuiste naam of wachtwoord","cloud.err.net":"Server niet bereikbaar — probeer later opnieuw","cloud.err.short":"Naam minstens 2 tekens, wachtwoord minstens 4",
+    "wl.sub":"Leer Nederlandse werkwoorden: smelt de vormen samen tot het werkwoord.","wl.google":"Met Google doorgaan","wl.guest":"Direct als gast spelen","wl.guestsub":"Voortgang blijft op dit toestel — je kunt later altijd een account maken.",
+    "menu.profile":"Profiel","pf.title":"Profiel","pf.name":"Weergavenaam","pf.save":"Opslaan","pf.saved":"✓ opgeslagen","pf.login":"Log in om je voortgang te bewaren","pf.del":"Verwijder account","pf.delSure":"Zeker weten? Nog eens tikken","pf.deleted":"Account verwijderd",
+    "mi.endless":"Jacht op punten met jouw verzameling: elke ronde 6 werkwoorden, je beste score wordt bewaard.","mi.daily":"180 seconden, één keer per dag. Dezelfde puzzel voor iedereen.","mi.start":"Start","mi.back":"Terug",
   },
   zh:{
     "menu.new":"新的开始","menu.continue":"继续游戏","menu.levels":"关卡选择",
@@ -812,6 +1075,11 @@ const I18N={
     "help.stuck":"卡住了?点提示按钮获取提示,或稍等片刻自动提示。普通关卡每次消除后会弹出教学卡并朗读单词。",
     "set.voice":"朗读语音","set.voicetest":"试听",
     "set.novoice":"未找到荷兰语语音:Chrome 设置 → 语言 → 添加 Dutch",
+    "set.cloud":"云存档","cloud.user":"用户名","cloud.pass":"密码","cloud.in":"登录","cloud.new":"注册新账号","cloud.as":"已登录","cloud.out":"退出登录","cloud.sync":"立即同步",
+    "cloud.ok":"✓ 已同步","cloud.fail":"同步失败","cloud.busy":"同步中…","cloud.err.taken":"用户名已存在","cloud.err.creds":"用户名或密码错误","cloud.err.net":"无法连接服务器，请稍后再试","cloud.err.short":"用户名至少 2 个字符，密码至少 4 位",
+    "wl.sub":"荷兰语强变化动词三消:把三种变位消成动词原形。","wl.google":"使用 Google 登录","wl.guest":"游客身份直接玩","wl.guestsub":"进度只保存在本机，之后随时可以注册同步。",
+    "menu.profile":"个人档案","pf.title":"个人档案","pf.name":"显示名","pf.save":"保存","pf.saved":"✓ 已保存","pf.login":"登录以保存你的进度","pf.del":"删除账号","pf.delSure":"确认删除？再点一次","pf.deleted":"账号已删除",
+    "mi.endless":"用已收集的词刷分:每盘抽样 6 词,离场记最佳。","mi.daily":"180 秒,每天一次,所有玩家同一盘面。","mi.start":"开始","mi.back":"返回",
   },
   en:{
     "menu.new":"New game","menu.continue":"Continue","menu.levels":"Levels",
@@ -843,6 +1111,11 @@ const I18N={
     "help.stuck":"Stuck? Tap the hint button — or wait a moment and one appears automatically. In level mode a learning card with audio appears after every combo.",
     "set.voice":"Voice","set.voicetest":"Test",
     "set.novoice":"No Dutch voice found. Chrome: Settings → Languages → add Dutch",
+    "set.cloud":"Cloud save","cloud.user":"Username","cloud.pass":"Password","cloud.in":"Sign in","cloud.new":"Create account","cloud.as":"Signed in as","cloud.out":"Sign out","cloud.sync":"Sync now",
+    "cloud.ok":"✓ synced","cloud.fail":"sync failed","cloud.busy":"syncing…","cloud.err.taken":"That name is already taken","cloud.err.creds":"Wrong username or password","cloud.err.net":"Can't reach the server — try again later","cloud.err.short":"Name needs at least 2 characters, password at least 4",
+    "wl.sub":"Learn Dutch verbs: melt the forms back into the infinitive.","wl.google":"Continue with Google","wl.guest":"Play as guest","wl.guestsub":"Progress stays on this device — you can create an account anytime.",
+    "menu.profile":"Profile","pf.title":"Profile","pf.name":"Display name","pf.save":"Save","pf.saved":"✓ saved","pf.login":"Sign in to keep your progress","pf.del":"Delete account","pf.delSure":"Sure? Tap again","pf.deleted":"Account deleted",
+    "mi.endless":"Chase points with your collection: 6 sampled verbs per board, best score is kept.","mi.daily":"180 seconds, once per day. Same puzzle for everyone.","mi.start":"Start","mi.back":"Back",
   },
 };
 function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
@@ -2048,6 +2321,7 @@ function openMenu(){
   document.getElementById("mEndlessSub").textContent=unlockedModes
     ?(eBest?`${t("result.best")}: ${eBest}`:t("menu.endlessnew"))
     :t("menu.needlevel");
+  buildLangRow(document.getElementById("menuLang"));
   document.getElementById("menuScreen").classList.add("on");
 }
 function showMenuView(v){
@@ -2164,11 +2438,8 @@ document.getElementById("mContinue").onclick=()=>{
   startLevel(window.__continueId||LEVELS[0].id);
 };
 document.getElementById("mLevels").onclick=()=>showMenuView("levels");
-document.getElementById("mDaily").onclick=()=>{
-  if(save.unlocked<MODE_UNLOCK) return;
-  if(save.dailyDone===todayKey()){ toast(t("menu.dailydone")); return; }   // 已完成:留在菜单并说明
-  document.getElementById("menuScreen").classList.remove("on"); startDaily();
-};
+document.getElementById("mDaily").onclick=()=>modeIntro("daily");
+document.getElementById("mEndless").onclick=()=>modeIntro("endless");
 document.getElementById("mEndless").onclick=()=>{ if(save.unlocked<MODE_UNLOCK) return; document.getElementById("menuScreen").classList.remove("on"); startEndless(); };
 document.getElementById("mBack").onclick=()=>showMenuView("main");
 document.getElementById("mHelp").onclick=()=>document.getElementById("helpModal").classList.add("on");
@@ -2188,7 +2459,7 @@ document.getElementById("cardPanel").onclick=()=>{
   else closeCard();
 };
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
-["bookDrawer","helpModal","settingsModal"].forEach(id=>{
+["bookDrawer","helpModal","settingsModal","profileModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });
 });
 window.addEventListener("error",e=>{
@@ -2224,13 +2495,135 @@ window.NLM3={
   },
   settings:()=>({...save.settings}),
   banner:()=>document.getElementById("learnBanner").className,
+  cloud:()=>({auth:!!cloudAuth, status:cloudStatus}),
+  skipWelcome:()=>{ save.welcomeDone=true; persist(); document.getElementById("welcomeModal").classList.remove("on"); },
+  welcomeNeeded:()=>welcomeNeeded(),
 };
+
+/* ---- 欢迎页 / 档案页 / 语言行 / 模式介绍(demo 同款) ---- */
+function welcomeNeeded(){   // 只挡全新玩家:老档/已登录/选过游客的直接进
+  return !cloudAuth && !save.welcomeDone && Object.keys(save.done).length===0 && (save.unlocked||1)<=1;
+}
+function welcomeDoneNow(){ save.welcomeDone=true; persist(); document.getElementById("welcomeModal").classList.remove("on"); openMenu(); }
+function buildLangRow(el){
+  if(!el) return;
+  el.innerHTML="";
+  for(const [v,label] of [["nl","Nederlands"],["zh","中文"],["en","English"]]){
+    const b=document.createElement("button");
+    b.textContent=label;
+    if(save.settings.uiLang===v) b.classList.add("sel");
+    b.onclick=()=>{ save.settings.uiLang=v; persist(); applyI18n(); buildLangRow(el); renderSettings(); renderWelcome(); };
+    el.appendChild(b);
+  }
+}
+function renderWelcome(){
+  document.getElementById("wlUser").placeholder=t("cloud.user");
+  document.getElementById("wlPass").placeholder=t("cloud.pass");
+}
+function openProfile(){
+  document.getElementById("pfName").value=myDisplayName();
+  renderProfileAuth();
+  document.getElementById("profileModal").classList.add("on");
+}
+function renderProfileAuth(){
+  const out=document.getElementById("pfAuthOut"), inn=document.getElementById("pfAuthIn");
+  out.style.display=cloudAuth?"none":"";
+  inn.style.display=cloudAuth?"":"none";
+  if(cloudAuth) document.getElementById("pfAs").textContent=t("cloud.as")+" "+cloudAuth.username;
+  document.getElementById("pfUser").placeholder=t("cloud.user");
+  document.getElementById("pfPass").placeholder=t("cloud.pass");
+}
+async function saveDisplayName(){
+  const v=document.getElementById("pfName").value.trim().replace(/\s+/g," ");
+  if(v.length<2||v.length>24){ toast(t("cloud.err.short")); return; }
+  if(cloudAuth){
+    try{
+      const r=await fetch("/api/profile",{method:"PATCH",headers:cloudHeaders(),body:JSON.stringify({display_name:v})});
+      if(r.status===401){ cloudLost(); return; }
+      if(!r.ok){ toast(t("cloud.err.net")); return; }
+      cloudAuth.display_name=v; cloudSaveAuth();
+    }catch(e){ toast(t("cloud.err.net")); return; }
+  }else{
+    save.displayName=v;
+  }
+  persist(); toast(t("pf.saved"));
+}
+async function deleteAccount(){   // 两步确认:第一次点变成"确定?"文案,3 秒内再点才执行
+  const b=document.getElementById("pfDelete");
+  if(b.dataset.armed!=="1"){
+    b.dataset.armed="1"; b.textContent=t("pf.delSure");
+    setTimeout(()=>{ b.dataset.armed=""; b.textContent=t("pf.del"); },3000);
+    return;
+  }
+  b.dataset.armed=""; b.textContent=t("pf.del");
+  try{
+    const r=await fetch("/api/account",{method:"DELETE",headers:cloudHeaders()});
+    if(r.ok||r.status===401){
+      cloudAuth=null;
+      try{ localStorage.removeItem(CLOUD_KEY); }catch(e){}
+      renderCloud(); renderProfileAuth();
+      toast(t("pf.deleted"));
+    }else toast(t("cloud.err.net"));
+  }catch(e){ toast(t("cloud.err.net")); }
+}
+/* 模式介绍弹窗:点每日/无尽先看说明+最高分,再开始(demo v1.14 定稿交互) */
+function modeIntro(mode){
+  if(save.unlocked<MODE_UNLOCK) return;
+  const dailyDone=mode==="daily"&&save.dailyDone===todayKey();
+  const info={
+    endless:{tt:t("menu.endless"),best:save.best["Oneindig"]?`${t("result.best")}: ${save.best["Oneindig"]}`:"—",go:startEndless},
+    daily:{tt:t("menu.daily"),best:`${t("result.today")}: ${save.dailyBest[todayKey()]||0}`,go:startDaily},
+  }[mode];
+  document.getElementById("miTitle").textContent=info.tt;
+  document.getElementById("miText").textContent=t("mi."+mode)+(dailyDone?" "+t("menu.dailydone"):"");
+  document.getElementById("miBest").textContent=info.best;
+  const btns=document.getElementById("miBtns"); btns.innerHTML="";
+  if(!dailyDone){
+    const go=document.createElement("button"); go.className="btn primary"; go.textContent=t("mi.start");
+    go.onclick=()=>{ document.getElementById("modeIntro").classList.remove("on"); document.getElementById("menuScreen").classList.remove("on"); info.go(); };
+    btns.appendChild(go);
+  }
+  const back=document.createElement("button"); back.className="btn ghost"; back.textContent=t("mi.back");
+  back.onclick=()=>document.getElementById("modeIntro").classList.remove("on");
+  btns.appendChild(back);
+  document.getElementById("modeIntro").classList.add("on");
+}
+
+/* ---- Cloud/档案/语言 事件绑定 ---- */
+document.getElementById("mProfile").onclick=openProfile;
+document.getElementById("cloudLoginBtn").onclick=()=>cloudDoAuth(false,document.getElementById("cloudUser"),document.getElementById("cloudPass"));
+document.getElementById("cloudSignupBtn").onclick=()=>cloudDoAuth(true,document.getElementById("cloudUser"),document.getElementById("cloudPass"));
+document.getElementById("cloudSyncBtn").onclick=cloudSyncNow;
+document.getElementById("cloudOutBtn").onclick=cloudLogout;
+document.getElementById("cloudPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("cloudUser"),document.getElementById("cloudPass")); });
+document.getElementById("wlLogin").onclick=()=>cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
+document.getElementById("wlSignup").onclick=()=>cloudDoAuth(true,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
+document.getElementById("wlGuest").onclick=welcomeDoneNow;
+document.getElementById("wlPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow); });
+document.getElementById("pfSave").onclick=saveDisplayName;
+document.getElementById("pfLogout").onclick=()=>{ cloudLogout(); renderProfileAuth(); };
+document.getElementById("pfDelete").onclick=deleteAccount;
+document.getElementById("pfLogin").onclick=()=>cloudDoAuth(false,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth);
+document.getElementById("pfSignup").onclick=()=>cloudDoAuth(true,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth);
+document.getElementById("pfPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("pfUser"),document.getElementById("pfPass"),renderProfileAuth); });
+["wlGoogle","cloudGoogleBtn","pfGoogle"].forEach(id=>{
+  document.getElementById(id).onclick=()=>{ location.href="/api/auth/google?game=tile"; };
+});
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"&&cloudAuth&&cloudTimer) cloudPush(true); });
 
 initVoices();
 applySettings();
 syncWidths();
 window.addEventListener("orientationchange",()=>setTimeout(syncWidths,250));
-openMenu();
+if(!save.displayName){ save.displayName=genDisplayName(Date.now()); persist(); }   // 游客显示名:生成即落盘,刷新不变
+renderCloud();
+if(welcomeNeeded()){
+  renderWelcome();
+  buildLangRow(document.getElementById("wlLang"));
+  document.getElementById("welcomeModal").classList.add("on");
+}else{
+  openMenu();
+}
 </script>
 </body>
 </html>

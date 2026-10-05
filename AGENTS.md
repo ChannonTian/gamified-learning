@@ -97,6 +97,7 @@ gamified-learning/
 - **link-match v1.9(2026-10-04,试玩 13 项)**:HUD 语境化(短关卡名+中槽按模式切进度/倒计时/最佳分)、词块 weight500+×0.93、菜单 ✕/点外回游戏/图标翻转、分数胶囊、emoji→手绘 SVG(色块偏移+墨线)、下划线一笔、庆祝进分数槽、词行删除、盘面 **4×9=18 对**(轮数=⌈池/9⌉,42 关,迁移 lvOrder v3)、连线虚线+边中点+lit 边框、--hot 统一橙红、朗读关→确认音、插画 grugRough 滤镜(feTurbulence+displacement,零重绘手绘化)。
 - **link-match v1.8(2026-10-04)**:**Grug 手作主题**(用户从四方向效果图选定 D)——`settings.theme` 默认 "grug",Papier 可切回;CSS 在 `body.theme-grug:not(.dark)` 下覆盖(暗色变量级联在后不破坏);tile 歪斜走 applyTileRotations(inline transform,与 scale/translate 动画属性不冲突);字号测量按主题选字体(手写体更宽)。效果图:docs/mockups/aesthetics.html。
 - **tile-match v0.9(2026-10-04,一次性解冻做美术,功能仍冻结)**:移植 link-match v1.8/v1.9 风格——Grug 主题(Thema 设置,Grug 默认/Papier 切回)+ 字号按主题手写字体测量 ×0.93/字重500 + emoji 全清换手绘 SVG(ICO_STAR/FLAME/CLOCK/TARGET)+ 分数真胶囊(**渐变字会吞 SVG 描边**,两主题都改实底)+ grugRough 滤镜 + --hot + 菜单 ✕/点外 + TTS=0 确认音;**与 link-match 实现差异:三消词块移动走 transform translate,歪斜必须合并进同一 transform(tileRot),不能独立 rotate**;hint 开关作用域到主题圆角/色染(no-shape/no-color);顺修弹窗后兜底自愈 pickRefillTile 读 level.verbs 崩(加空回退)。
+- **tile-match v0.95(2026-10-05,同步 link-match-demo 云栈+UX)**:后端 `saves_games(user_id,game)` 新表(game='tilematch';**saves 旧表仍专属 demo,save/load 带 `?game=tilematch` 才走新表,缺省行为不变**)+ account DELETE 连带清 saves_games + Google OAuth `?game=tile`(发起端 g_game cookie,回调写 `nlm3.auth` 跳 /tile-match/,失败页同源返回;state 格式未动不碰 CSRF)。前端=demo v1.17–v1.19 同款:设置 Cloudopslag 区块+欢迎页(登录优先+Google+游客兜底,welcomeDone)+Profiel 档案页(显示名+登录态+两步删除)+cloud 引擎(4s 去抖/keepalive/cloudMerge/401 静默)+菜单语言行+**模式介绍弹窗**(点每日/无尽先弹说明+最高分+Start;每日已完成=只说明+返回)。**不做:排行榜**(daily_scores 无 game 维度,重建表有迁移风险,单独立项)→ 无 lbSent/无成绩补报。QA:curl 全套(双表隔离/cookie/删号)+浏览器全链路(欢迎页三语/游客/注册/自动同步/清档云恢复/模式弹窗)+bot 零错误。
 
 ## 已踩过的坑(别再踩)
 
@@ -107,7 +108,7 @@ gamified-learning/
 - **wrangler 登录态会过期/切账号**:报"In a non-interactive environment..."(要 CLOUDFLARE_API_TOKEN)或 7403 "account is not valid"→ 让用户跑一次 `npx wrangler login`(浏览器授权);自动化环境可设 CLOUDFLARE_API_TOKEN。
 - **内联 `<script>` 给 `localStorage.setItem` 传值必须是字符串字面量**:传对象会隐式 `toString()` 存成 `"[object Object]"`→启动解析失败→登录墙死循环(Google 回调致命 bug,PR #7)。正确写法:`JSON.stringify(JSON.stringify(obj))` + `<>&`/行分隔符 unicode 转义。用户名密码登录走前端 JSON.stringify 不经过这条路,所以只在 OAuth 出现——**修登录 bug 先分清走哪条路径**。
 - **排行榜去重不能按"每天一次"闸**:会把当天后来打出的更高分永久挡在服务器外(用户实测 5235 vs 榜上 15)。正确姿势:记录"已上报分数",本地最高>已上报就补报(服务器 `MAX()` 幂等,重复无害);启动时也补报一次,存量缺口自动修正。
-- **前端/后端同源函数是拷贝**:`genDisplayName`(显示名词库)在 `functions/api/_lib.js` 和 demo 前端各一份——**改动必须两边同步**(漏一边=前端启动 ReferenceError)。
+- **前端/后端同源函数是拷贝**:`genDisplayName`(显示名词库)在 `functions/api/_lib.js`、demo 前端、tile-match 前端各一份(2026-10-05 起三份)——**改动必须三边同步**(漏一边=前端启动 ReferenceError)。
 - **Google OAuth 三个硬知识**:①`workers.dev`/`github.io`/免费域名都在公共后缀名单,**无法通过 Google 域名验证**——发布(Publish)必须有自购域名+Search Console 验证+公开的 privacy/terms 页;②Testing 模式 Test users 上限 100 人,名单外 "Access blocked";③Auth Platform 的 metrics 面板有 1–2 天延迟,以 D1 数据为准。
 - **清理测试账号必须精确圈定**:DELETE 的 WHERE 里只放测试用户名;曾险些误伤真实用户数据(自查后手动补了 display_name)——动远程库前先 SELECT 确认影响行。
 - **QA 别留在本地服务器页面**:测完 `wrangler dev` 要停+提醒关掉 127.0.0.1 标签页——用户在死掉的本地页点登录("停留在登录界面"),排查半天其实是服务器没起。另外 Google 凭据在本地要用 `--var` 假值,真值只在生产 Secret。

@@ -1,5 +1,12 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · tile-match v0.95 同步 link-match-demo:云存档+账号 + 界面三项(用户:连连看更新了,同步过来)
+
+- **范围**:对照 demo v1.14–v1.19 排同步清单。**做**:云存档+账号栈、模式介绍弹窗、菜单语言行。**不做**:排行榜(daily_scores 无 game 维度,要重建表迁移,单独立项记 ROADMAP)、demo 专属词表/关卡结构、统一词卡组件(三消横幅是条形非卡片,产品形态不同)。
+- **后端(不碰 demo 行为)**:新表 `saves_games(user_id, game, data)`(schema.sql 幂等;远程 D1 已执行)——save/load 增 `?game=tilematch` 路由,缺省仍走 saves 旧表(demo 零改动);account DELETE 连带清 saves_games;Google OAuth 发起端 `?game=tile` 种 `g_game` cookie(state 仍纯 hex 不碰 CSRF),回调按 cookie 写 `nlm3.auth` 并跳 `/tile-match/`,失败页同源返回。
+- **前端(=demo v1.17–v1.19 引擎移植)**:设置 Cloudopslag 区块(登录/注册/立即同步/退出/状态角标)、欢迎页(登录优先+Google+游客兜底,welcomeDone,只挡全新玩家)、Profiel 档案页(显示名本地/云端、登录态、删除两步确认)、cloud 引擎(persist→4s 去抖上传、hidden keepalive 补发、cloudMerge 数值大/布尔或/数组并/对象递归、401 静默登出、失败离线照玩)、游客显示名(genDisplayName 第三份拷贝,三边同步坑已记)、菜单/欢迎页语言行、NLM3.cloud()/skipWelcome() 钩子。**模式介绍弹窗**:点每日/无尽先弹"说明+最高分+Start"(demo v1.14 定稿交互),每日已完成=说明+返回不开局。
+- **QA**:本地 `wrangler dev --persist-to /tmp`(假 Google secret)。curl 全套:tilematch 存取、demo 槽隔离(null→自有数据)、?game=tile 种 g_game cookie、无参不种、删号后会话失效。浏览器全链路:欢迎页三语切换/游客进入/玩一步 4s 自动上云(服务器核对 85 词整包)/清档刷新→欢迎页→登录→云恢复(unlocked 4+85 词)/恢复后可玩/模式弹窗 Start/Terug;bot 数步零错误。踩自己的坑一次:种子写 localStorage 不刷新内存→首解锁卡挂起 swap(AGENTS 已有记录,照做即免)。云链路测试在 8787(wrangler dev)独立 origin 做;测完停 dev+提醒关本地标签页。
+
 ## 2026-10-05 · v1.19(link-match-demo)档案页+显示名 + 每日排行榜 + 落地页
 
 - **档案页(菜单 Profiel 按钮)**:显示名(输入框+Opslaan,不查重——设计拍板:显示名只是昵称,身份靠账号;撞名无实际危害)+登录态区(未登录=用户名/密码+Google;已登录=Ingelogd als+Uitloggen+**Verwijder account 两步确认**,3 秒内再点才执行,服务端连带删 daily_scores/sessions/saves/users)。显示名规则:登录用户建号时按 user id 确定性生成(形容词32×名词32,存 users.display_name 新列,两设备同默认名);游客本地生成即落盘(**修:genDisplayName 曾只写后端,前端未定义启动即崩,复测捕获;两份词库需同步**);改登录用户的名走 PATCH /api/profile。
