@@ -1,0 +1,15 @@
+# Workers 静态资产排除清单(源码/文档不对外,游戏 HTML 全保留)
+.git
+.wrangler
+node_modules
+.zcode
+.zcodeignore
+functions
+docs
+AGENTS.md
+README.md
+LICENSE
+schema.sql
+wrangler.toml
+worker.js
+.assetsignore
