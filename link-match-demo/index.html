@@ -652,6 +652,7 @@
           <button id="cloudLoginBtn" class="cloud-btn primary" data-i18n="cloud.in">Inloggen</button>
           <button id="cloudSignupBtn" class="cloud-btn" data-i18n="cloud.new">Nieuw account</button>
         </div>
+        <button id="cloudGoogleBtn" class="cloud-btn wl-google"><svg viewBox="0 0 18 18" style="width:16px; height:16px; flex:none;" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.32A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.96H.96a9 9 0 0 0 0 8.08l3.01-2.32z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.9 11.42 0 9 0A9 9 0 0 0 .96 4.96l3.01 2.32C4.68 5.16 6.66 3.58 9 3.58z"/></svg><span data-i18n="wl.google">Met Google doorgaan</span></button>
       </div>
       <div id="cloudLoggedIn" style="display:none;">
         <div id="cloudAs" style="font-size:13px; font-weight:700; margin-top:9px;"></div>
@@ -2626,6 +2627,7 @@ document.getElementById("cloudSignupBtn").onclick=()=>cloudDoAuth(true,document.
 document.getElementById("wlLogin").onclick=()=>cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
 document.getElementById("wlSignup").onclick=()=>cloudDoAuth(true,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow);
 document.getElementById("wlGoogle").onclick=()=>{ location.href="/api/auth/google"; };
+document.getElementById("cloudGoogleBtn").onclick=()=>{ location.href="/api/auth/google"; };
 document.getElementById("wlGuest").onclick=welcomeDoneNow;
 document.getElementById("wlUser").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("wlPass").focus(); });
 document.getElementById("wlPass").addEventListener("keydown",e=>{ if(e.key==="Enter") cloudDoAuth(false,document.getElementById("wlUser"),document.getElementById("wlPass"),welcomeDoneNow); });
