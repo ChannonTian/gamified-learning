@@ -1201,12 +1201,14 @@ function cloudLost(){   // 会话失效(401):静默退出登录态
 
 /* ---- Profiel(显示名 + 登录态;显示名不查重,身份靠账号) ---- */
 function utcKey(){ return new Date().toISOString().slice(0,10); }
-function cloudSubmitDaily(){   // 登录后把今天的每日成绩报给排行榜(服务器保留当日最高)
+function cloudSubmitDaily(){   // 登录后把今天的每日成绩报给排行榜:本地最高分 > 已上报分数才发(服务器 MAX 幂等,重复无害)
   if(!cloudAuth) return;
-  const best=save.dailyBest[todayKey()]||0;
-  if(best<=0 || save.lbSent===utcKey()) return;
+  const u=utcKey(), best=save.dailyBest[todayKey()]||0;
+  if(best<=0) return;
+  const sent=(save.lbSent&&typeof save.lbSent==="object")?(save.lbSent[u]||0):0;   // 旧格式(字符串日期)视为 0,自动补报一次
+  if(best<=sent) return;
   fetch("/api/score",{method:"POST",headers:cloudHeaders(),body:JSON.stringify({score:best})})
-    .then(r=>{ if(r.ok){ save.lbSent=utcKey(); persist(); } })
+    .then(r=>{ if(r.ok){ save.lbSent={[u]:best}; persist(); } })
     .catch(()=>{});
 }
 function myDisplayName(){
@@ -2865,7 +2867,7 @@ applySettings();
 syncSize();
 if(!save.displayName){ save.displayName=genDisplayName(Date.now()); persist(); }   // 游客显示名:生成即落盘,刷新不变
 openMenu();
-if(cloudAuth) cloudPull();
+if(cloudAuth){ cloudPull(); cloudSubmitDaily(); }   // 启动即补报:昨天/旧版漏掉或被去重挡掉的更高分,上线就修正
 if(welcomeNeeded()){
   renderWelcome();
   buildLangRow(document.getElementById("wlLang"));
