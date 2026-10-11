@@ -420,6 +420,12 @@
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
   #cardModal .word-card{ margin-top:8px; }
+  /* 例句卡 prototype:例句 + 词形高亮 + 中文 */
+  .wc-sent{ display:block; width:100%; text-align:left; margin-top:12px; padding-top:10px; border-top:1.5px dashed color-mix(in srgb, currentColor 25%, transparent); font-size:15.5px; line-height:1.55; font-weight:600; }
+  .wc-sent .wsh{ font-weight:800; color:hsl(var(--h) 55% 38%); text-decoration:underline dashed 1.5px; text-decoration-color:color-mix(in srgb, currentColor 45%, transparent); text-underline-offset:3px; }
+  body.dark .wc-sent .wsh{ color:hsl(var(--h) 60% 66%); }
+  .wc-sent-label{ display:block; font-size:10.5px; font-weight:800; letter-spacing:.8px; color:#98a1b0; text-transform:uppercase; margin-bottom:3px; }
+  .wc-sent-zh{ display:block; font-size:12.5px; opacity:.62; margin-top:4px; font-weight:500; }
   #resultModal .panel{text-align:center;}
   .btn{
     display:inline-block; border:none; border-radius:12px;
@@ -656,24 +662,24 @@ window.__errs=[]; window.addEventListener("error",e=>{(window.__errs=window.__er
 "use strict";
 /* ================= 数据:85 词(与 tile-match 同源,改动需两边同步) ================= */
 const VERBS=[
-  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215},
-  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12},
-  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275},
-  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160},
-  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48},
-  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330},
-  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65},
+  {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215, p1:"ben", p3:"is", p6:"zijn", st:"Vorige week was ik in Amsterdam; ik ben er vaak geweest.", stz:"上周我在阿姆斯特丹;我去过那儿很多次。"},
+  {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12, p1:"heb", p3:"heeft", p6:"hebben", st:"Vroeger had ik een hond; we hebben hem nog steeds.", stz:"以前我养过一只狗;我们现在还养着它。"},
+  {inf:"gaan",     sg:"ging",    pl:"gingen",   pp:"gegaan",     en:"to go",    zh:"去",    hue:275, p1:"ga", p3:"gaat", p6:"gaan", st:"Ik ging naar de markt; mijn vrienden zijn ook gegaan.", stz:"我去了市场;我的朋友们也去了。"},
+  {inf:"komen",    sg:"kwam",    pl:"kwamen",   pp:"gekomen",    en:"to come",  zh:"来",    hue:160, p1:"kom", p3:"komt", p6:"komen", st:"Hij kwam te laat, want de bus was niet gekomen.", stz:"他来晚了,因为公交一直没来。"},
+  {inf:"zien",     sg:"zag",     pl:"zagen",    pp:"gezien",     en:"to see",   zh:"看见",  hue:48, p1:"zie", p3:"ziet", p6:"zien", st:"Ik zag hem gisteren; vandaag heb ik hem weer gezien.", stz:"我昨天见到了他;今天又见到了。"},
+  {inf:"geven",    sg:"gaf",     pl:"gaven",    pp:"gegeven",    en:"to give",  zh:"给",    hue:330, p1:"geef", p3:"geeft", p6:"geven", st:"Oma gaf ons taart; ze heeft het recept aan mij gegeven.", stz:"奶奶给了我们蛋糕;她把配方给了我。"},
+  {inf:"nemen",    sg:"nam",     pl:"namen",    pp:"genomen",    en:"to take",  zh:"拿",    hue:65, p1:"neem", p3:"neemt", p6:"nemen", st:"Ik nam de trein; jij hebt de bus genomen.", stz:"我坐了火车;你坐了公交。"},
   {inf:"blijven",  sg:"bleef",   pl:"bleven",   pp:"gebleven",   en:"to stay",  zh:"停留",  hue:190},
-  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130},
-  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356},
+  {inf:"lopen",    sg:"liep",    pl:"liepen",   pp:"gelopen",    en:"to walk",  zh:"走",    hue:130, p1:"loop", p3:"loopt", p6:"lopen", st:"Wij liepen in het park; daarna heb ik nog een rondje gelopen.", stz:"我们在公园散步;之后我又多走了一圈。"},
+  {inf:"eten",     sg:"at",      pl:"aten",     pp:"gegeten",    en:"to eat",   zh:"吃",    hue:356, p1:"eet", p3:"eet", p6:"eten", st:"We aten samen; hebben jullie al gegeten?", stz:"我们一起吃了饭;你们吃过了吗?"},
   {inf:"schrijven",sg:"schreef", pl:"schreven", pp:"geschreven", en:"to write", zh:"写",    hue:250},
   {inf:"slapen",   sg:"sliep",   pl:"sliepen",  pp:"geslapen",   en:"to sleep", zh:"睡觉",  hue:300},
-  {inf:"drinken",  sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝"},
-  {inf:"zitten",   sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐"},
-  {inf:"liggen",   sg:"lag",     pl:"lagen",    pp:"gelegen",    en:"to lie",   zh:"躺"},
-  {inf:"staan",    sg:"stond",   pl:"stonden",  pp:"gestaan",    en:"to stand", zh:"站"},
-  {inf:"lezen",    sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读"},
-  {inf:"spreken",  sg:"sprak",   pl:"spraken",  pp:"gesproken",  en:"to speak", zh:"说"},
+  {inf:"drinken",  sg:"dronk",   pl:"dronken",  pp:"gedronken",  en:"to drink", zh:"喝", p1:"drink", p3:"drinkt", p6:"drinken", st:"Ik dronk koffie; hij heeft er drie gedronken.", stz:"我喝了咖啡;他喝了三杯。"},
+  {inf:"zitten",   sg:"zat",     pl:"zaten",    pp:"gezeten",    en:"to sit",   zh:"坐", p1:"zit", p3:"zit", p6:"zitten", st:"Ik zat in de tuin; de kat heeft in de zon gezeten.", stz:"我坐在花园里;猫在太阳底下坐着。"},
+  {inf:"liggen",   sg:"lag",     pl:"lagen",    pp:"gelegen",    en:"to lie",   zh:"躺", p1:"lig", p3:"ligt", p6:"liggen", st:"Het boek lag op tafel; het heeft daar een week gelegen.", stz:"书放在桌上;它在那儿放了一周。"},
+  {inf:"staan",    sg:"stond",   pl:"stonden",  pp:"gestaan",    en:"to stand", zh:"站", p1:"sta", p3:"staat", p6:"staan", st:"De auto stond voor de deur; hij is daar weken gestaan.", stz:"车停在门口;它在那儿停了好几周。"},
+  {inf:"lezen",    sg:"las",     pl:"lazen",    pp:"gelezen",    en:"to read",  zh:"读", p1:"lees", p3:"leest", p6:"lezen", st:"Ik las elke avond; dit boek heb ik in één weekend gelezen.", stz:"我那时每晚读书;这本书我一个周末就读完了。"},
+  {inf:"spreken",  sg:"sprak",   pl:"spraken",  pp:"gesproken",  en:"to speak", zh:"说", p1:"spreek", p3:"spreekt", p6:"spreken", st:"Ze sprak heel rustig; we hebben een uur gesproken.", stz:"她说得很平静;我们聊了一个小时。"},
   {inf:"doen",     sg:"deed",    pl:"deden",    pp:"gedaan",     en:"to do",    zh:"做"},
   {inf:"weten",    sg:"wist",    pl:"wisten",   pp:"geweten",    en:"to know",  zh:"知道"},
   {inf:"zeggen",   sg:"zei",     pl:"zeiden",   pp:"gezegd",     en:"to say",   zh:"说(话)"},
@@ -741,11 +747,11 @@ const VERBS=[
   {inf:"verbieden",sg:"verbood", pl:"verboden", pp:"verboden",   en:"to forbid",zh:"禁止"},
   {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen",   en:"to proceed",zh:"进行"},
   {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen",  en:"to meet",  zh:"遇到"},
-  {inf:"kunnen",   sg:"kon",     pl:"konden",   pp:"gekund",     en:"can; to be able",  zh:"能;会"},
-  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoet",     en:"must; to have to", zh:"必须;得"},
-  {inf:"willen",   sg:"wilde",   pl:"wilden",   pp:"gewild",     en:"to want",  zh:"想要"},
-  {inf:"mogen",    sg:"mocht",   pl:"mochten",  pp:"gemogen",    en:"may; to be allowed",  zh:"可以;被允许"},
-  {inf:"zoeken",   sg:"zocht",   pl:"zochten",  pp:"gezocht",    en:"to look for",  zh:"找;寻找"},
+  {inf:"kunnen",   sg:"kon",     pl:"konden",   pp:"gekund",     en:"can; to be able",  zh:"能;会", p1:"kan", p3:"kan", p6:"kunnen", st:"Eerst kon ik het niet, maar nu heb ik het eindelijk gekund.", stz:"起初我不会;现在我终于做到了。"},
+  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoet",     en:"must; to have to", zh:"必须;得", p1:"moet", p3:"moet", p6:"moeten", st:"Morgen moet ik vroeg weg; gisteren moest dat ook al.", stz:"明天我得早出门;昨天就已经是这样了。"},
+  {inf:"willen",   sg:"wilde",   pl:"wilden",   pp:"gewild",     en:"to want",  zh:"想要", p1:"wil", p3:"wil", p6:"willen", st:"Ik wil een hond; als kind wilde ik er altijd al één.", stz:"我想要一只狗;小时候我就一直想要。"},
+  {inf:"mogen",    sg:"mocht",   pl:"mochten",  pp:"gemogen",    en:"may; to be allowed",  zh:"可以;被允许", p1:"mag", p3:"mag", p6:"mogen", st:"Mag jij dat? Als kind mocht ik dat nooit.", stz:"你可以这样做吗?我小时候可从来不被允许。"},
+  {inf:"zoeken",   sg:"zocht",   pl:"zochten",  pp:"gezocht",    en:"to look for",  zh:"找;寻找", p1:"zoek", p3:"zoekt", p6:"zoeken", st:"Ik zocht overal; uiteindelijk heb ik ze onder de bank gezocht.", stz:"我到处找;最后在沙发底下找到了。"},
   {inf:"zwemmen",  sg:"zwam",    pl:"zwammen",  pp:"gezwommen",  en:"to swim",  zh:"游泳"},
   {inf:"vliegen",  sg:"vloog",   pl:"vlogen",   pp:"gevlogen",   en:"to fly",   zh:"飞;乘飞机"},
   {inf:"stelen",   sg:"stal",    pl:"stolen",   pp:"gestolen",   en:"to steal", zh:"偷"},
@@ -764,6 +770,50 @@ const VERBS=[
   {inf:"verschijnen", sg:"verscheen", pl:"verschenen", pp:"verschenen", en:"to appear",  zh:"出现"},
   {inf:"bevriezen", sg:"bevroor", pl:"bevroren", pp:"bevroren",   en:"to freeze (solid)",  zh:"结冰;冻结"},
   {inf:"stinken",  sg:"stonk",   pl:"stonken",  pp:"gestonken",  en:"to stink", zh:"发臭"},
+  /* ---- B1 补缺(日常核心强变化词,v1.20 铺量) ---- */
+  {inf:"bevelen",  sg:"beval",   pl:"bevalen",  pp:"bevolen",    en:"to command", zh:"命令",  hue:88},
+  {inf:"breken",   sg:"brak",    pl:"braken",   pp:"gebroken",   en:"to break",   zh:"打破",  hue:122},
+  {inf:"steken",   sg:"stak",    pl:"staken",   pp:"gestoken",   en:"to sting",   zh:"刺",    hue:322},
+  {inf:"slaan",    sg:"sloeg",   pl:"sloegen",  pp:"geslagen",   en:"to hit",     zh:"打",    hue:2},
+  {inf:"blazen",   sg:"blies",   pl:"bliezen",  pp:"geblazen",   en:"to blow",    zh:"吹",    hue:194},
+  {inf:"meten",    sg:"mat",     pl:"maten",    pp:"gemeten",    en:"to measure", zh:"测量",  hue:172},
+  {inf:"varen",    sg:"voer",    pl:"voeren",   pp:"gevaren",    en:"to sail",    zh:"乘船",  hue:208},
+  {inf:"graven",   sg:"groef",   pl:"groeven",  pp:"gegraven",   en:"to dig",     zh:"挖",    hue:28},
+  {inf:"blijken",  sg:"bleek",   pl:"bleken",   pp:"gebleken",   en:"to turn out",zh:"表明",  hue:138},
+  /* ---- B2(12 词承 four-match v0.2 已校对池,3 词新编) ---- */
+  {inf:"bergen",   sg:"borg",    pl:"borgen",   pp:"geborgen",   en:"to salvage", zh:"打捞",  hue:205},
+  {inf:"spinnen",  sg:"spon",    pl:"sponnen",  pp:"gesponnen",  en:"to spin",    zh:"纺线",  hue:255},
+  {inf:"rijzen",   sg:"rees",    pl:"rezen",    pp:"gerezen",    en:"to rise",    zh:"升起",  hue:160},
+  {inf:"gelijken", sg:"geleek",  pl:"geleken",  pp:"geleken",    en:"to resemble",zh:"酷似",  hue:25},
+  {inf:"bezwijken",sg:"bezweek", pl:"bezweken", pp:"bezweken",   en:"to succumb", zh:"倒下",  hue:290},
+  {inf:"vlechten", sg:"vlocht",  pl:"vlochten", pp:"gevlochten", en:"to plait",   zh:"编织",  hue:55},
+  {inf:"mijden",   sg:"meed",    pl:"meden",    pp:"gemeden",    en:"to avoid",   zh:"回避",  hue:345},
+  {inf:"doorzien", sg:"doorzag", pl:"doorzagen",pp:"doorzien",   en:"to see through",zh:"看穿",hue:235},
+  {inf:"overzien", sg:"overzag", pl:"overzagen",pp:"overzien",   en:"to oversee", zh:"总览",  hue:145},
+  {inf:"bezingen", sg:"bezong",  pl:"bezongen", pp:"bezongen",   en:"to celebrate in song",zh:"歌颂",hue:15},
+  {inf:"verslinden",sg:"verslond",pl:"verslonden",pp:"verslonden",en:"to devour",  zh:"吞噬",  hue:315},
+  {inf:"vreten",   sg:"vrat",    pl:"vraten",   pp:"gevreten",   en:"to devour",  zh:"吞食",  hue:35},
+  {inf:"splijten", sg:"spleet",  pl:"spleten",  pp:"gespleten",  en:"to split",   zh:"劈开",  hue:262},
+  {inf:"ontsteken",sg:"ontstak", pl:"ontstaken",pp:"ontstoken",  en:"to kindle",  zh:"点燃",  hue:20},
+  {inf:"scheren",  sg:"schoor",  pl:"schoren",  pp:"geschoren",  en:"to shave",   zh:"剃毛",  hue:30},
+  /* ---- C1(文学/低频强变化词,新编) ---- */
+  {inf:"delven",   sg:"dolf",    pl:"dolven",   pp:"gedolven",   en:"to delve",   zh:"采掘",  hue:75},
+  {inf:"verdrieten",sg:"verdroot",pl:"verdroten",pp:"verdroten", en:"to begrudge",zh:"舍不得",hue:348},
+  {inf:"gebieden", sg:"gebood",  pl:"geboden",  pp:"geboden",    en:"to enjoin",  zh:"谕令",  hue:42},
+  {inf:"ontgaan",  sg:"ontging", pl:"ontgingen",pp:"ontgaan",    en:"to escape one's notice",zh:"未察觉",hue:218},
+  {inf:"verwerpen",sg:"verwierp",pl:"verwierpen",pp:"verworpen", en:"to reject",  zh:"摒弃",  hue:8},
+  {inf:"spijten",  sg:"speet",   pl:"speten",   pp:"gespeten",   en:"to be regretted",zh:"使懊悔",hue:300},
+  {inf:"zwelgen",  sg:"zwolg",   pl:"zwolgen",  pp:"gezwolgen",  en:"to gulp down",zh:"狼吞虎咽",hue:96},
+  {inf:"ontwerpen",sg:"ontwierp",pl:"ontwierpen",pp:"ontworpen",  en:"to design",  zh:"设计",  hue:232},
+  {inf:"vervliegen",sg:"vervloog",pl:"vervlogen",pp:"vervlogen", en:"to fade away",zh:"消散",  hue:184},
+  /* ---- 人称代词组(PR;ik 本位 ↔ 宾格/物主/反身;sg/pl/pp 字段复用为 obj/pos/refl) ---- */
+  {inf:"ik",     sg:"mij",    pl:"mijn",   pp:"mezelf",   en:"I / me / my / myself",       zh:"我",    hue:150, pron:true, st:"Ik pak mijn tas; jij hoeft die niet voor mij te dragen.", stz:"我拿自己的包;你不用替我拿。"},
+  {inf:"jij",    sg:"jou",    pl:"jouw",   pp:"jezelf",   en:"you / your / yourself",      zh:"你",    hue:210, pron:true, st:"Jij bent vroeg; heb jij jouw boek bij jou?", stz:"你来真早;你的书带在身上吗?"},
+  {inf:"hij",    sg:"hem",    pl:"zijn",   pp:"zichzelf", en:"he / him / his / himself",   zh:"他",    hue:30,  pron:true, st:"Hij wast zijn handen; zijn moeder roept hem.", stz:"他在洗手;他妈妈在叫他。"},
+  {inf:"zij",    sg:"haar",   pl:"haar",   pp:"zichzelf", en:"she / her / herself",        zh:"她",    hue:330, pron:true, st:"Zij zoekt haar sleutels; niemand heeft haar gezien.", stz:"她在找她的钥匙;没人见过她。"},
+  {inf:"wij",    sg:"ons",    pl:"onze",   pp:"onszelf",  en:"we / us / our / ourselves",  zh:"我们",  hue:265, pron:true, st:"Wij nemen onze tassen mee; de bus wacht op ons.", stz:"我们带上自己的包;公交在等我们。"},
+  {inf:"jullie", sg:"jullie", pl:"jullie", pp:"jezelf",   en:"you (pl) / your",            zh:"你们",  hue:60,  pron:true, st:"Dit is jullie kamer; jullie mogen blijven.", stz:"这是你们的房间;你们可以留下。"},
+  {inf:"zij",    sg:"hen",    pl:"hun",    pp:"zich",     en:"they / them / their",        zh:"他们",  hue:100, pron:true},
 ];
 VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
 
@@ -771,17 +821,43 @@ VERBS.forEach((v,i)=>{ if(v.hue==null) v.hue=Math.round((i*137.508)%360); });
 const TIER_NAMES=[
   {band:"A1", names:["zijn","hebben","gaan","komen","zien","geven","nemen","lopen","eten","drinken","zitten","liggen","staan","lezen","spreken","kunnen","moeten","willen","mogen","zoeken"]},
   {band:"A2", names:["slapen","blijven","schrijven","doen","weten","zeggen","houden","kiezen","beginnen","begrijpen","brengen","denken","vinden","helpen","kopen","krijgen","vragen","wassen","dragen","verliezen","winnen","hangen","sterven","vergeten","bieden","trekken","zingen","vallen","sluiten","rijden","zwemmen","vliegen","stelen","schieten","roepen","verdwijnen","duiken","verstaan"]},
-  {band:"B1", names:["zwijgen","wijzen","werpen","gelden","smelten","zwellen","binden","zenden","bijten","gieten","wringen","zuigen","krimpen","springen","klinken","zinken","lijden","scheppen","heffen","vriezen","schrikken","vechten","prijzen","genezen","wegen","treden","schenden","besluiten","bedriegen","bederven","ontbreken","beschrijven","vermijden","wijken","schuiven","klimmen","dringen","verbieden","verlopen","treffen","genieten","dwingen","glijden","kruipen","bestaan","onthouden","vertrekken","verschijnen","bevriezen","stinken"]},
+  {band:"B1", names:["zwijgen","wijzen","werpen","gelden","smelten","zwellen","binden","zenden","bijten","gieten","wringen","zuigen","krimpen","springen","klinken","zinken","lijden","scheppen","heffen","vriezen","schrikken","vechten","prijzen","genezen","wegen","treden","schenden","besluiten","bedriegen","bederven","ontbreken","beschrijven","vermijden","wijken","schuiven","klimmen","dringen","verbieden","verlopen","treffen","genieten","dwingen","glijden","kruipen","bestaan","onthouden","vertrekken","verschijnen","bevriezen","stinken","bevelen","breken","steken","slaan","blazen","meten","varen","graven","blijken"]},
+  {band:"B2", names:["bergen","spinnen","rijzen","gelijken","bezwijken","vlechten","mijden","doorzien","overzien","bezingen","verslinden","vreten","splijten","ontsteken","scheren"]},
+  {band:"C1", names:["delven","verdrieten","gebieden","ontgaan","verwerpen","spijten","zwelgen","ontwerpen","vervliegen"]},
 ];
 const VIDX={}; VERBS.forEach((v,i)=>{ VIDX[v.inf]=i; });
 const TIERS=TIER_NAMES.map(t=>({band:t.band, pool:t.names.map(n=>VIDX[n])}));
 const LINK_TYPES=["sg","pl","pp"];
 const LINK_LEVELS=[];
 const LV_ROUNDS=[];
-TIERS.forEach((t,ti)=>{
-  const R=Math.ceil(t.pool.length/9);      // 轮数=覆盖全池所需;每关 9 词×2 对=18 对      // 轮数=覆盖全池所需;每关 7 词
-  LV_ROUNDS.push(R);
+/* ---- PR 代词组(最前;ik 本位 ↔ 宾格 sg/物主 pl/反身 pp,字段复用) ---- */
+const PRON_VERBS=VERBS.map((v,i)=>v.pron?i:-1).filter(i=>i>=0);
+LV_ROUNDS.push(1);
+{
   let num=0;
+  LINK_TYPES.forEach(ty=>{
+    LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"PR", type:ty, num:++num, verbs:[...PRON_VERBS]});
+  });
+}
+/* ---- A1 人称变位组(现在时:ik / hij-zij / wij) ---- */
+{
+  const pool=TIERS[0].pool, R=Math.ceil(pool.length/9);
+  LV_ROUNDS.push(R);
+  const P_TYPES=["p1","p3","p6"];
+  let pnum=0;
+  P_TYPES.forEach((ty,fi)=>{
+    for(let round=0;round<R;round++){
+      const start=((fi*R)+round)*7 % pool.length;
+      const verbs=[];
+      for(let k=0;k<9;k++) verbs.push(pool[(start+k)%pool.length]);
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"A1", type:ty, num:++pnum, verbs});
+    }
+  });
+}
+TIERS.forEach((t,ti)=>{
+  const R=Math.ceil(t.pool.length/9);      // 轮数=覆盖全池所需;每关 9 词×2 对=18 对
+  LV_ROUNDS.push(R);
+  let num=LINK_LEVELS.filter(lv=>lv.band===t.band).length;   // A1 已有人称关:续编号
   LINK_TYPES.forEach((ty,fi)=>{            // 形式分组:先单数过去式各轮,再复数,最后分词(用户试玩反馈 #1/#3)
     for(let round=0;round<R;round++){
       const start=((fi*R)+round)*7 % t.pool.length;
@@ -791,8 +867,10 @@ TIERS.forEach((t,ti)=>{
     }
   });
 });
-const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp"};
-const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp"};
+const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp", p1:"legend.p1", p3:"legend.p3", p6:"legend.p6"};
+const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp", p1:"short.p1", p3:"short.p3", p6:"short.p6"};
+const PRON_SHORT_KEY={sg:"short.pr.obj", pl:"short.pr.pos", pp:"short.pr.ref"};   // PR 组:sg=宾格 pl=物主 pp=反身
+const keyOf=lv=>lv.band==="PR"?PRON_SHORT_KEY[lv.type]:SHORT_KEY[lv.type];
 
 /* ================= i18n ================= */
 const I18N={
@@ -804,6 +882,7 @@ const I18N={
     "mi.endless":"Jacht punten met je verzamelde vormen: elke keer 18 paren, de combo loopt door na een schoon bord.","mi.daily":"180 seconden, één keer per dag. Iedereen krijgt dezelfde puzzel.","mi.survival":"Elke koppel binnen 15 seconden — anders is het voorbij. Fout klikken mag.","mi.start":"Start","mi.back":"Terug",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
+    "legend.p1":"ik-vorm (o.t.t.)","legend.p3":"hij/zij-vorm (o.t.t.)","legend.p6":"wij-vorm (o.t.t.)","short.p1":"ik","short.p3":"hij/zij","short.p6":"wij","legend.pr.obj":"lijdend voorwerp","legend.pr.pos":"bezittelijk voornaamwoord","legend.pr.ref":"wederkerend","short.pr.obj":"obj.","short.pr.pos":"bezit","short.pr.ref":"refl.","band.pr":"Voornaamwoorden","card.sent":"Voorbeeldzin",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
@@ -818,7 +897,7 @@ const I18N={
     "help.p1":"Koppel het werkwoord aan zijn vorm: tik op de infinitief en op de vorm van hetzelfde werkwoord die met hoogstens 2 bochten verbonden is (via lege vakken of buiten de rand). Elk level oefent één vorm.",
     "help.goal":"Doel: vind alle paren voordat je vastloopt. Lukt het niet, dan wordt het bord opnieuw geschud.",
     "help.score":"Score: 15 punten per paar. Snelle paren na elkaar geven een combinatiebonus.",
-    "help.rules":"Levels heten A1.1, A1.2, …: binnen elke band komen eerst alle enkelvoud-rondes, daarna de meervoud-rondes en tot slot het voltooid deelwoord.",
+    "help.rules":"Levels heten A1.1, A1.2, …: eerst de persoonsvormen (ik / hij-zij / wij), daarna de verleden tijd (enk. → mv.) en tot slot het voltooid deelwoord. De PR-groep oefent voornaamwoorden: ik ↔ mij / mijn / mezelf.",
     "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag). Elk bord oefent één werkwoordsvorm.",
     "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
     "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
@@ -832,6 +911,7 @@ const I18N={
     "mi.endless":"用已收集的动词刷分:每盘 18 对,清盘后连击延续。","mi.daily":"180 秒,每天一次,所有玩家同一盘面。","mi.survival":"每次配对须在 15 秒内完成,超时即结束;点错不失败。","mi.start":"开始","mi.back":"返回",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
+    "legend.p1":"现在时第一人称","legend.p3":"现在时第三人称","legend.p6":"现在时复数","short.p1":"我形","short.p3":"三单","short.p6":"复数","legend.pr.obj":"宾格","legend.pr.pos":"物主代词","legend.pr.ref":"反身代词","short.pr.obj":"宾格","short.pr.pos":"物主","short.pr.ref":"反身","band.pr":"人称代词","card.sent":"例句",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手绘","theme.papier":"便签",
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
@@ -846,7 +926,7 @@ const I18N={
     "help.p1":"动词连连看:点选动词原形和同一动词的变位形式,两者以最多 2 个折角的路径连通(穿过空格或绕棋盘外圈)即可消除。每关只练一种形式。",
     "help.goal":"目标:找出全部配对。卡住时棋盘会自动重新洗牌。",
     "help.score":"计分:每对 +15 分;快速连续配对有连击加成。",
-    "help.rules":"关卡名为 A1.1、A1.2……每档先练完所有单数轮,再复数轮,最后过去分词轮。",
+    "help.rules":"关卡名为 A1.1、A1.2……每档先练人称变位(我形/三单/复数),再练过去时(单数→复数),最后过去分词。PR 组专练人称代词:ik ↔ mij / mijn / mezelf。",
     "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。每一盘只练一种词型,清盘后换下一型。",
     "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
     "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
@@ -860,6 +940,7 @@ const I18N={
     "mi.endless":"Chase points with your collected forms: 18 pairs per board, the combo carries over.","mi.daily":"180 seconds, once per day. Everyone gets the same puzzle.","mi.survival":"Each pair within 15 seconds — or it is over. Wrong taps are fine.","mi.start":"Start","mi.back":"Back",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
+    "legend.p1":"present I-form","legend.p3":"present he/she-form","legend.p6":"present we-form","short.p1":"I","short.p3":"he","short.p6":"we","legend.pr.obj":"object","legend.pr.pos":"possessive","legend.pr.ref":"reflexive","short.pr.obj":"obj.","short.pr.pos":"poss.","short.pr.ref":"refl.","band.pr":"Pronouns","card.sent":"Example",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
@@ -874,7 +955,7 @@ const I18N={
     "help.p1":"Verb pairs: tap the infinitive and the form of the same verb that is connected by a path with at most 2 turns (through empty cells or around the board edge). Each level practises one form.",
     "help.goal":"Goal: find all pairs before you get stuck. If you do get stuck, the board reshuffles.",
     "help.score":"Score: 15 points per pair. Quick consecutive pairs give a combo bonus.",
-    "help.rules":"Levels are named A1.1, A1.2, …: within each band all singular rounds come first, then the plural rounds, then the past participle.",
+    "help.rules":"Levels are named A1.1, A1.2, …: person forms first (I / he-she / we), then past tense (singular → plural), then the past participle. The PR group drills pronouns: ik ↔ mij / mijn / mezelf.",
     "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day). Each board practises one verb form; clear it to switch.",
     "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
     "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
@@ -896,7 +977,7 @@ try{
 // 关卡布局迁移:v1(18 关)→ v2(51 关,7 词)→ v3(42 关,9 词/18 对);done/best 按映射搬家,超出新轮次的记录丢弃
 if(save.lvOrder!=="v3"){
   const R2=[3,6,8], B2=[0,9,27];                      // v2:每档轮数与档基址(7 词/关时代)
-  const R3=LV_ROUNDS, B3=[0]; for(let i=1;i<R3.length;i++) B3.push(B3[i-1]+R3[i-1]*3);
+  const R3=TIERS.map(t=>Math.ceil(t.pool.length/9)), B3=[0]; for(let i=1;i<R3.length;i++) B3.push(B3[i-1]+R3[i-1]*3);
   const map=k=>{                                       // v2 索引 → v3 索引(新方案无此轮返回 -1)
     const i=+String(k).slice(1);
     if(isNaN(i)||i>=51) return i>=0?i:-1;
@@ -912,6 +993,18 @@ if(save.lvOrder!=="v3"){
     save.done=nd; save.best=nb;
   }
   save.lvOrder="v3";
+}
+// v4 迁移(2026-10-05):最前插入 PR 代词组 3 关 + A1 人称变位 9 关(+12)——旧 done/best/lUnlocked 顺移
+if(save.lvOrder!=="v4"){
+  const hasProg=(save.lUnlocked||1)>1 || (save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k)));
+  if(hasProg){
+    const nd={}, nb={};
+    for(const k in save.done){ const m2=/^L(\d+)$/.exec(k); nd[m2?("L"+(+m2[1]+12)):k]=save.done[k]; }
+    for(const k in save.best){ const m2=/^L(\d+)$/.exec(k); nb[m2?("L"+(+m2[1]+12)):k]=save.best[k]; }
+    save.done=nd; save.best=nb;
+    if(typeof save.lUnlocked==="number") save.lUnlocked+=12;
+  }
+  save.lvOrder="v4";
 }
 // 设置默认值迁移:v1.12 及之前横幅默认 10s、提示等待 12s → 统一 15s(用户自定义值保留)
 if(save.settings.bannerMs===10) save.settings.bannerMs=15;
@@ -2236,16 +2329,17 @@ function showMenuView(v){
 function renderLevelGrid(){
   const g=document.getElementById("lvGrid");
   g.innerHTML="";
-  TIERS.forEach(tr=>{
+  const bands=[{band:"PR", label:t("band.pr")}].concat(TIERS.map(tr=>({band:tr.band, label:tr.band})));
+  bands.forEach(gr=>{
     const head=document.createElement("div");
-    head.className="band-head"; head.textContent=tr.band;
+    head.className="band-head"; head.textContent=gr.label;
     g.appendChild(head);
     LINK_LEVELS.forEach((lv,i)=>{
-      if(lv.band!==tr.band) return;
+      if(lv.band!==gr.band) return;
       const b=document.createElement("button");
       const locked=i>save.lUnlocked-1;
       b.className="lv-btn k-"+lv.type+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型
-      b.innerHTML=`${lv.band}.${lv.num}<small>${t(SHORT_KEY[lv.type])}</small>`;
+      b.innerHTML=`${lv.band}.${lv.num}<small>${t(keyOf(lv))}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
       g.appendChild(b);
     });
@@ -2319,11 +2413,19 @@ function openBook(){
   document.getElementById("bookDrawer").classList.add("on");
 }
 let cardResolve=null;
+/* ---- 例句卡 prototype:把该词的各形态织进一句简单例句,词形高亮 + 中文 ---- */
+function sentHTML(V){
+  if(!V.st) return "";
+  const forms=[V.inf,V.sg,V.pl,V.pp].filter(Boolean).sort((a,b)=>b.length-a.length);
+  const re=new RegExp("("+forms.map(f=>f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")","gi");
+  const hl=V.st.replace(re,'<b class="wsh">$1</b>');
+  return `<div class="wc-sent"><span class="wc-sent-label">${t("card.sent")}</span>${hl}<span class="wc-sent-zh">${V.stz||""}</span></div>`;
+}
 function showCard(vi){
   return new Promise(res=>{
     cardResolve=res;
     const V=VERBS[vi];
-    document.getElementById("cardBody").innerHTML=wordCardHTML(vi,null);
+    document.getElementById("cardBody").innerHTML=wordCardHTML(vi,null)+sentHTML(V);
     document.getElementById("cardPanel").style.setProperty("--h",V.hue);
     document.getElementById("cardModal").classList.add("on");
     stopSpeech(); speakWords([V.inf,V.sg,V.pl,V.pp].filter(Boolean));   // 开卡朗读完整四形态

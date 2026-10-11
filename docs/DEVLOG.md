@@ -1,5 +1,13 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-05 · v1.20-v1.21(link-match)内容铺量 + PR 代词组 + A1 人称变位组 + 例句卡(用户拍板:铺量先做、插画押后先改美术、1/4 搁置)
+
+- **词池 108→148 词 / 42→66 关**:B1 补缺 9(bevelen/breken/steken/slaan/blazen/meten/varen/graven/blijken)+ **B2 15**(bergen/spinnen/rijzen/gelijken/bezwijken/vlechten/mijden/doorzien/overzien/bezingen/verslinden 承 four-match v0.2 已校对池 + vreten/splijten/ontsteken/scheren 新编)+ **C1 9**(delven/verdrieten/gebieden/ontgaan/verwerpen/spijten/zwelgen/ontwerpen/vervliegen 新编);TIER_NAMES 加 B2/C1 档(图鉴/网格自动出组)。新词全部首字母纹章 fallback(插画押后)。
+- **PR 代词组(最前 3 关)**:7 个人称代词(ik/jij/hij/zij/wij/jullie/zij-mv)以 VERBS 伪条目并入(pron 标记,sg/pl/pp 字段复用为 宾格/物主/反身),ik 本位 ↔ mij/mijn/mezel… 每关 7 对;网格/按钮标签走 band 感知 keyOf(PR 用 legend.pr.*),组头"Voornaamwoorden/人称代词"。**不进 TIERS** → 模式采样/图鉴不受影响(collectedPool 无代词已断言)。
+- **A1 人称变位组(9 关)**:A1 20 词加现在时人称字段 p1(ik)/p3(hij-zij)/p6(wij)——规则形式 + 不规则手写(zijn→ben/is、hebben→heb/heeft、kunnen→kan、mogen→mag…);3 类型 × 3 轮,排在代词后、过去时前(教学顺序)。**坑:字段名曾写 i1/i3/i6 与类型键 p1/p3/p6 不一致 → 磁贴全空(bot 仍"通过"——attemptPair 不校验文本),磁贴文本断言抓出。**
+- **例句卡 prototype**:VERBS 加 st/stz(荷/中);showCard 追加 sentHTML——句中该词各形态正则高亮(最-longest-first + 词边界)、中文翻译行、虚线分隔;先配 A1 20 词+代词 7 词,其余后续补。
+- **存档迁移 v3→v4**:前插 12 关(PR 3+人称 9)→ 旧 done/best 键 L<k>→L<k+12>、lUnlocked+12(有进度才迁,新档默认 PR.1);v2 迁移的目标轮数改从 TIERS 现算(前置组打乱了 LV_ROUNDS)。迁移用例:done L24→L36、best L12→L24、Oneindig 保留、lUnlocked 20→32 ✓。
+- QA:bot **66/66 关 588 对**、代词/人称关磁贴内容断言、例句卡(2 形态高亮+中文)、模式池无代词、零错误;视觉验收三图(PR.1/A1.1/例句卡)pass。
 ## 2026-10-05 · 主版同步(demo→link-match;冻结解除第一波)
 
 demo 定稿发布,按 AGENTS 冻结政策把**通用改进**同步回主版(demo 专属的 50 词表/18 关结构/分组标题/云登录/排行榜不带)。逐块从 demo 最终版移植,锚点法:
