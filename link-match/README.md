@@ -6,8 +6,8 @@
 
 - **五组关卡,组内按形式分关,互不锁关、可分别开始**:
   - **Voornaamwoorden(3 关)**:人称代词 ik ↔ 宾格/物主/反身(mij / mijn / mezelf);
-  - **Persoonsvormen(9 关)**:A1 动词现在时人称 ik / hij-zij / wij;
-  - **Lidwoorden de/het(4 关)**:名词 ↔ 冠词+名词(boek ↔ het boek;36 个 A1/A2 高频名词,冠词逐词经 Onze Taal 官方 het-words 词表核对);
+  - **Persoonsvormen(9 关)**:A1 动词现在时人称,磁贴带上人称(gaan ↔ **ik ga** / hij gaat / wij gaan);
+  - **Lidwoorden de/het(4 关)**:名词 ↔ 冠词+名词(boek ↔ het boek),**de/het 混在一盘**;相邻两关为一组:前一关名词磁贴带冠词提示(**de dag - dag**),下一关裸词(36 个 A1/A2 高频名词,冠词经 Onze Taal 官方 het-words 词表核对);
   - **Meervouden(4 关)**:单数 ↔ 复数 -en / -s / -'s(boek ↔ boeken;tafel ↔ tafels;auto ↔ auto's);
   - **Verleden tijd A1–C1(54 关)**:148 个动词的过去时单数 → 复数 → 过去分词。
 - 闯关:**4×5 盘,9 词×1 对(同屏零重复)+ 开局 2 个随机空位**;挑战模式:**4×9 盘,9 词×2 对=18 对**。点选原形块与同词的对应形式块,路径**最多 2 个折角**(可穿空格、绕棋盘外圈)即消除;无重力,消除后原位留空。
