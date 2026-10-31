@@ -906,7 +906,7 @@ const NOUNS=[
   {inf:"baby",    ap:"baby's",    gloss:"baby → babies",     zh:"婴儿",   hue:100},
   {inf:"pizza",   ap:"pizza's",   gloss:"pizza → pizzas",    zh:"披萨",   hue:25},
   {inf:"paraplu", ap:"paraplu's", gloss:"umbrella → umbrellas",zh:"雨伞", hue:290},
-  {inf:"bureau",  ap:"bureau's",  gloss:"desk → desks",      zh:"书桌",   hue:140},
+  {inf:"taxi",    ap:"taxi's",    gloss:"taxi → taxis",      zh:"出租车", hue:140},
   {inf:"menu",    ap:"menu's",    gloss:"menu → menus",      zh:"菜单",   hue:88},
   {inf:"hobby",   ap:"hobby's",   gloss:"hobby → hobbies",   zh:"爱好",   hue:315},
 ];
@@ -1020,7 +1020,7 @@ const I18N={
     "help.rules":"Vijf groepen, elk met een eigen volgorde: Voornaamwoorden (ik ↔ mij / mijn / mezelf), Persoonsvormen (ik / hij-zij / wij), Lidwoorden (boek ↔ het boek), Meervouden (boek ↔ boeken) en verleden tijd A1–C1 (enk. → mv. → voltooid deelwoord). De groepen sluiten elkaar niet af — je kunt overal beginnen.",
     "help.modes":"Modi: na niveau 1 ontgrendel je Oneindig, Overleven (elke koppel binnen de tijd) en de Dagelijkse uitdaging (180 seconden, één keer per dag). Elk bord oefent één werkwoordsvorm.",
     "help.stuck":"Vastgelopen? Tik op Hint — of wacht even. De hoekranden horen bij het spel: paden mogen erlangs.",
-    "demo.step1":"1 · Tik op het werkwoord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
+    "demo.step1":"1 · Tik op het onderstreepte woord","demo.step2":"2 · Tik op de bijpassende vorm","demo.step3":"3 · De lijn tekent zichzelf…","demo.go":"Nu jij!",
     "combo.m3":"Mooi!","combo.m5":"Geweldig!","combo.m8":"Formidabel!","combo.m12":"Legendarisch!",
   },
   zh:{
@@ -1049,7 +1049,7 @@ const I18N={
     "help.rules":"五组各有独立顺序:人称代词(ik ↔ mij / mijn / mezelf)、动词人称变位(我形 / 三单 / 复数)、冠词 de/het(boek ↔ het boek)、名词复数(boek ↔ boeken)、过去时 A1–C1(单数 → 复数 → 分词)。各组互不锁关,可分别开始。",
     "help.modes":"模式:通过第 1 关后解锁无尽模式(用你的词库刷分)、生存模式(每次消除之间限时)与每日挑战(180 秒,每天一次)。每一盘只练一种词型,清盘后换下一型。",
     "help.stuck":"卡住了?点 Hint 获取提示,或稍等片刻。棋盘外圈属于可通行区域。",
-    "demo.step1":"1 · 点击动词原形","demo.step2":"2 · 点击它的变位","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
+    "demo.step1":"1 · 点击带下划线的词","demo.step2":"2 · 点击它对应的形式","demo.step3":"3 · 连线自动画出来了…","demo.go":"该你了!",
     "combo.m3":"好样的!","combo.m5":"太棒了!","combo.m8":"势不可挡!","combo.m12":"传说级!",
   },
   en:{
@@ -1078,7 +1078,7 @@ const I18N={
     "help.rules":"Five groups, each with its own order: Pronouns (ik ↔ mij / mijn / mezelf), Person forms (ik / hij-zij / wij), Articles (boek ↔ het boek), Plurals (boek ↔ boeken) and past tense A1–C1 (singular → plural → participle). The groups unlock separately — start anywhere.",
     "help.modes":"Modes: after level 1 you unlock Endless, Survival (beat the clock between pairs) and the Daily Challenge (180 seconds, once per day). Each board practises one verb form; clear it to switch.",
     "help.stuck":"Stuck? Tap Hint — or wait a moment. The edges around the board are part of the play field.",
-    "demo.step1":"1 · Tap the verb","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
+    "demo.step1":"1 · Tap the underlined word","demo.step2":"2 · Tap its matching form","demo.step3":"3 · The line draws itself…","demo.go":"Your turn!",
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
   },
 };
@@ -1089,7 +1089,7 @@ function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.
 /* ================= 存档 ================= */
 const SAVE_KEY="linkmatch.v1";
 const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:15, bannerMs:15, theme:"grug", dark:false};
-let save={lUnlocked:1, gUnlocked:{}, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
+let save={gUnlocked:{}, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
@@ -1107,7 +1107,7 @@ if(save.lvOrder==="v2"||save.lvOrder==null){
     if(f>2||r>=R3[b]) return -1;
     return B3[b]+f*R3[b]+r;
   };
-  if(save.lvOrder==="v2"||(save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k)))){
+  if(save.lvOrder==="v2"||[save.done,save.best].some(records=>Object.keys(records).some(k=>/^L\d+$/.test(k)))){
     const nd={}, nb={};
     for(const k in save.done){ if(save.done[k]&&/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nd["L"+m2]=true; } }
     for(const k in save.best){ if(/^L\d+$/.test(k)){ const m2=map(k); if(m2>=0) nb["L"+m2]=save.best[k]; } else nb[k]=save.best[k]; }
@@ -1116,8 +1116,8 @@ if(save.lvOrder==="v2"||save.lvOrder==null){
   save.lvOrder="v3";
 }
 // v4 迁移(2026-10-05):最前插入 PR 代词组 3 关 + A1 人称变位 9 关(+12)——旧 done/best/lUnlocked 顺移
-if(save.lvOrder!=="v4"){
-  const hasProg=(save.lUnlocked||1)>1 || (save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k)));
+if(save.lvOrder==="v3"){
+  const hasProg=(save.lUnlocked||1)>1 || [save.done,save.best].some(records=>Object.keys(records).some(k=>/^L\d+$/.test(k)));
   if(hasProg){
     const nd={}, nb={};
     for(const k in save.done){ const m2=/^L(\d+)$/.exec(k); nd[m2?("L"+(+m2[1]+12)):k]=save.done[k]; }
@@ -1128,8 +1128,8 @@ if(save.lvOrder!=="v4"){
   save.lvOrder="v4";
 }
 // v5 迁移(2026-10-31):插入 LN 冠词组 4 关 + MV 复数组 4 关(位 12–19,过去时整体 +8);解锁改分组互锁
-if(save.lvOrder!=="v5"){
-  const hasProg=save.done&&Object.keys(save.done).some(k=>/^L\d+$/.test(k));
+if(save.lvOrder==="v4"){
+  const hasProg=[save.done,save.best].some(records=>Object.keys(records).some(k=>/^L\d+$/.test(k)));
   if(hasProg){
     const shift=i=> i>=12 ? i+8 : i;   // v4 顺序:PR3+人称9=12 关在前,其后即过去时
     const nd={}, nb={};
@@ -1541,6 +1541,7 @@ const bannerEl=document.getElementById("learnBanner");
 let tiles=[];                        // {v,k:'inf'|'form',r,c,el,alive}
 let occ=[];                          // (ROWS+2)x(COLS+2) 外圈坐标占用
 let curLevel=null, busy=false, selected=null;
+let sessionGen=0; // 新对局/新盘使旧的延迟清盘、洗牌与教学回调失效
 let scoreRun=0, streak=0, lastScoreShown=-1;
 let levelFont=12, hintTimer=null, pendingHint=false, lastAction=Date.now();
 let modeTargetBest=0, modeFormState=null;   // 分数条目标(开局捕获的最佳分)/上一盘词型(一屏一词型)
@@ -1715,22 +1716,24 @@ function reshuffleRemaining(){
     const pos=[...list.map(p=>[p.r,p.c])];
     for(let i=pos.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pos[i],pos[j]]=[pos[j],pos[i]]; }
     const g=Array.from({length:ROWS},()=>Array(COLS).fill(null));
-    list.forEach((p,i)=>{ g[pos[i][0]][pos[i][1]]={v:p.t.v,k:p.t.k}; });
+    list.forEach((p,i)=>{ g[pos[i][0]][pos[i][1]]=p.t; });
     if(findAnyPair(g)){ applyShuffle(g,list); return; }
   }
   applyShuffleShallow(list);
 }
 function applyShuffle(g,list){
+  clearSel(); clearHint();
   for(const p of list){ board[p.r][p.c]=null; }
   for(const p of list){
     const nt=g[p.r][p.c];
     board[p.r][p.c]=nt;
-    p.t.r=p.r; p.t.c=p.c;
-    positionTile(p.t);
+    nt.r=p.r; nt.c=p.c;
+    positionTile(nt);
   }
 }
 // 兜底:把剩余块按"原形+变位"成对放入行主序相邻格(经典路径下必然可连)
 function applyShuffleShallow(list){
+  clearSel(); clearHint();
   // 按动词分组:原形与形式各自排队,配成对
   const infs=[], forms=[];
   for(const p of list){ (p.t.k==="inf"?infs:forms).push(p.t); }
@@ -1871,6 +1874,7 @@ function sampleModeVerbs(pool,n,r){   // 一屏只一种词型搭配(用户反�
   return picks;
 }
 function dealModeBoard(){
+  sessionGen++;
   ROWS=9;   // 挑战模式恢复 4×9=36 格盘(9 词×2 对,允许同屏重复)
   document.body.classList.remove("in-levels");
   const picks=sampleModeVerbs(collectedPool(),9,mode==="daily"?modeRng:Math.random);
@@ -2061,11 +2065,14 @@ function attemptPair(a,b){
   setTimeout(()=>{ a.el.classList.add("gone"); b.el.classList.add("gone"); },170);
   setTimeout(()=>{ a.el.remove(); b.el.remove(); },470);
   if(pairsLeft<=0){
+    const generation=sessionGen;
     scoreRun+=CLEAR_BONUS;
+    const completion=mode==="levels"?recordLevelCompletion():null;
     updateHUD();
     if(trial()){ confetti(); [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>blip(f,.12,"triangle",.07),i*70)); }   // 试点:清盘终章
     setTimeout(()=>{
-      if(mode==="levels"){ if(curLevel) finishLevel(); }
+      if(generation!==sessionGen) return;
+      if(mode==="levels"){ if(curLevel) finishLevel(completion); }
       else if(curLevel){ blip(660,.1,"triangle",.07); dealModeBoard(); }   // 清盘→发下一盘,连击窗口延续
     },480);
   }else reshuffleIfStuck();   // 成功一连后查死局
@@ -2074,8 +2081,9 @@ function attemptPair(a,b){
 /* ---- 死局检测:成功一连后或一次失败尝试后都要查(此前只在成功路径查——玩家点不出对时永远不洗牌) ---- */
 function reshuffleIfStuck(){
   if(findAnyPairNow()) return;
+  const generation=sessionGen;
   setTimeout(()=>{
-    if(!curLevel) return;                 // 对局已结束
+    if(generation!==sessionGen || !curLevel || pairsLeft<=0) return; // 旧盘或已结束
     if(findAnyPairNow()) return;          // 500ms 内局面可能已变(背靠背连点)
     toast(t("toast.nopair"));
     reshuffleRemaining();
@@ -2187,7 +2195,8 @@ function collapseBanner(){
 }
 function wordCardHTML(vi,activeF){
   const V=VERBS[vi];
-  const forms=[["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]].filter(([,w])=>w)
+  const keys=["p1","p3","p6"].includes(activeF)?["inf","p1","p3","p6"]:["inf","sg","pl","pp"];
+  const forms=keys.map(k=>[k,V[k]]).filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
 }
@@ -2351,7 +2360,9 @@ function demoClick(tile){   // 注意:参数不可叫 t,会遮蔽全局 i18n 函
     if(tile===demo.form){
       demo.form.el.classList.remove("demo-target");
       demo.step=3; demo.bar.textContent=t("demo.step3"); blip(560,.06,"sine",.05);
+      const generation=sessionGen, currentDemo=demo;
       setTimeout(()=>{
+        if(generation!==sessionGen || demo!==currentDemo) return;
         busy=false;
         attemptPair(demo.inf,demo.form);   // 连线自己画出来
         if(demo.bar){ demo.bar.remove(); }
@@ -2372,6 +2383,7 @@ function wiggle(t){
 /* ================= i18n ================= */
 let board=[];                        // 由引擎脚本赋值
 function abandonSession(){
+  sessionGen++;
   stopSpeech(); hideBanner();
   if(demo){ demo=null; const b=document.getElementById("demoBar"); if(b) b.remove(); }   // 弃局时撤演示
 }
@@ -2395,16 +2407,18 @@ function speakVerb(word){
     }catch(e){ res(); }
   });
 }
-function finishLevel(){
+function recordLevelCompletion(){
   const idx=LINK_LEVELS.indexOf(curLevel);
   const lvId=LINK_LEVELS[idx].id;
-  const disp=displayId(curLevel);
   save.done[lvId]=true;
   save.gUnlocked[curLevel.grp]=Math.max(save.gUnlocked[curLevel.grp]||1, LINK_LEVELS[idx].gpos+2);   // 只推进本组(四组互不锁关)
   const prev=save.best[lvId]||0;
   const rec=scoreRun>prev;
   if(rec){ save.best[lvId]=scoreRun; }
   persist();
+  return {idx,prev,rec};
+}
+function finishLevel({idx,prev,rec}){
   curLevel=null;
   document.getElementById("resultTitle").textContent=t("result.title");
   document.getElementById("resultText").innerHTML=
@@ -2492,6 +2506,7 @@ function renderLevelGrid(){
       if(lv.band!==gr.band) return;
       const b=document.createElement("button");
       const locked=lv.gpos>=(save.gUnlocked[lv.grp]||1);   // 分组解锁:只看本组进度
+      b.disabled=locked; // CSS pointer-events 不能阻止键盘 Enter/Space 激活
       b.className="lv-btn k-"+lv.type+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型
       b.innerHTML=`${lv.band}.${lv.num}<small>${t(keyOf(lv))}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
