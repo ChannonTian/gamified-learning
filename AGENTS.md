@@ -43,7 +43,7 @@ gamified-learning/
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{lUnlocked, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder, settings{...}}`;four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);demo 云登录态=`linkmatchdemo.auth`(`{token, username}`,云端整包档存 Cloudflare D1);改结构要保持向后兼容(merge 默认值+云端 cloudMerge:数值取大/布尔取或/数组并集/对象递归/其余本地优先);改关卡顺序要像 v1.5 一样做映射迁移。
+- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{gUnlocked{PR/PS/LN/MV/PT:组内解锁关数,启动时由 done 重算}, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder("v5"), settings{...}}`(lUnlocked 全局链已退役);four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);demo 云登录态=`linkmatchdemo.auth`(`{token, username}`,云端整包档存 Cloudflare D1);改结构要保持向后兼容(merge 默认值+云端 cloudMerge:数值取大/布尔取或/数组并集/对象递归/其余本地优先);改关卡顺序要像 v1.5 一样做映射迁移。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -57,7 +57,9 @@ gamified-learning/
 - 按钮、触控目标要大;底部不贴屏幕边缘(iOS 误触)。
 - 难度宁易勿难:开局保底 ≥2 解、无步数限制(计分制)、闲置自动提示。
 
-## 当前状态(2026-10-05)
+## 当前状态(2026-10-31)
+
+- **link-match v1.22(2026-10-31,LN 冠词组+MV 复数组+分组解锁;分支 PR 待并)**:新 **NOUNS 数组**(72 词条,与 VERBS 分离避 eten 撞名)+ 两组名词关卡——**LN 冠词 4 关**(de 18+het 18,磁贴 名词↔"冠词+名词";词源经 Onze Taal 官方 het-words 词表逐词核)、**MV 复数 4 关**(-en 18/-s 9/-'s 9,按构词法分型)。**分组解锁**:PR 代词 3+PS 人称变位 9+LN+MV+PT 过去时 54=74 关,五组互不锁关(gUnlocked 由 done 前缀启动重算,lvOrder="v5",旧档过去时键 +8);人称组 band A1→PS 独立成节;模式解锁改"过任意一关";名词磁贴 src:"n" 分流 wordOf/NOUNS,名词不写 counts(防 het eten 污染动词池),横幅 nounCardHTML 两形态卡。**顺修两个存量 bug**:①发牌步长 7→9(旧步长 B1 59 词池漏 8 词永不出现在关卡);②**v3 迁移条件 bug(v1.21 线上已发)**——v4 存档二次加载被 v2 映射表错误重排,修后仅 v2 及更早档进重排;已有玩家若在修复前二次加载过 v1.21,done/best 已损坏且无法还原(窗口小,玩家少)。QA:node 冒烟+迁移 vm 测试+浏览器 bot **74/74 全清零错**+线上迁移用例+四组独立断言+四图验收,详见 DEVLOG。
 
 - **link-match-demo v1.19(2026-10-05,档案页+显示名+排行榜+落地页)**:菜单 Profiel 档案页(显示名可改**不查重**、登录态区:未登录三种登录/已登录 Uitloggen+删除账号两步确认,DELETE /api/account 连带删云端数据);显示名=形容词32×名词32 荷兰语随机组合,登录用户按 user id 确定性生成存 users.display_name(**前后端各一份词库,改动需同步**),游客本地 save.displayName;每日排行榜 `daily_scores(date,user_id,score)` 服务器按 UTC 分桶自然翻日,POST /api/score 保留当日最高、GET /api/leaderboard top50+自己名次;**游客可看不可上榜**,榜单内联登录入口,登录/启动自动补报当天成绩(游客分登录后当场上榜,save.lbSent 去重);每日挑战介绍弹窗加 Klassement 按钮;根 index.html 改公开落地页(Koppelen+Link Match 别名,修 Google 发布验证三连拒)。Google 侧待办:同意屏幕应用名改 Koppelen、homepage 改根路径、Search Console 验证+24h 重试。详见 DEVLOG。
 
@@ -131,3 +133,6 @@ gamified-learning/
 - 引擎是 COLS×ROWS 非方形网格,遍历边界别写死同一个常量。
 - **QA 钩子细节**:`NLM3/NLM4.findMove()` 返回 `{a:[r,c], b:[r,c]}`(不是 r1/c1/r2/c2),bot 调 `swap(mv.a[0],mv.a[1],mv.b[0],mv.b[1])`;种子存档若未收集本关词,消除会弹首解锁卡并挂起 `await swap`(卡片等点击)——QA 种子直接全词收集最省事。
 - **隐藏标签页定时器节流**:Chrome 后台页 setTimeout 会被钳到 ~1s,朗读链/计时类自动化要放长等待或插桩看时间戳;系测试环境现象,与产品无关。
+- **发牌轮转步长必须=每关词数(9)**(v1.22 修):旧步长 7 在"轮数=⌈池/9⌉"下覆盖不足——18 词池只出 16 词、**B1 59 词池漏 8 个(永不出现在任何关卡)**;改词池/轮数后必须跑"全池覆盖"断言(每类型池内每词至少一关)。
+- **存档迁移链条件按版本枚举,勿写反向判断**(v1.22 修,v1.21 线上事故):v3 块曾写 `lvOrder!=="v3"` → **v4 存档二次加载也被 v2 映射表重排**,done/best 静默损坏;迁移块只对 `lvOrder===目标旧版本||无标记` 生效,新增迁移必须配"旧档→新键"与"新档不受扰动"两个用例。
+- **名词组字段与动词词条的撞名**:复数类型键 `en` 与动词 English 释义字段 `en` 同名——NOUNS 释义存 `gloss`,glossOf 读 `V.gloss||V.en`;新增名词类型键前先查两数组现有字段名。

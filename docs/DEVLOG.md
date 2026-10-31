@@ -1,5 +1,17 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-31 · v1.22(link-match)LN 冠词组 + MV 复数组 + 分组解锁(用户:词要准、长程任务列目标、完整测试再 PR)
+
+- **LN 冠词组(4 关)**:36 个 A1/A2 高频名词(de 18 + het 18),磁贴=名词 ↔ 冠词+名词(boek ↔ het boek)。**词源核证:Onze Taal(onzetaal.nl)de/het 通用规则页的官方 het-words 词表逐词核对**(antwoord/bed/boek/bord/feest/geld/hoofd/huis/jaar/kind/licht/meisje/oog/raam/water/weer/werk/eten 全部命中);de 组全为无争议高频词(人/时间/日常物),刻意避开双冠词词(been/boter 等)。
+- **MV 复数组(4 关)**:36 名词按三大构词法分型——**-en 18**(主规则含双写/换音:mannen/katten/straten/bomen/messen/prijzen/dagen/glazen/steden/kinderen)、**-s 9**(-el/-en/-er 轻音节尾:tafels/kamers/vaders/moeders/dokters/zomers/meisjes/winkels/films)、**-'s 9**(a·o·u·y 结尾撇号防连写:auto's/foto's/radio's/baby's/pizza's/paraplu's/bureau's/menu's/hobby's);规则经 Onze Taal 复数页核对。磁贴=单数 ↔ 复数。
+- **数据结构**:新 `NOUNS` 数组(不并 VERBS,避 eten 动词/名词 VIDX 撞名);**字段名=关卡类型键**(de/ht/en/s/ap,承 p1 坑纪律);English 释义存 `gloss` 字段(**类型键 en 与动词释义字段 en 撞名**——glossOf 改 `V.gloss||V.en`);磁贴带 `src:"n"` 标记,wordOf/syncSize/渲染走 wordSrc 分流;**名词不计 counts**(防 het eten 消除把动词 eten 记成已收集、污染模式池)。名词无插画→横幅走 `nounCardHTML`(两形态卡,无插画位),朗读照常。
+- **分组解锁(用户:人称变位/het-de/复数/sterk worden 四组互不锁关)**:每关带 `grp`(PR/PS/LN/MV/PT)与组内 `gpos`;`save.gUnlocked[grp]`=组内已解锁关数,**每次启动由 done 前缀重算**(每组第 1 关默认开,组内完成即推进,组间互不影响);lUnlocked 全局链退役(delete)。模式解锁改"过任意一关"。人称组 band A1→**PS** 独立成节(过去时 A1 编号回到 A1.1 起),网格九节:Voornaamwoorden/Persoonsvormen/Lidwoorden/Meervouden/A1–C1;菜单按钮/磁贴新形状类 k-de/k-ht/k-en/k-s/k-ap(de·en=圆角、ht·s=方角、ap=叶形,两主题)。
+- **存档迁移 v4→v5**:LN4+MV4 前插在位 12–19 → 旧过去时键 +8;gUnlocked 由迁移后 done 重算(用例:done L12-14→L20-22、PT 解锁 4 关、他组不动、counts/dailyBest 原样)。
+- **修存量 bug①(发牌覆盖缺口)**:轮转步长 7 → **9**(=每关词数)。旧公式 18 词池只覆盖前 16 词;**B1 59 词池只覆盖 51——8 个动词(如 zinken 后段)永远不会出现在任何关卡**;A2 漏 1 词。三处生成点(PS/名词/TIERS)同修,冒烟断言全部组×类型全池覆盖。
+- **修存量 bug②(v3 迁移条件,v1.21 已发布线上)**:v3 块条件 `lvOrder!=="v3"` 对 **v4 存档也生效**——v1.21 玩家第二次加载时 done/best 会被 v2 时代的映射表错误重排(L12→L9 等)。修为 `lvOrder==="v2"||lvOrder==null` 才进 v2 重排。线上回归用例:v4 存档 done {L12} → 迁移后**恰好 {L20}**(旧代码会得出错误键)。⚠️ 已有 v1.21 玩家若在修复前二次加载过,其 done/best 已被错误改写且无法可靠还原(影响窗口=v1.21 上线至本次修复,玩家量小)。
+- QA:node 冒烟(74 关/分组计数/全池覆盖/编号)+迁移链 vm 测试(全新档/v4 混进度/v3 链式/锁定语义 12 断言)+语法检查+路径引擎回归 42072 对全过;浏览器 QA:种子存档后 **bot 74/74 关全清零错误**、LN/MV/PS/PT 磁贴内容断言、LN.1/LN.2 清盘后 gUnlocked={LN:3} 且 PS/PT/MV 纹丝不动、无尽×2/每日/生存盘**零名词磁贴**、名词横幅 nl/zh 双语("jaar het jaar 年")、**线上迁移用例**(v4 存档→v5:键移位+PT.1-3 已完成态+A1.4 解锁+LN.2 锁定)全过;视觉验收四图(LN 盘/中文网格/MV.4 叶形撇号磁贴/桌面网格)pass;QA 存档已清空恢复。
+- 未做(后续):例句未配名词组;LN/MV 关卡的 nounCard 仍无插画位(插画押后,等美术风格改版);demo 版不带这组(demo 独立演化)。
+
 ## 2026-10-05 · v1.20-v1.21(link-match)内容铺量 + PR 代词组 + A1 人称变位组 + 例句卡(用户拍板:铺量先做、插画押后先改美术、1/4 搁置)
 
 - **词池 108→148 词 / 42→66 关**:B1 补缺 9(bevelen/breken/steken/slaan/blazen/meten/varen/graven/blijken)+ **B2 15**(bergen/spinnen/rijzen/gelijken/bezwijken/vlechten/mijden/doorzien/overzien/bezingen/verslinden 承 four-match v0.2 已校对池 + vreten/splijten/ontsteken/scheren 新编)+ **C1 9**(delven/verdrieten/gebieden/ontgaan/verwerpen/spijten/zwelgen/ontwerpen/vervliegen 新编);TIER_NAMES 加 B2/C1 档(图鉴/网格自动出组)。新词全部首字母纹章 fallback(插画押后)。
