@@ -1,5 +1,11 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-10-31 · v1.22b(link-match)试玩反馈:LN 混盘+冠词提示阶梯、PS 人称上磁贴
+
+- **LN 冠词组重构(用户:单型盘太简单)**:4 关全部 **de/het 混盘**(de/het 交替铺平切 4 份,每盘 5+4/4+5);**相邻两关一阶梯**——奇数关(LN.1/LN.3)名词磁贴带冠词提示"de dag - dag",偶数关裸词。实现:关卡类型键改 `dh`(short.dh="de/het"),磁贴类型按词自带字段(NOUN_FIELD)逐块定 k-de/k-ht;`lv.hint` 传入磁贴,wordOf 原形分支拼 `冠词+名词 - 名词`。关卡数不变 → 存档零迁移。
+- **PS 人称上磁贴(用户:把人称放上去,gaan - ik ga)**:形磁贴显示 人称+形式(ik ga / hij gaat / wij gaan,P_PRONOUN 表),朗读同源(speakPair 念 "gaan, ik ga");横幅词卡 person 分支显示 geven/ik geef/hij geeft/wij geven 且当前人称高亮(此前 activeF=p1 在四形态卡里无高亮,顺修)。发光牌/同步字号全走 wordOf 自动适配。
+- QA:冒烟测试更新(LN 每盘 de/ht ≥3 混编、提示交替 T/F/T/F、de/ht 全池覆盖、关内唯一)全过;浏览器:LN.1 提示磁贴("de vrouw - vrouw"/"het boek - boek")+LN.2 裸词复验、PS.1 磁贴 ik ga/ik ben/ik heb…、PS 横幅 liggen/ik lig/hij ligt/wij liggen、bot 清 PS.1+LN.1 后 gUnlocked 各自推进、零错误;截图两张(LN.1 提示盘/PS.2 人称盘)pass;QA 存档清空。
+
 ## 2026-10-31 · v1.22(link-match)LN 冠词组 + MV 复数组 + 分组解锁(用户:词要准、长程任务列目标、完整测试再 PR)
 
 - **LN 冠词组(4 关)**:36 个 A1/A2 高频名词(de 18 + het 18),磁贴=名词 ↔ 冠词+名词(boek ↔ het boek)。**词源核证:Onze Taal(onzetaal.nl)de/het 通用规则页的官方 het-words 词表逐词核对**(antwoord/bed/boek/bord/feest/geld/hoofd/huis/jaar/kind/licht/meisje/oog/raam/water/weer/werk/eten 全部命中);de 组全为无争议高频词(人/时间/日常物),刻意避开双冠词词(been/boter 等)。
