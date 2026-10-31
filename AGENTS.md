@@ -59,6 +59,8 @@ gamified-learning/
 
 ## 当前状态(2026-10-31)
 
+- **link-match v1.22 QA 修复(2026-10-31)**:修复 v5 再进 v4 迁移导致每次刷新进度偏移;迁移只接受明确旧版本,最高分独立迁移。洗牌保留完整 tile 引用并同步 DOM;清盘即时存档+sessionGen 隔离旧清盘/洗牌/教学回调;锁关按钮 disabled 阻止键盘绕过。PS 横幅展示现在时字段;错误 bureau's 例词换 taxi's(74 关编号保持)。新增内容/存档与真实浏览器回归,含 74 关全清、刷新、3 模式、24 布局组合。已损坏历史档不猜测逆推。详见 DEVLOG 和 link-match/README.md。
+
 - **link-match v1.22(2026-10-31,LN 冠词组+MV 复数组+分组解锁;分支 PR 待并)**:新 **NOUNS 数组**(72 词条,与 VERBS 分离避 eten 撞名)+ 两组名词关卡——**LN 冠词 4 关**(de 18+het 18,磁贴 名词↔"冠词+名词";词源经 Onze Taal 官方 het-words 词表逐词核)、**MV 复数 4 关**(-en 18/-s 9/-'s 9,按构词法分型)。**分组解锁**:PR 代词 3+PS 人称变位 9+LN+MV+PT 过去时 54=74 关,五组互不锁关(gUnlocked 由 done 前缀启动重算,lvOrder="v5",旧档过去时键 +8);人称组 band A1→PS 独立成节;模式解锁改"过任意一关";名词磁贴 src:"n" 分流 wordOf/NOUNS,名词不写 counts(防 het eten 污染动词池),横幅 nounCardHTML 两形态卡。**顺修两个存量 bug**:①发牌步长 7→9(旧步长 B1 59 词池漏 8 词永不出现在关卡);②**v3 迁移条件 bug(v1.21 线上已发)**——v4 存档二次加载被 v2 映射表错误重排,修后仅 v2 及更早档进重排;已有玩家若在修复前二次加载过 v1.21,done/best 已损坏且无法还原(窗口小,玩家少)。QA:node 冒烟+迁移 vm 测试+浏览器 bot **74/74 全清零错**+线上迁移用例+四组独立断言+四图验收,详见 DEVLOG。
 
 - **link-match-demo v1.19(2026-10-05,档案页+显示名+排行榜+落地页)**:菜单 Profiel 档案页(显示名可改**不查重**、登录态区:未登录三种登录/已登录 Uitloggen+删除账号两步确认,DELETE /api/account 连带删云端数据);显示名=形容词32×名词32 荷兰语随机组合,登录用户按 user id 确定性生成存 users.display_name(**前后端各一份词库,改动需同步**),游客本地 save.displayName;每日排行榜 `daily_scores(date,user_id,score)` 服务器按 UTC 分桶自然翻日,POST /api/score 保留当日最高、GET /api/leaderboard top50+自己名次;**游客可看不可上榜**,榜单内联登录入口,登录/启动自动补报当天成绩(游客分登录后当场上榜,save.lbSent 去重);每日挑战介绍弹窗加 Klassement 按钮;根 index.html 改公开落地页(Koppelen+Link Match 别名,修 Google 发布验证三连拒)。Google 侧待办:同意屏幕应用名改 Koppelen、homepage 改根路径、Search Console 验证+24h 重试。详见 DEVLOG。

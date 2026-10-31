@@ -26,6 +26,23 @@
 
 与全仓一致:单文件零依赖,双击即玩;push 到 main 后 GitHub Pages 自动发布,地址 `/link-match/`。
 
+## 自动化验证
+
+零依赖检查(从仓库根目录运行):
+
+```bash
+node link-match/test/path-engine.test.mjs
+node --test link-match/test/content-save.test.mjs
+```
+
+真实浏览器回归需要开发环境提供 Playwright 与 Chromium(游戏本身仍是零依赖):
+
+```bash
+node --test link-match/test/browser.test.cjs
+```
+
+可用 `NODE_PATH` 指向外部 Playwright 安装,`CHROME_PATH` 指定本机 Chrome 路径。测试自启临时 HTTP 服务和隔离浏览器上下文,不读写玩家存档;覆盖 74 关、教学词卡、刷新迁移、洗牌、切关竞态、挑战模式及手机/桌面布局。`QA_SCREENSHOTS` 可指定已存在的目录保存两档截图。语音静音,实际 TTS 需真机复测。
+
 ## 与 tile-match 的关系
 
 **独立产品、互不依赖**:词库数据、插画元素库(小人/道具/场景表)、主题与 i18n 框架从 tile-match 拷贝而来,两侧各自演化。⚠️ 若修改动词变位/释义或插画元素库,需**同步两个文件**。

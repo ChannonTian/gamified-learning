@@ -1,5 +1,17 @@
 # DEVLOG.md — 迭代日志
 
+
+## 2026-10-31 · link-match v1.22 QA 修复
+
+- **存档重复迁移(P1)**:v5 仍满足旧 `lvOrder!=="v4"`,每次刷新又走 +12/+8,例如 PR 的 L0 变成过去时 L20。迁移入口改为明确旧版本 v3→v4→v5;最高分独立于 done 搬迁,移除默认值重新注入的 lUnlocked。新增 v2/v3/v4/v5 与重复加载回归。修复前已经被覆盖的 done/best 无法可靠逆推,本次不猜测恢复、不清空玩家存档。
+- **洗牌失效(P1)**:候选棋盘只复制 `{v,k}`,丢了 f/src/alive/el;applyShuffle 又只将旧 DOM 放回旧位置。现在重新排列原始 tile 引用,同步坐标和 DOM,保留名词来源/词形/存活态并清除旧选择和提示。浏览器用实际洗牌入口验证所有 tile 身份与配对能力,旧版 18 块无效、修复后 0 块无效。
+- **切关竞态(P1)**:清盘延迟 480ms 回调读到新 curLevel,能将完全没玩的新关标为通关。清盘立即记录原关成绩/解锁,延迟弹窗受 sessionGen 守卫;新盘也使旧洗牌/教学回调失效。覆盖快速切关仍保留旧成绩、不会误解锁新关和教学动画中途离场。
+- **PS 教学反馈(P2)**:wordCardHTML 固定过去时字段,PS 关正确消除 ben 却显示 was/waren/geweest。按 activeF 选择现在时或过去时四形态,所有关卡逐对断言词卡高亮=消除词形。首教文案改“带下划线的词”,适配首关 PR 代词。
+- **复数词条(P2)**:`bureau's` 拼写错误,正确为 bureaus([Onze Taal](https://onzetaal.nl/taalloket/bureau-buro)、[ANW](https://anw.ivdnt.org/article/bureau?lang=en))。该条换为符合 -'s 组的 taxi→taxi's,保留 72 条、74 关及现有编号,不引入额外关卡迁移。
+- **键盘绕过锁关(P2)**:旧版只设 pointer-events:none,Tab+Enter 仍能开未解锁关。关卡按钮同步设置 disabled,验证新档仅五组首关可用、Enter 无法进入 PR.2。
+- **验证**:零依赖内容/迁移测试 5 项;路径引擎独立参照+300 局全消;隔离 Chromium 浏览器 7 项场景(键盘锁关、洗牌、清盘切关、教学离场、挑战模式、布局/真实点击、74 关全消及刷新存档)。无尽连续 3 盘、生存续命/超时、每日结算/禁止重入;390×844 与 1440×900 × nl/en/zh × grug/papier × 明暗=24 布局组合,检查文字非空/不越界、棋盘不盖 dock,检查 console/pageerror。测试浏览器使用全新 context,不访问用户存档;语音静音,未验证实际设备发音。
+- 新增 `link-match/test/content-save.test.mjs`、`browser.test.cjs`(后者需外部 Playwright,无运行时依赖);运行说明在 link-match/README.md。
+
 ## 2026-10-31 · v1.22(link-match)LN 冠词组 + MV 复数组 + 分组解锁(用户:词要准、长程任务列目标、完整测试再 PR)
 
 - **LN 冠词组(4 关)**:36 个 A1/A2 高频名词(de 18 + het 18),磁贴=名词 ↔ 冠词+名词(boek ↔ het boek)。**词源核证:Onze Taal(onzetaal.nl)de/het 通用规则页的官方 het-words 词表逐词核对**(antwoord/bed/boek/bord/feest/geld/hoofd/huis/jaar/kind/licht/meisje/oog/raam/water/weer/werk/eten 全部命中);de 组全为无争议高频词(人/时间/日常物),刻意避开双冠词词(been/boter 等)。
