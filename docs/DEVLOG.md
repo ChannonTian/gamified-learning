@@ -1,6 +1,5 @@
 # DEVLOG.md — 迭代日志
 
-
 ## 2026-10-31 · link-match v1.22 QA 修复
 
 - **存档重复迁移(P1)**:v5 仍满足旧 `lvOrder!=="v4"`,每次刷新又走 +12/+8,例如 PR 的 L0 变成过去时 L20。迁移入口改为明确旧版本 v3→v4→v5;最高分独立于 done 搬迁,移除默认值重新注入的 lUnlocked。新增 v2/v3/v4/v5 与重复加载回归。修复前已经被覆盖的 done/best 无法可靠逆推,本次不猜测恢复、不清空玩家存档。
@@ -11,6 +10,15 @@
 - **键盘绕过锁关(P2)**:旧版只设 pointer-events:none,Tab+Enter 仍能开未解锁关。关卡按钮同步设置 disabled,验证新档仅五组首关可用、Enter 无法进入 PR.2。
 - **验证**:零依赖内容/迁移测试 5 项;路径引擎独立参照+300 局全消;隔离 Chromium 浏览器 7 项场景(键盘锁关、洗牌、清盘切关、教学离场、挑战模式、布局/真实点击、74 关全消及刷新存档)。无尽连续 3 盘、生存续命/超时、每日结算/禁止重入;390×844 与 1440×900 × nl/en/zh × grug/papier × 明暗=24 布局组合,检查文字非空/不越界、棋盘不盖 dock,检查 console/pageerror。测试浏览器使用全新 context,不访问用户存档;语音静音,未验证实际设备发音。
 - 新增 `link-match/test/content-save.test.mjs`、`browser.test.cjs`(后者需外部 Playwright,无运行时依赖);运行说明在 link-match/README.md。
+
+## 2026-10-31 · v1.22b(link-match)试玩反馈:LN 混盘+冠词提示阶梯、PS 人称上磁贴
+
+> 注:本条改动(df6e57c)在 PR #10 合并后才推到分支,未随 #10 进 main;已从最新 main 重新摘取开新 PR(与 PR #11 的 wordCard 人称分支冲突处取带人称版本,与磁贴同源)。
+
+- **LN 冠词组重构(用户:单型盘太简单)**:4 关全部 **de/het 混盘**(de/het 交替铺平切 4 份,每盘 5+4/4+5);**相邻两关一阶梯**——奇数关(LN.1/LN.3)名词磁贴带冠词提示"de dag - dag",偶数关裸词。实现:关卡类型键改 `dh`(short.dh="de/het"),磁贴类型按词自带字段(NOUN_FIELD)逐块定 k-de/k-ht;`lv.hint` 传入磁贴,wordOf 原形分支拼 `冠词+名词 - 名词`。关卡数不变 → 存档零迁移。
+- **PS 人称上磁贴(用户:把人称放上去,gaan - ik ga)**:形磁贴显示 人称+形式(ik ga / hij gaat / wij gaan,P_PRONOUN 表),朗读同源(speakPair 念 "gaan, ik ga");横幅词卡 person 分支显示 geven/ik geef/hij geeft/wij geven 且当前人称高亮(此前 activeF=p1 在四形态卡里无高亮,顺修;PR #11 独立修过同一处,合并取人称前缀版)。发光牌/同步字号全走 wordOf 自动适配。
+- QA:冒烟测试更新(LN 每盘 de/ht ≥3 混编、提示交替 T/F/T/F、de/ht 全池覆盖、关内唯一)全过;浏览器:LN.1 提示磁贴("de vrouw - vrouw"/"het boek - boek")+LN.2 裸词复验、PS.1 磁贴 ik ga/ik ben/ik heb…、PS 横幅 liggen/ik lig/hij ligt/wij liggen、bot 清 PS.1+LN.1 后 gUnlocked 各自推进、零错误;截图两张(LN.1 提示盘/PS.2 人称盘)pass;QA 存档清空。
+
 
 ## 2026-10-31 · v1.22(link-match)LN 冠词组 + MV 复数组 + 分组解锁(用户:词要准、长程任务列目标、完整测试再 PR)
 

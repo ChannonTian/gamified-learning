@@ -420,11 +420,13 @@
   .lv-btn.k-pl{border-radius:7px;}
   .lv-btn.k-pp{border-radius:20px 4px 20px 4px;}
   .lv-btn.k-ht,.lv-btn.k-s{border-radius:7px;}
+  .lv-btn.k-dh{border-radius:16px;}
   .lv-btn.k-ap{border-radius:20px 4px 20px 4px;}
   body.theme-grug .lv-btn.k-sg{border-radius:20px 16px 21px 15px;}
   body.theme-grug .lv-btn.k-pl{border-radius:4px 7px 3px 6px;}
   body.theme-grug .lv-btn.k-pp{border-radius:26px 6px 27px 5px;}
   body.theme-grug .lv-btn.k-de,body.theme-grug .lv-btn.k-en{border-radius:20px 16px 21px 15px;}
+  body.theme-grug .lv-btn.k-dh{border-radius:20px 16px 21px 15px;}
   body.theme-grug .lv-btn.k-ht,body.theme-grug .lv-btn.k-s{border-radius:4px 7px 3px 6px;}
   body.theme-grug .lv-btn.k-ap{border-radius:26px 6px 27px 5px;}
   #cardModal{z-index:70;}
@@ -948,7 +950,8 @@ LV_ROUNDS.push(1);
     }
   });
 }
-/* ---- LN 冠词组(de/het:名词 ↔ 冠词+名词) + MV 复数组(-en/-s/-'s:单数 ↔ 复数) ---- */
+/* ---- LN 冠词组(de/het 混盘:名词 ↔ 冠词+名词;单型太简单——每盘 de/het 混编,
+        相邻两关前一关名词磁贴带冠词提示"de dag - dag",下一关裸词) + MV 复数组(-en/-s/-'s:单数 ↔ 复数) ---- */
 {
   const nounLevels=(band,specs)=>{   // specs:[[类型键,词池索引数组]];与动词组同款 9 词轮转切片
     let num=0;
@@ -963,7 +966,17 @@ LV_ROUNDS.push(1);
     });
   };
   const idxOf=field=>NOUNS.map((n,i)=>n[field]?i:-1).filter(i=>i>=0);
-  nounLevels("LN",[["de",idxOf("de")],["ht",idxOf("ht")]]);
+  // LN:de/het 交替铺平切成 4 盘(每盘 5+4/4+5 混编),奇数关带提示
+  {
+    const de=idxOf("de"), ht=idxOf("ht");
+    const flat=[];
+    for(let i=0;i<Math.max(de.length,ht.length);i++){ if(de[i]!=null) flat.push(de[i]); if(ht[i]!=null) flat.push(ht[i]); }
+    let num=0;
+    for(let li=0;li<4;li++){
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num,
+        verbs:flat.slice(li*9,(li+1)*9), noun:true, hint:li%2===0});
+    }
+  }
   nounLevels("MV",[["en",idxOf("en")],["s",idxOf("s")],["ap",idxOf("ap")]]);
 }
 TIERS.forEach((t,ti)=>{
@@ -987,8 +1000,8 @@ TIERS.forEach((t,ti)=>{
     lv.gpos=byGrp[lv.grp]-1;
   });
 }
-const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp", p1:"legend.p1", p3:"legend.p3", p6:"legend.p6", de:"legend.de", ht:"legend.ht", en:"legend.en", s:"legend.s", ap:"legend.ap"};
-const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp", p1:"short.p1", p3:"short.p3", p6:"short.p6", de:"short.de", ht:"short.ht", en:"short.en", s:"short.s", ap:"short.ap"};
+const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp", p1:"legend.p1", p3:"legend.p3", p6:"legend.p6", de:"legend.de", ht:"legend.ht", dh:"legend.dh", en:"legend.en", s:"legend.s", ap:"legend.ap"};
+const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp", p1:"short.p1", p3:"short.p3", p6:"short.p6", de:"short.de", ht:"short.ht", dh:"short.dh", en:"short.en", s:"short.s", ap:"short.ap"};
 const PRON_SHORT_KEY={sg:"short.pr.obj", pl:"short.pr.pos", pp:"short.pr.ref"};   // PR 组:sg=宾格 pl=物主 pp=反身
 const keyOf=lv=>lv.band==="PR"?PRON_SHORT_KEY[lv.type]:SHORT_KEY[lv.type];
 
@@ -1002,7 +1015,7 @@ const I18N={
     "mi.endless":"Jacht punten met je verzamelde vormen: elke keer 18 paren, de combo loopt door na een schoon bord.","mi.daily":"180 seconden, één keer per dag. Iedereen krijgt dezelfde puzzel.","mi.survival":"Elke koppel binnen 15 seconden — anders is het voorbij. Fout klikken mag.","mi.start":"Start","mi.back":"Terug",
     "legend.sg":"verl. tijd enk.","legend.pl":"verl. tijd mv.","legend.pp":"voltooid deelwoord",
     "short.sg":"enk.","short.pl":"mv.","short.pp":"v.d.",
-    "legend.p1":"ik-vorm (o.t.t.)","legend.p3":"hij/zij-vorm (o.t.t.)","legend.p6":"wij-vorm (o.t.t.)","short.p1":"ik","short.p3":"hij/zij","short.p6":"wij","legend.pr.obj":"lijdend voorwerp","legend.pr.pos":"bezittelijk voornaamwoord","legend.pr.ref":"wederkerend","short.pr.obj":"obj.","short.pr.pos":"bezit","short.pr.ref":"refl.","band.pr":"Voornaamwoorden","band.ps":"Persoonsvormen","band.ln":"Lidwoorden (de/het)","band.mv":"Meervouden","legend.de":"lidwoord de","legend.ht":"lidwoord het","legend.en":"meervoud op -en","legend.s":"meervoud op -s","legend.ap":"meervoud op -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","card.sent":"Voorbeeldzin",
+    "legend.p1":"ik-vorm (o.t.t.)","legend.p3":"hij/zij-vorm (o.t.t.)","legend.p6":"wij-vorm (o.t.t.)","short.p1":"ik","short.p3":"hij/zij","short.p6":"wij","legend.pr.obj":"lijdend voorwerp","legend.pr.pos":"bezittelijk voornaamwoord","legend.pr.ref":"wederkerend","short.pr.obj":"obj.","short.pr.pos":"bezit","short.pr.ref":"refl.","band.pr":"Voornaamwoorden","band.ps":"Persoonsvormen","band.ln":"Lidwoorden (de/het)","band.mv":"Meervouden","legend.de":"lidwoord de","legend.ht":"lidwoord het","legend.en":"meervoud op -en","legend.s":"meervoud op -s","legend.ap":"meervoud op -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","legend.dh":"lidwoord de of het","short.dh":"de/het","card.sent":"Voorbeeldzin",
     "set.title":"Instellingen","set.style":"Illustratiestijl","set.lang":"Taal",
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd","set.banner":"Bannerduur","set.theme":"Thema","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Donkere modus","opt.off":"Uit","opt.on":"Aan",
@@ -1031,7 +1044,7 @@ const I18N={
     "mi.endless":"用已收集的动词刷分:每盘 18 对,清盘后连击延续。","mi.daily":"180 秒,每天一次,所有玩家同一盘面。","mi.survival":"每次配对须在 15 秒内完成,超时即结束;点错不失败。","mi.start":"开始","mi.back":"返回",
     "legend.sg":"单数过去式","legend.pl":"复数过去式","legend.pp":"过去分词",
     "short.sg":"单数","short.pl":"复数","short.pp":"分词",
-    "legend.p1":"现在时第一人称","legend.p3":"现在时第三人称","legend.p6":"现在时复数","short.p1":"我形","short.p3":"三单","short.p6":"复数","legend.pr.obj":"宾格","legend.pr.pos":"物主代词","legend.pr.ref":"反身代词","short.pr.obj":"宾格","short.pr.pos":"物主","short.pr.ref":"反身","band.pr":"人称代词","band.ps":"动词人称变位","band.ln":"冠词 de/het","band.mv":"名词复数","legend.de":"定冠词 de","legend.ht":"定冠词 het","legend.en":"复数 -en","legend.s":"复数 -s","legend.ap":"复数 -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","card.sent":"例句",
+    "legend.p1":"现在时第一人称","legend.p3":"现在时第三人称","legend.p6":"现在时复数","short.p1":"我形","short.p3":"三单","short.p6":"复数","legend.pr.obj":"宾格","legend.pr.pos":"物主代词","legend.pr.ref":"反身代词","short.pr.obj":"宾格","short.pr.pos":"物主","short.pr.ref":"反身","band.pr":"人称代词","band.ps":"动词人称变位","band.ln":"冠词 de/het","band.mv":"名词复数","legend.de":"定冠词 de","legend.ht":"定冠词 het","legend.en":"复数 -en","legend.s":"复数 -s","legend.ap":"复数 -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","legend.dh":"冠词 de 或 het","short.dh":"de/het","card.sent":"例句",
     "set.title":"设置","set.style":"插画画风","set.lang":"界面及注释语言",
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长","set.banner":"横幅时长","set.theme":"界面主题","theme.grug":"手绘","theme.papier":"便签",
     "set.dark":"深色模式","opt.off":"关","opt.on":"开",
@@ -1060,7 +1073,7 @@ const I18N={
     "mi.endless":"Chase points with your collected forms: 18 pairs per board, the combo carries over.","mi.daily":"180 seconds, once per day. Everyone gets the same puzzle.","mi.survival":"Each pair within 15 seconds — or it is over. Wrong taps are fine.","mi.start":"Start","mi.back":"Back",
     "legend.sg":"past sing.","legend.pl":"past plur.","legend.pp":"past participle",
     "short.sg":"sing.","short.pl":"plur.","short.pp":"part.",
-    "legend.p1":"present I-form","legend.p3":"present he/she-form","legend.p6":"present we-form","short.p1":"I","short.p3":"he","short.p6":"we","legend.pr.obj":"object","legend.pr.pos":"possessive","legend.pr.ref":"reflexive","short.pr.obj":"obj.","short.pr.pos":"poss.","short.pr.ref":"refl.","band.pr":"Pronouns","band.ps":"Person forms","band.ln":"Articles (de/het)","band.mv":"Plurals","legend.de":"article de","legend.ht":"article het","legend.en":"plural -en","legend.s":"plural -s","legend.ap":"plural -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","card.sent":"Example",
+    "legend.p1":"present I-form","legend.p3":"present he/she-form","legend.p6":"present we-form","short.p1":"I","short.p3":"he","short.p6":"we","legend.pr.obj":"object","legend.pr.pos":"possessive","legend.pr.ref":"reflexive","short.pr.obj":"obj.","short.pr.pos":"poss.","short.pr.ref":"refl.","band.pr":"Pronouns","band.ps":"Person forms","band.ln":"Articles (de/het)","band.mv":"Plurals","legend.de":"article de","legend.ht":"article het","legend.en":"plural -en","legend.s":"plural -s","legend.ap":"plural -'s","short.de":"de","short.ht":"het","short.en":"-en","short.s":"-s","short.ap":"-'s","legend.dh":"article de or het","short.dh":"de/het","card.sent":"Example",
     "set.title":"Settings","set.style":"Art style","set.lang":"Language",
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait","set.banner":"Banner duration","set.theme":"Theme","theme.grug":"Sketch","theme.papier":"Post-it",
     "set.dark":"Dark mode","opt.off":"Off","opt.on":"On",
@@ -1550,7 +1563,14 @@ let layout={ring:RING, tw:80, th:60};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
 const wordSrc=t=> t.src==="n" ? NOUNS : VERBS;   // 名词组磁贴(src:"n")查 NOUNS,动词查 VERBS
-const wordOf=(t)=>{ const A=wordSrc(t); return t.k==="inf" ? A[t.v].inf : A[t.v][t.f]; };
+const NOUN_FIELD=n=> n.de?"de":n.ht?"ht":n.en?"en":n.s?"s":"ap";   // 名词条目的类型键=它有的字段
+const P_PRONOUN={p1:"ik",p3:"hij",p6:"wij"};     // 人称变位组:形磁贴带人称(gaan ↔ ik ga,试玩反馈)
+const wordOf=(t)=>{
+  const A=wordSrc(t);
+  if(t.k==="inf") return t.hint ? A[t.v][t.f]+" - "+A[t.v].inf : A[t.v].inf;   // 冠词提示关:名词磁贴带"de dag - dag"
+  const w=A[t.v][t.f];
+  return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"
+};
 
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
@@ -1604,7 +1624,7 @@ function buildPairsFrom(picks, per=2, gapCount=0){   // per=每词对数(闯关 
   const open=cells.filter(([r,c])=>!gapKey.has(r+","+c));
   const tiles=[];
   picks.forEach((p,pi)=>{
-    for(let k=0;k<per;k++) tiles.push({v:p.v,k:"inf",f:p.f,src:p.src,chip:pi},{v:p.v,k:"form",f:p.f,src:p.src,chip:pi});
+    for(let k=0;k<per;k++) tiles.push({v:p.v,k:"inf",f:p.f,src:p.src,hint:p.hint,chip:pi},{v:p.v,k:"form",f:p.f,src:p.src,hint:p.hint,chip:pi});
   });
   // 洗牌(词块与位置都随机;缺口格永远空置)
   for(let tries=0;tries<60;tries++){
@@ -1622,7 +1642,14 @@ function buildPairsFrom(picks, per=2, gapCount=0){   // per=每词对数(闯关 
   tiles.forEach((tl,i)=>{ const [r,c]=open[i]; g[r][c]={...tl}; });
   return g;
 }
-function buildPairs(){ return buildPairsFrom(curLevel.verbs.map(vi=>({v:vi,f:curLevel.type,src:curLevel.noun?"n":undefined})), 1, 2); }
+function buildPairs(){   // 名词关:每词自带类型键(de/ht/en/s/ap,混盘);提示关给名词磁贴带冠词
+  return buildPairsFrom(curLevel.verbs.map(vi=>({
+    v:vi,
+    f: curLevel.noun ? NOUN_FIELD(NOUNS[vi]) : curLevel.type,
+    src: curLevel.noun ? "n" : undefined,
+    hint: curLevel.noun && curLevel.hint ? true : undefined,
+  })), 1, 2);
+}
 function occFrom(g){
   const o=Array.from({length:ROWS+2},()=>Array(COLS+2).fill(false));
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(g[r][c]) o[r+1][c+1]=true;
@@ -2195,8 +2222,11 @@ function collapseBanner(){
 }
 function wordCardHTML(vi,activeF){
   const V=VERBS[vi];
-  const keys=["p1","p3","p6"].includes(activeF)?["inf","p1","p3","p6"]:["inf","sg","pl","pp"];
-  const forms=keys.map(k=>[k,V[k]]).filter(([,w])=>w)
+  const isPerson=activeF==="p1"||activeF==="p3"||activeF==="p6";
+  const raw=isPerson
+    ? [["inf",V.inf],["p1","ik "+V.p1],["p3","hij "+V.p3],["p6","wij "+V.p6]]   // 人称变位关:形带人称,与磁贴同源
+    : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]];
+  const forms=raw.filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
 }
