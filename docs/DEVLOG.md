@@ -1,5 +1,11 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-11-04 · Link match favicon
+
+- 设计“两块词卡,一笔相连”:不对称圆角方块与叶形词卡,陶土红直角连接路径,沿用 Sketch 的奶油纸底、深棕墨线、麦黄与鼠尾草绿。小尺寸不放文字/纹理,保留两卡相连的轮廓。
+- link-match/index.html 的 head 内嵌 SVG favicon data URI,不新增网络依赖,保持单文件离线可玩。SVG 源与浅/深色标签栏、16/24/32/64px 对照页位于 docs/mockups/link-match-favicon.svg / .html。
+- 验证:Chromium 离线打开游戏,icon 图像成功解码且 NLM3 正常启动;截图检查浅/深背景和四档尺寸。仅修改 head 与设计文档,未改游戏逻辑。
+
 ## 2026-10-31 · link-match v1.22 QA 修复
 
 - **存档重复迁移(P1)**:v5 仍满足旧 `lvOrder!=="v4"`,每次刷新又走 +12/+8,例如 PR 的 L0 变成过去时 L20。迁移入口改为明确旧版本 v3→v4→v5;最高分独立于 done 搬迁,移除默认值重新注入的 lUnlocked。新增 v2/v3/v4/v5 与重复加载回归。修复前已经被覆盖的 done/best 无法可靠逆推,本次不猜测恢复、不清空玩家存档。
