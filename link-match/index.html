@@ -1569,8 +1569,9 @@ const NOUN_FIELD=n=> n.de?"de":n.ht?"ht":n.en?"en":n.s?"s":"ap";   // 名词条�
 const P_PRONOUN={p1:"ik",p3:"hij",p6:"wij"};     // 人称变位组:形磁贴带人称(gaan ↔ ik ga,试玩反馈)
 const wordOf=(t)=>{
   const A=wordSrc(t);
-  if(t.k==="inf") return t.hint ? A[t.v][t.f]+" - "+A[t.v].inf : A[t.v].inf;   // 冠词提示关:名词磁贴带"de dag - dag"
-  if(A===NOUNS && (t.f==="de"||t.f==="ht")) return t.f==="de" ? "de" : "het";  // 冠词磁贴:只放冠词,配对=检索名词的冠词(试玩反馈)
+  if(t.k==="inf") return A[t.v].inf;                                           // 词侧:永远是纯词
+  if(A===NOUNS && (t.f==="de"||t.f==="ht"))                                    // 冠词侧:提示关带全短语(de dag),下一关只剩 de
+    return t.hint ? A[t.v][t.f] : (t.f==="de" ? "de" : "het");
   const w=A[t.v][t.f];
   return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"
 };
