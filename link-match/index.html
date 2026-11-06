@@ -1570,6 +1570,7 @@ const P_PRONOUN={p1:"ik",p3:"hij",p6:"wij"};     // 人称变位组:形磁贴带
 const wordOf=(t)=>{
   const A=wordSrc(t);
   if(t.k==="inf") return t.hint ? A[t.v][t.f]+" - "+A[t.v].inf : A[t.v].inf;   // 冠词提示关:名词磁贴带"de dag - dag"
+  if(A===NOUNS && (t.f==="de"||t.f==="ht")) return t.f==="de" ? "de" : "het";  // 冠词磁贴:只放冠词,配对=检索名词的冠词(试玩反馈)
   const w=A[t.v][t.f];
   return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"
 };
@@ -2067,7 +2068,8 @@ function attemptPair(a,b){
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
   drawPath(path);
   const V=wordSrc(a)[a.v];
-  const formWord=a.k==="form"?wordOf(a):wordOf(b);
+  const formTile=a.k==="form"?a:b;
+  const formWord=a.src==="n" ? wordSrc(a)[a.v][formTile.f] : wordOf(formTile);   // 冠词磁贴只显示冠词,朗读念全短语(dag, de dag)
   // 计分:每对 15;连击(横幅窗口内)加成
   streak++;
   let pts=PAIR_POINTS;
