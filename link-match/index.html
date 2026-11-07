@@ -952,8 +952,7 @@ LV_ROUNDS.push(1);
     }
   });
 }
-/* ---- LN 冠词组(de/het 混盘:名词 ↔ 冠词+名词;单型太简单——每盘 de/het 混编,
-        相邻两关前一关名词磁贴带冠词提示"de dag - dag",下一关裸词) + MV 复数组(-en/-s/-'s:单数 ↔ 复数) ---- */
+/* ---- LN 冠词组(de/het 混盘;每组词做两关:短语↔裸冠词 → 名词↔裸冠词,试玩反馈 v1.24) + MV 复数组(-en/-s/-'s:单数 ↔ 复数) ---- */
 {
   const nounLevels=(band,specs)=>{   // specs:[[类型键,词池索引数组]];与动词组同款 9 词轮转切片
     let num=0;
@@ -968,15 +967,17 @@ LV_ROUNDS.push(1);
     });
   };
   const idxOf=field=>NOUNS.map((n,i)=>n[field]?i:-1).filter(i=>i>=0);
-  // LN:de/het 交替铺平切成 4 盘(每盘 5+4/4+5 混编),奇数关带提示
+  // LN:de/het 交替铺平分 4 组(每组 9 词,5+4/4+5 混编);每组做两关(试玩反馈 v1.24):
+  // 第一关 de vrouw ↔ de(短语在词侧,答案给到),第二关 vrouw ↔ de(答案拿掉,靠检索)
   {
     const de=idxOf("de"), ht=idxOf("ht");
     const flat=[];
     for(let i=0;i<Math.max(de.length,ht.length);i++){ if(de[i]!=null) flat.push(de[i]); if(ht[i]!=null) flat.push(ht[i]); }
     let num=0;
-    for(let li=0;li<4;li++){
-      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num,
-        verbs:flat.slice(li*9,(li+1)*9), noun:true, hint:li%2===0});
+    for(let g=0;g<4;g++){
+      const words=flat.slice(g*9,(g+1)*9);
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num, verbs:words, noun:true, hint:true});   // 短语关
+      LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num, verbs:words, noun:true, hint:false});  // 裸冠词关
     }
   }
   nounLevels("MV",[["en",idxOf("en")],["s",idxOf("s")],["ap",idxOf("ap")]]);
@@ -1155,8 +1156,21 @@ if(save.lvOrder==="v4"){
   delete save.lUnlocked;   // 全局线性解锁退役:分组解锁由下方按 done 重算
   save.lvOrder="v5";
 }
+// v6 迁移(2026-11-07):LN 冠词组 4→8 关(每组词做两关:短语关+裸冠词关)——旧 LN 关映射到各组短语关位(12,14,16,18),MV/PT 整体 +4
+if(save.lvOrder==="v5"){
+  const hasProg=[save.done,save.best].some(records=>Object.keys(records).some(k=>/^L\d+$/.test(k)));
+  if(hasProg){
+    const shift=i=> i>=16 ? i+4 : (i>=12 ? 12+(i-12)*2 : i);   // v5:LN 12-15 / MV 16-19 / PT 20-73 → v6:LN 12-19 / MV 20-23 / PT 24-77
+    const nd={}, nb={};
+    for(const k in save.done){ const m=/^L(\d+)$/.exec(k); nd[m?("L"+shift(+m[1])):k]=save.done[k]; }
+    for(const k in save.best){ const m=/^L(\d+)$/.exec(k); nb[m?("L"+shift(+m[1])):k]=save.best[k]; }
+    save.done=nd; save.best=nb;
+  }
+  save.lvOrder="v6";
+}
 // 分组解锁态(各组互不锁关):每组第 1 关默认开;组内按 done 前缀推进。每次启动由 done 重算,无需持久化
 {
+  if(!save.lvOrder) save.lvOrder="v6";   // 全新档补盖当前布局标记(迁移块只认明确旧版本)
   const gu={};
   LINK_LEVELS.forEach(lv=>{ gu[lv.grp]=gu[lv.grp]||1; });
   LINK_LEVELS.forEach(lv=>{ if(save.done[lv.id] && (gu[lv.grp]||1)>lv.gpos) gu[lv.grp]=Math.max(gu[lv.grp], lv.gpos+2); });
@@ -1569,7 +1583,8 @@ const NOUN_FIELD=n=> n.de?"de":n.ht?"ht":n.en?"en":n.s?"s":"ap";   // 名词条�
 const P_PRONOUN={p1:"ik",p3:"hij",p6:"wij"};     // 人称变位组:形磁贴带人称(gaan ↔ ik ga,试玩反馈)
 const wordOf=(t)=>{
   const A=wordSrc(t);
-  if(t.k==="inf") return t.hint ? A[t.v][t.f]+" - "+A[t.v].inf : A[t.v].inf;   // 冠词提示关:名词磁贴带"de dag - dag"
+  if(t.k==="inf") return (A===NOUNS && t.hint) ? A[t.v][t.f] : A[t.v].inf;   // LN 第一关:词侧放全短语(de vrouw,答案给到);其余:纯词
+  if(A===NOUNS && (t.f==="de"||t.f==="ht")) return t.f==="de" ? "de" : "het";  // 冠词侧:两关都只放裸冠词
   const w=A[t.v][t.f];
   return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"
 };
@@ -2067,7 +2082,8 @@ function attemptPair(a,b){
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
   drawPath(path);
   const V=wordSrc(a)[a.v];
-  const formWord=a.k==="form"?wordOf(a):wordOf(b);
+  const formTile=a.k==="form"?a:b;
+  const formWord=a.src==="n" ? wordSrc(a)[a.v][formTile.f] : wordOf(formTile);   // 冠词磁贴只显示冠词,朗读念全短语(dag, de dag)
   // 计分:每对 15;连击(横幅窗口内)加成
   streak++;
   let pts=PAIR_POINTS;
