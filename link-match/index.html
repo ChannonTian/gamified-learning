@@ -674,7 +674,9 @@
 <script>
 window.__errs=[]; window.addEventListener("error",e=>{(window.__errs=window.__errs||[]).push(e.message+" @"+e.lineno);});
 "use strict";
-/* ================= 数据:85 词(与 tile-match 同源,改动需两边同步) ================= */
+/* ================= 数据(语言内容区;变体游戏由 tools/gen-variants.py 替换 ==LANG:== 区生成) ================= */
+/*==LANG:DATA==*/
+const LANG_META={ code:"nl", ui:"Nederlands", tts:"nl-NL", save:"linkmatch.v1", ln:["de","ht"], mv:["en","s","ap"], pron:{p1:"ik",p3:"hij",p6:"wij"} };
 const VERBS=[
   {inf:"zijn",     sg:"was",     pl:"waren",    pp:"geweest",    en:"to be",    zh:"是",    hue:215, p1:"ben", p3:"is", p6:"zijn", st:"Vorige week was ik in Amsterdam; ik ben er vaak geweest.", stz:"上周我在阿姆斯特丹;我去过那儿很多次。"},
   {inf:"hebben",   sg:"had",     pl:"hadden",   pp:"gehad",      en:"to have",  zh:"有",    hue:12, p1:"heb", p3:"heeft", p6:"hebben", st:"Vroeger had ik een hond; we hebben hem nog steeds.", stz:"以前我养过一只狗;我们现在还养着它。"},
@@ -914,6 +916,7 @@ const NOUNS=[
   {inf:"menu",    ap:"menu's",    gloss:"menu → menus",      zh:"菜单",   hue:88},
   {inf:"hobby",   ap:"hobby's",   gloss:"hobby → hobbies",   zh:"爱好",   hue:315},
 ];
+NOUNS.forEach((n,i)=>{ if(n.hue==null) n.hue=Math.round((i*137.508+73)%360); });   // 变体语言不手配色相:黄金角自动
 
 /* 每关 7 词;A1/A2/B1 各三关(sg→pl→pp),词池轮转覆盖 */
 const TIER_NAMES=[
@@ -925,6 +928,9 @@ const TIER_NAMES=[
 ];
 const VIDX={}; VERBS.forEach((v,i)=>{ VIDX[v.inf]=i; });
 const TIERS=TIER_NAMES.map(t=>({band:t.band, pool:t.names.map(n=>VIDX[n])}));
+const NOUN_SHAPE={};   // 语言变体:词型键→形状类映射(k-de/k-ht/k-ap 家族;空=键名直用,荷兰语 CSS 键齐全)
+const shapeKey=f=> NOUN_SHAPE[f]||f;
+/*==END:DATA==*/
 const LINK_TYPES=["sg","pl","pp"];
 const LINK_LEVELS=[];
 const LV_ROUNDS=[];
@@ -967,20 +973,24 @@ LV_ROUNDS.push(1);
     });
   };
   const idxOf=field=>NOUNS.map((n,i)=>n[field]?i:-1).filter(i=>i>=0);
-  // LN:de/het 交替铺平分 4 组(每组 9 词,5+4/4+5 混编);每组做两关(试玩反馈 v1.24):
+  const LN_FIELDS=LANG_META.ln, MV_FIELDS=LANG_META.mv;
+  // LN:各冠词类交替铺平分 4 组(每组 9 词,轮转混编);每组做两关(试玩反馈 v1.24):
   // 第一关 de vrouw ↔ de(短语在词侧,答案给到),第二关 vrouw ↔ de(答案拿掉,靠检索)
   {
-    const de=idxOf("de"), ht=idxOf("ht");
+    const pools=LN_FIELDS.map(f=>idxOf(f));
     const flat=[];
-    for(let i=0;i<Math.max(de.length,ht.length);i++){ if(de[i]!=null) flat.push(de[i]); if(ht[i]!=null) flat.push(ht[i]); }
+    for(let i=0;i<Math.max(...pools.map(p=>p.length));i++){
+      for(const pool of pools){ if(pool[i]!=null) flat.push(pool[i]); }
+    }
+    const per=Math.ceil(flat.length/4);   // 4 组词;每组做两关(短语↔冠词 → 名词↔冠词)
     let num=0;
     for(let g=0;g<4;g++){
-      const words=flat.slice(g*9,(g+1)*9);
+      const words=flat.slice(g*per,(g+1)*per);
       LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num, verbs:words, noun:true, hint:true});   // 短语关
       LINK_LEVELS.push({id:`L${LINK_LEVELS.length}`, band:"LN", grp:"LN", type:"dh", num:++num, verbs:words, noun:true, hint:false});  // 裸冠词关
     }
   }
-  nounLevels("MV",[["en",idxOf("en")],["s",idxOf("s")],["ap",idxOf("ap")]]);
+  nounLevels("MV",MV_FIELDS.map(f=>[f,idxOf(f)]));
 }
 TIERS.forEach((t,ti)=>{
   const R=Math.ceil(t.pool.length/9);      // 轮数=覆盖全池所需;每关 9 词×2 对=18 对
@@ -1003,12 +1013,15 @@ TIERS.forEach((t,ti)=>{
     lv.gpos=byGrp[lv.grp]-1;
   });
 }
+/*==LANG:KEYS==*/
 const FORM_KEY={sg:"legend.sg", pl:"legend.pl", pp:"legend.pp", p1:"legend.p1", p3:"legend.p3", p6:"legend.p6", de:"legend.de", ht:"legend.ht", dh:"legend.dh", en:"legend.en", s:"legend.s", ap:"legend.ap"};
 const SHORT_KEY={sg:"short.sg", pl:"short.pl", pp:"short.pp", p1:"short.p1", p3:"short.p3", p6:"short.p6", de:"short.de", ht:"short.ht", dh:"short.dh", en:"short.en", s:"short.s", ap:"short.ap"};
 const PRON_SHORT_KEY={sg:"short.pr.obj", pl:"short.pr.pos", pp:"short.pr.ref"};   // PR 组:sg=宾格 pl=物主 pp=反身
 const keyOf=lv=>lv.band==="PR"?PRON_SHORT_KEY[lv.type]:SHORT_KEY[lv.type];
+/*==END:KEYS==*/
 
 /* ================= i18n ================= */
+/*==LANG:I18N==*/
 const I18N={
   nl:{
     "menu.back":"Terug naar spel","menu.continue":"Volgend level","menu.levels":"Levels",
@@ -1098,13 +1111,14 @@ const I18N={
     "combo.m3":"Nice!","combo.m5":"Great!","combo.m8":"Unstoppable!","combo.m12":"Legendary!",
   },
 };
-function t(key){ return (I18N[save.settings.uiLang]||I18N.nl)[key] ?? I18N.nl[key] ?? key; }
+/*==END:I18N==*/
+function t(key){ return (I18N[save.settings.uiLang]||I18N[LANG_META.code])[key] ?? I18N[LANG_META.code][key] ?? key; }
 function glossOf(V){ return save.settings.uiLang==="zh" ? V.zh : (V.gloss||V.en); }   // 名词组释义在 gloss(MV 类型键 en=复数,撞名词义字段)
 function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); }); }
 
 /* ================= 存档 ================= */
-const SAVE_KEY="linkmatch.v1";
-const DEFAULT_SETTINGS={uiLang:"nl", volume:70, ttsVolume:80, hintWait:15, bannerMs:15, theme:"grug", dark:false};
+const SAVE_KEY=LANG_META.save;
+const DEFAULT_SETTINGS={uiLang:LANG_META.code, volume:70, ttsVolume:80, hintWait:15, bannerMs:15, theme:"grug", dark:false};
 let save={gUnlocked:{}, done:{}, best:{}, dailyBest:{}, dailyDone:null, counts:{}, style:"A", settings:{...DEFAULT_SETTINGS}};
 try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -1211,17 +1225,17 @@ function blip(freq,dur=.08,type="sine",gain=.12){
     o.start(); o.stop(actx.currentTime+dur);
   }catch(e){}
 }
-let nlVoice=null;
+let appVoice=null;
 function updateVoiceName(){
   const el=document.getElementById("voiceName");
-  if(el) el.textContent = nlVoice ? nlVoice.name : t("set.novoice");
+  if(el) el.textContent = appVoice ? appVoice.name : t("set.novoice");
 }
 function initVoices(){
   if(!("speechSynthesis" in window)) return;
   const pick=()=>{
     const vs=window.speechSynthesis.getVoices();
-    nlVoice = vs.find(v=>(v.lang||"").toLowerCase().replace("_","-")==="nl-nl")
-           || vs.find(v=>(v.lang||"").toLowerCase().startsWith("nl")) || null;
+    appVoice = vs.find(v=>(v.lang||"").toLowerCase().replace("_","-")===LANG_META.tts.toLowerCase())
+           || vs.find(v=>(v.lang||"").toLowerCase().startsWith(LANG_META.code)) || null;
     updateVoiceName();
   };
   pick();
@@ -1247,7 +1261,7 @@ function speakWords(seq){
         if(gen!==speakGen){ res(); return; }
         if(i>=seq.length){ res(); return; }
         const u=new SpeechSynthesisUtterance(seq[i++]);
-        u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+        u.lang=LANG_META.tts; if(appVoice) u.voice=appVoice;
         u.rate=0.82; u.volume=save.settings.ttsVolume/100;
         u.onstart=()=>{ startedAny=true; };
         u.onend=next; u.onerror=next;
@@ -1579,14 +1593,15 @@ let layout={ring:RING, tw:80, th:60};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
 const wordSrc=t=> t.src==="n" ? NOUNS : VERBS;   // 名词组磁贴(src:"n")查 NOUNS,动词查 VERBS
-const NOUN_FIELD=n=> n.de?"de":n.ht?"ht":n.en?"en":n.s?"s":"ap";   // 名词条目的类型键=它有的字段
-const P_PRONOUN={p1:"ik",p3:"hij",p6:"wij"};     // 人称变位组:形磁贴带人称(gaan ↔ ik ga,试玩反馈)
+const NOUN_FIELD=n=>{ for(const f of LANG_META.ln.concat(LANG_META.mv)) if(n[f]) return f; return null; };   // 名词条目的类型键=它有的字段(字段表随语言)
+const P_PRONOUN=LANG_META.pron;     // 人称变位组:形磁贴带人称(gaan ↔ ik ga;随语言)
 const wordOf=(t)=>{
   const A=wordSrc(t);
-  if(t.k==="inf") return (A===NOUNS && t.hint) ? A[t.v][t.f] : A[t.v].inf;   // LN 第一关:词侧放全短语(de vrouw,答案给到);其余:纯词
-  if(A===NOUNS && (t.f==="de"||t.f==="ht")) return t.f==="de" ? "de" : "het";  // 冠词侧:两关都只放裸冠词
+  const isArt=A===NOUNS && LANG_META.ln.includes(t.f);   // 冠词侧(字段表随语言:de/ht、le/la、el/la、o/a、der/die/das)
+  if(t.k==="inf") return (isArt && t.hint) ? A[t.v][t.f] : A[t.v].inf;   // LN 第一关:词侧放全短语(de vrouw,答案给到);其余:纯词
+  if(isArt) return t.f;   // 冠词侧:两关都只放裸冠词
   const w=A[t.v][t.f];
-  return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"
+  return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"(前缀随语言)
 };
 
 /* ---- 尺寸:确定性布局 ---- */
@@ -1808,7 +1823,7 @@ function buildBoardDOM(){
     const t=board[r][c];
     if(!t) continue;   // 开局缺口格(闯关 4×5 盘的 2 个随机空位)
     const el=document.createElement("div");
-    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+t.f);
+    el.className="tile "+(t.k==="inf"?"k-inf":"k-"+shapeKey(t.f));
     el.style.setProperty("--h",wordSrc(t)[t.v].hue);
     const face=document.createElement("div");
     face.className="face";
@@ -2444,7 +2459,7 @@ function speakVerb(word){
       const busyS=ss.speaking||ss.pending;
       if(busyS) ss.cancel();
       const u=new SpeechSynthesisUtterance(word);
-      u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice;
+      u.lang=LANG_META.tts; if(appVoice) u.voice=appVoice;
       u.rate=0.82; u.volume=save.settings.ttsVolume/100;
       let startedAny=false;
       u.onstart=()=>{ startedAny=true; };
@@ -2493,7 +2508,7 @@ function hideResult(){ document.getElementById("resultModal").classList.remove("
 function renderMenuLang(){
   const el=document.getElementById("menuLang"); if(!el) return;
   el.innerHTML="";
-  for(const [v,label] of [["nl","Nederlands"],["zh","中文"],["en","English"]]){
+  for(const [v,label] of [[LANG_META.code,LANG_META.ui],["zh","中文"],["en","English"]]){
     const b=document.createElement("button");
     b.className="lang-btn"+(save.settings.uiLang===v?" sel":"");
     b.textContent=label;
@@ -2555,7 +2570,7 @@ function renderLevelGrid(){
       const b=document.createElement("button");
       const locked=lv.gpos>=(save.gUnlocked[lv.grp]||1);   // 分组解锁:只看本组进度
       b.disabled=locked; // CSS pointer-events 不能阻止键盘 Enter/Space 激活
-      b.className="lv-btn k-"+lv.type+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型
+      b.className="lv-btn k-"+shapeKey(lv.type)+(locked?" locked":"")+(save.done[lv.id]?" done":"");   // 形状随游戏内词型
       b.innerHTML=`${lv.band}.${lv.num}<small>${t(keyOf(lv))}</small>`;
       b.onclick=()=>{ document.getElementById("menuScreen").classList.remove("on"); startLink(i); };
       g.appendChild(b);
@@ -2582,7 +2597,7 @@ function renderSettings(){
   const S=save.settings;
   updateVoiceName();
   seg(document.getElementById("setStyle"),[["A","Stijl A"],["B","Stijl B"]],save.style,v=>save.style=v);
-  seg(document.getElementById("setLang"),[["nl","Nederlands"],["zh","中文"],["en","English"]],S.uiLang,v=>S.uiLang=v);
+  seg(document.getElementById("setLang"),[[LANG_META.code,LANG_META.ui],["zh","中文"],["en","English"]],S.uiLang,v=>S.uiLang=v);
   document.getElementById("setVolume").value=S.volume;
   document.getElementById("setTts").value=S.ttsVolume;
   const hw=document.getElementById("setHintWait"); hw.value=S.hintWait;

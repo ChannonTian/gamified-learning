@@ -1,0 +1,1296 @@
+{
+ "meta": {
+  "code": "fr",
+  "ui": "Français",
+  "tts": "fr-FR",
+  "save": "linkmatchfr.v1",
+  "title": "Relier · verbes et noms français",
+  "htmlLang": "fr",
+  "ln": [
+   "le",
+   "la"
+  ],
+  "mv": [
+   "s",
+   "x",
+   "eaux"
+  ],
+  "pron": {
+   "p1": "je",
+   "p3": "il",
+   "p6": "nous"
+  }
+ },
+ "keys": {
+  "legend": {
+   "sg": "imparfait (je)",
+   "pl": "imparfait (nous)",
+   "pp": "participe passé",
+   "p1": "présent (je)",
+   "p3": "présent (il/elle)",
+   "p6": "présent (nous)",
+   "le": "article le",
+   "la": "article la",
+   "s": "pluriel en -s",
+   "x": "pluriel en -x",
+   "eaux": "pluriel en -eaux",
+   "dh": "article (le/la)"
+  },
+  "short": {
+   "sg": "impf.",
+   "pl": "impf. pl.",
+   "pp": "part.",
+   "p1": "je",
+   "p3": "il/elle",
+   "p6": "nous",
+   "le": "le",
+   "la": "la",
+   "s": "-s",
+   "x": "-x",
+   "eaux": "-eaux",
+   "dh": "le/la"
+  }
+ },
+ "verbs": [
+  {
+   "inf": "être",
+   "sg": "étais",
+   "pl": "étions",
+   "pp": "été",
+   "p1": "suis",
+   "p3": "est",
+   "p6": "sommes",
+   "en": "to be",
+   "zh": "是"
+  },
+  {
+   "inf": "avoir",
+   "sg": "avais",
+   "pl": "avions",
+   "pp": "eu",
+   "p1": "ai",
+   "p3": "a",
+   "p6": "avons",
+   "en": "to have",
+   "zh": "有"
+  },
+  {
+   "inf": "faire",
+   "sg": "faisais",
+   "pl": "faisions",
+   "pp": "fait",
+   "p1": "fais",
+   "p3": "fait",
+   "p6": "faisons",
+   "en": "to do",
+   "zh": "做"
+  },
+  {
+   "inf": "dire",
+   "sg": "disais",
+   "pl": "disions",
+   "pp": "dit",
+   "p1": "dis",
+   "p3": "dit",
+   "p6": "disons",
+   "en": "to say",
+   "zh": "说"
+  },
+  {
+   "inf": "aller",
+   "sg": "allais",
+   "pl": "allions",
+   "pp": "allé",
+   "p1": "vais",
+   "p3": "va",
+   "p6": "allons",
+   "en": "to go",
+   "zh": "去"
+  },
+  {
+   "inf": "voir",
+   "sg": "voyais",
+   "pl": "voyions",
+   "pp": "vu",
+   "p1": "vois",
+   "p3": "voit",
+   "p6": "voyons",
+   "en": "to see",
+   "zh": "看见"
+  },
+  {
+   "inf": "savoir",
+   "sg": "savais",
+   "pl": "savions",
+   "pp": "su",
+   "p1": "sais",
+   "p3": "sait",
+   "p6": "savons",
+   "en": "to know",
+   "zh": "知道"
+  },
+  {
+   "inf": "pouvoir",
+   "sg": "pouvais",
+   "pl": "pouvions",
+   "pp": "pu",
+   "p1": "peux",
+   "p3": "peut",
+   "p6": "pouvons",
+   "en": "can",
+   "zh": "能"
+  },
+  {
+   "inf": "venir",
+   "sg": "venais",
+   "pl": "venions",
+   "pp": "venu",
+   "p1": "viens",
+   "p3": "vient",
+   "p6": "venons",
+   "en": "to come",
+   "zh": "来"
+  },
+  {
+   "inf": "vouloir",
+   "sg": "voulais",
+   "pl": "voulions",
+   "pp": "voulu",
+   "p1": "veux",
+   "p3": "veut",
+   "p6": "voulons",
+   "en": "to want",
+   "zh": "想要"
+  },
+  {
+   "inf": "devoir",
+   "sg": "devais",
+   "pl": "devions",
+   "pp": "dû",
+   "p1": "dois",
+   "p3": "doit",
+   "p6": "devons",
+   "en": "must",
+   "zh": "必须"
+  },
+  {
+   "inf": "prendre",
+   "sg": "prenais",
+   "pl": "prenions",
+   "pp": "pris",
+   "p1": "prends",
+   "p3": "prend",
+   "p6": "prenons",
+   "en": "to take",
+   "zh": "拿"
+  },
+  {
+   "inf": "donner",
+   "sg": "donnais",
+   "pl": "donnions",
+   "pp": "donné",
+   "p1": "donne",
+   "p3": "donne",
+   "p6": "donnons",
+   "en": "to give",
+   "zh": "给"
+  },
+  {
+   "inf": "parler",
+   "sg": "parlais",
+   "pl": "parlions",
+   "pp": "parlé",
+   "p1": "parle",
+   "p3": "parle",
+   "p6": "parlons",
+   "en": "to speak",
+   "zh": "说话"
+  },
+  {
+   "inf": "aimer",
+   "sg": "aimais",
+   "pl": "aimions",
+   "pp": "aimé",
+   "p1": "aime",
+   "p3": "aime",
+   "p6": "aimons",
+   "en": "to love",
+   "zh": "爱"
+  },
+  {
+   "inf": "mettre",
+   "sg": "mettais",
+   "pl": "mettions",
+   "pp": "mis",
+   "p1": "mets",
+   "p3": "met",
+   "p6": "mettons",
+   "en": "to put",
+   "zh": "放"
+  },
+  {
+   "inf": "passer",
+   "sg": "passais",
+   "pl": "passions",
+   "pp": "passé",
+   "p1": "passe",
+   "p3": "passe",
+   "p6": "passons",
+   "en": "to pass",
+   "zh": "经过"
+  },
+  {
+   "inf": "regarder",
+   "sg": "regardais",
+   "pl": "regardions",
+   "pp": "regardé",
+   "p1": "regarde",
+   "p3": "regarde",
+   "p6": "regardons",
+   "en": "to watch",
+   "zh": "看"
+  },
+  {
+   "inf": "demander",
+   "sg": "demandais",
+   "pl": "demandions",
+   "pp": "demandé",
+   "p1": "demande",
+   "p3": "demande",
+   "p6": "demandons",
+   "en": "to ask",
+   "zh": "问"
+  },
+  {
+   "inf": "partir",
+   "sg": "partais",
+   "pl": "partions",
+   "pp": "parti",
+   "p1": "pars",
+   "p3": "part",
+   "p6": "partons",
+   "en": "to leave",
+   "zh": "离开"
+  },
+  {
+   "inf": "comprendre",
+   "sg": "comprenais",
+   "pl": "comprenions",
+   "pp": "compris",
+   "en": "to understand",
+   "zh": "理解"
+  },
+  {
+   "inf": "attendre",
+   "sg": "attendais",
+   "pl": "attendions",
+   "pp": "attendu",
+   "en": "to wait",
+   "zh": "等待"
+  },
+  {
+   "inf": "répondre",
+   "sg": "répondais",
+   "pl": "répondions",
+   "pp": "répondu",
+   "en": "to answer",
+   "zh": "回答"
+  },
+  {
+   "inf": "connaître",
+   "sg": "connaissais",
+   "pl": "connaissions",
+   "pp": "connu",
+   "en": "to know (a person)",
+   "zh": "认识"
+  },
+  {
+   "inf": "croire",
+   "sg": "croyais",
+   "pl": "croyions",
+   "pp": "cru",
+   "en": "to believe",
+   "zh": "相信"
+  },
+  {
+   "inf": "suivre",
+   "sg": "suivais",
+   "pl": "suivions",
+   "pp": "suivi",
+   "en": "to follow",
+   "zh": "跟随"
+  },
+  {
+   "inf": "écrire",
+   "sg": "écrivais",
+   "pl": "écrivions",
+   "pp": "écrit",
+   "en": "to write",
+   "zh": "写"
+  },
+  {
+   "inf": "lire",
+   "sg": "lisais",
+   "pl": "lisions",
+   "pp": "lu",
+   "en": "to read",
+   "zh": "读"
+  },
+  {
+   "inf": "vivre",
+   "sg": "vivais",
+   "pl": "vivions",
+   "pp": "vécu",
+   "en": "to live",
+   "zh": "生活"
+  },
+  {
+   "inf": "tenir",
+   "sg": "tenais",
+   "pl": "tenions",
+   "pp": "tenu",
+   "en": "to hold",
+   "zh": "握住"
+  },
+  {
+   "inf": "arriver",
+   "sg": "arrivais",
+   "pl": "arrivions",
+   "pp": "arrivé",
+   "en": "to arrive",
+   "zh": "到达"
+  },
+  {
+   "inf": "entrer",
+   "sg": "entrais",
+   "pl": "entrions",
+   "pp": "entré",
+   "en": "to enter",
+   "zh": "进入"
+  },
+  {
+   "inf": "rester",
+   "sg": "restais",
+   "pl": "restions",
+   "pp": "resté",
+   "en": "to stay",
+   "zh": "逗留"
+  },
+  {
+   "inf": "tomber",
+   "sg": "tombais",
+   "pl": "tombions",
+   "pp": "tombé",
+   "en": "to fall",
+   "zh": "掉落"
+  },
+  {
+   "inf": "sortir",
+   "sg": "sortais",
+   "pl": "sortions",
+   "pp": "sorti",
+   "en": "to go out",
+   "zh": "出去"
+  },
+  {
+   "inf": "monter",
+   "sg": "montais",
+   "pl": "montions",
+   "pp": "monté",
+   "en": "to go up",
+   "zh": "登上"
+  },
+  {
+   "inf": "finir",
+   "sg": "finissais",
+   "pl": "finissions",
+   "pp": "fini",
+   "en": "to finish",
+   "zh": "完成"
+  },
+  {
+   "inf": "choisir",
+   "sg": "choisissais",
+   "pl": "choisissions",
+   "pp": "choisi",
+   "en": "to choose",
+   "zh": "选择"
+  },
+  {
+   "inf": "réussir",
+   "sg": "réussissais",
+   "pl": "réussissions",
+   "pp": "réussi",
+   "en": "to succeed",
+   "zh": "成功"
+  },
+  {
+   "inf": "penser",
+   "sg": "pensais",
+   "pl": "pensions",
+   "pp": "pensé",
+   "en": "to think",
+   "zh": "思考"
+  },
+  {
+   "inf": "naître",
+   "sg": "naissais",
+   "pl": "naissions",
+   "pp": "né",
+   "en": "to be born",
+   "zh": "出生"
+  },
+  {
+   "inf": "mourir",
+   "sg": "mourais",
+   "pl": "mourions",
+   "pp": "mort",
+   "en": "to die",
+   "zh": "死亡"
+  },
+  {
+   "inf": "ouvrir",
+   "sg": "ouvrais",
+   "pl": "ouvrions",
+   "pp": "ouvert",
+   "en": "to open",
+   "zh": "打开"
+  },
+  {
+   "inf": "offrir",
+   "sg": "offrais",
+   "pl": "offrions",
+   "pp": "offert",
+   "en": "to offer",
+   "zh": "提供"
+  },
+  {
+   "inf": "souffrir",
+   "sg": "souffrais",
+   "pl": "souffrions",
+   "pp": "souffert",
+   "en": "to suffer",
+   "zh": "受苦"
+  },
+  {
+   "inf": "découvrir",
+   "sg": "découvrais",
+   "pl": "découvrions",
+   "pp": "découvert",
+   "en": "to discover",
+   "zh": "发现"
+  },
+  {
+   "inf": "conduire",
+   "sg": "conduisais",
+   "pl": "conduisions",
+   "pp": "conduit",
+   "en": "to drive",
+   "zh": "驾驶"
+  },
+  {
+   "inf": "construire",
+   "sg": "construisais",
+   "pl": "construisions",
+   "pp": "construit",
+   "en": "to build",
+   "zh": "建造"
+  },
+  {
+   "inf": "détruire",
+   "sg": "détruisais",
+   "pl": "détruisions",
+   "pp": "détruit",
+   "en": "to destroy",
+   "zh": "摧毁"
+  },
+  {
+   "inf": "produire",
+   "sg": "produisais",
+   "pl": "produisions",
+   "pp": "produit",
+   "en": "to produce",
+   "zh": "生产"
+  },
+  {
+   "inf": "battre",
+   "sg": "battais",
+   "pl": "battions",
+   "pp": "battu",
+   "en": "to beat",
+   "zh": "打败"
+  },
+  {
+   "inf": "rompre",
+   "sg": "rompais",
+   "pl": "rompions",
+   "pp": "rompu",
+   "en": "to break",
+   "zh": "折断"
+  },
+  {
+   "inf": "résoudre",
+   "sg": "résolvais",
+   "pl": "résolvions",
+   "pp": "résolu",
+   "en": "to solve",
+   "zh": "解决"
+  },
+  {
+   "inf": "servir",
+   "sg": "servais",
+   "pl": "servions",
+   "pp": "servi",
+   "en": "to serve",
+   "zh": "服务"
+  },
+  {
+   "inf": "dormir",
+   "sg": "dormais",
+   "pl": "dormions",
+   "pp": "dormi",
+   "en": "to sleep",
+   "zh": "睡觉"
+  },
+  {
+   "inf": "mentir",
+   "sg": "mentais",
+   "pl": "mentions",
+   "pp": "menti",
+   "en": "to lie",
+   "zh": "撒谎"
+  },
+  {
+   "inf": "sentir",
+   "sg": "sentais",
+   "pl": "sentions",
+   "pp": "senti",
+   "en": "to feel",
+   "zh": "感觉"
+  },
+  {
+   "inf": "courir",
+   "sg": "courais",
+   "pl": "courions",
+   "pp": "couru",
+   "en": "to run",
+   "zh": "跑"
+  },
+  {
+   "inf": "rire",
+   "sg": "riais",
+   "pl": "rions",
+   "pp": "ri",
+   "en": "to laugh",
+   "zh": "笑"
+  },
+  {
+   "inf": "atteindre",
+   "sg": "atteignais",
+   "pl": "atteignions",
+   "pp": "atteint",
+   "en": "to reach",
+   "zh": "达到"
+  }
+ ],
+ "pronouns": [
+  {
+   "inf": "je",
+   "sg": "moi",
+   "pl": "mon",
+   "pp": "me",
+   "en": "I / me / my / myself",
+   "zh": "我"
+  },
+  {
+   "inf": "tu",
+   "sg": "toi",
+   "pl": "ton",
+   "pp": "te",
+   "en": "you / your / yourself",
+   "zh": "你"
+  },
+  {
+   "inf": "il",
+   "sg": "lui",
+   "pl": "son",
+   "pp": "se",
+   "en": "he / him / his / himself",
+   "zh": "他"
+  },
+  {
+   "inf": "elle",
+   "sg": "elle",
+   "pl": "son",
+   "pp": "se",
+   "en": "she / her / hers / herself",
+   "zh": "她"
+  },
+  {
+   "inf": "nous",
+   "sg": "nous",
+   "pl": "notre",
+   "pp": "nous",
+   "en": "we / us / our / ourselves",
+   "zh": "我们"
+  },
+  {
+   "inf": "vous",
+   "sg": "vous",
+   "pl": "votre",
+   "pp": "vous",
+   "en": "you (pl) / your",
+   "zh": "你们"
+  },
+  {
+   "inf": "ils",
+   "sg": "eux",
+   "pl": "leur",
+   "pp": "se",
+   "en": "they / them / their / themselves",
+   "zh": "他们"
+  }
+ ],
+ "nouns": [
+  {
+   "inf": "livre",
+   "le": "le livre",
+   "en": "the book",
+   "zh": "书"
+  },
+  {
+   "inf": "jour",
+   "le": "le jour",
+   "en": "the day",
+   "zh": "天"
+  },
+  {
+   "inf": "pain",
+   "le": "le pain",
+   "en": "the bread",
+   "zh": "面包"
+  },
+  {
+   "inf": "matin",
+   "le": "le matin",
+   "en": "the morning",
+   "zh": "早晨"
+  },
+  {
+   "inf": "travail",
+   "le": "le travail",
+   "en": "the work",
+   "zh": "工作"
+  },
+  {
+   "inf": "chemin",
+   "le": "le chemin",
+   "en": "the road",
+   "zh": "路"
+  },
+  {
+   "inf": "père",
+   "le": "le père",
+   "en": "the father",
+   "zh": "父亲"
+  },
+  {
+   "inf": "frère",
+   "le": "le frère",
+   "en": "the brother",
+   "zh": "兄弟"
+  },
+  {
+   "inf": "chien",
+   "le": "le chien",
+   "en": "the dog",
+   "zh": "狗"
+  },
+  {
+   "inf": "cheval",
+   "le": "le cheval",
+   "en": "the horse",
+   "zh": "马"
+  },
+  {
+   "inf": "repas",
+   "le": "le repas",
+   "en": "the meal",
+   "zh": "餐"
+  },
+  {
+   "inf": "soleil",
+   "le": "le soleil",
+   "en": "the sun",
+   "zh": "太阳"
+  },
+  {
+   "inf": "cadeau",
+   "le": "le cadeau",
+   "en": "the gift",
+   "zh": "礼物"
+  },
+  {
+   "inf": "bateau",
+   "le": "le bateau",
+   "en": "the boat",
+   "zh": "船"
+  },
+  {
+   "inf": "marché",
+   "le": "le marché",
+   "en": "the market",
+   "zh": "市场"
+  },
+  {
+   "inf": "temps",
+   "le": "le temps",
+   "en": "the time",
+   "zh": "时间"
+  },
+  {
+   "inf": "monde",
+   "le": "le monde",
+   "en": "the world",
+   "zh": "世界"
+  },
+  {
+   "inf": "lit",
+   "le": "le lit",
+   "en": "the bed",
+   "zh": "床"
+  },
+  {
+   "inf": "maison",
+   "la": "la maison",
+   "en": "the house",
+   "zh": "房子"
+  },
+  {
+   "inf": "table",
+   "la": "la table",
+   "en": "the table",
+   "zh": "桌子"
+  },
+  {
+   "inf": "porte",
+   "la": "la porte",
+   "en": "the door",
+   "zh": "门"
+  },
+  {
+   "inf": "ville",
+   "la": "la ville",
+   "en": "the city",
+   "zh": "城市"
+  },
+  {
+   "inf": "mer",
+   "la": "la mer",
+   "en": "the sea",
+   "zh": "海"
+  },
+  {
+   "inf": "mère",
+   "la": "la mère",
+   "en": "the mother",
+   "zh": "母亲"
+  },
+  {
+   "inf": "sœur",
+   "la": "la sœur",
+   "en": "the sister",
+   "zh": "姐妹"
+  },
+  {
+   "inf": "rue",
+   "la": "la rue",
+   "en": "the street",
+   "zh": "街道"
+  },
+  {
+   "inf": "nuit",
+   "la": "la nuit",
+   "en": "the night",
+   "zh": "夜晚"
+  },
+  {
+   "inf": "voiture",
+   "la": "la voiture",
+   "en": "the car",
+   "zh": "汽车"
+  },
+  {
+   "inf": "fenêtre",
+   "la": "la fenêtre",
+   "en": "the window",
+   "zh": "窗户"
+  },
+  {
+   "inf": "lettre",
+   "la": "la lettre",
+   "en": "the letter",
+   "zh": "信"
+  },
+  {
+   "inf": "plage",
+   "la": "la plage",
+   "en": "the beach",
+   "zh": "海滩"
+  },
+  {
+   "inf": "montagne",
+   "la": "la montagne",
+   "en": "the mountain",
+   "zh": "山"
+  },
+  {
+   "inf": "fleur",
+   "la": "la fleur",
+   "en": "the flower",
+   "zh": "花"
+  },
+  {
+   "inf": "semaine",
+   "la": "la semaine",
+   "en": "the week",
+   "zh": "星期"
+  },
+  {
+   "inf": "fête",
+   "la": "la fête",
+   "en": "the party",
+   "zh": "聚会"
+  },
+  {
+   "inf": "chose",
+   "la": "la chose",
+   "en": "the thing",
+   "zh": "东西"
+  },
+  {
+   "inf": "livre",
+   "s": "livres",
+   "en": "book → books",
+   "zh": "书"
+  },
+  {
+   "inf": "maison",
+   "s": "maisons",
+   "en": "house → houses",
+   "zh": "房子"
+  },
+  {
+   "inf": "jour",
+   "s": "jours",
+   "en": "day → days",
+   "zh": "天"
+  },
+  {
+   "inf": "table",
+   "s": "tables",
+   "en": "table → tables",
+   "zh": "桌子"
+  },
+  {
+   "inf": "chien",
+   "s": "chiens",
+   "en": "dog → dogs",
+   "zh": "狗"
+  },
+  {
+   "inf": "porte",
+   "s": "portes",
+   "en": "door → doors",
+   "zh": "门"
+  },
+  {
+   "inf": "arbre",
+   "s": "arbres",
+   "en": "tree → trees",
+   "zh": "树"
+  },
+  {
+   "inf": "semaine",
+   "s": "semaines",
+   "en": "week → weeks",
+   "zh": "星期"
+  },
+  {
+   "inf": "rue",
+   "s": "rues",
+   "en": "street → streets",
+   "zh": "街道"
+  },
+  {
+   "inf": "cheval",
+   "x": "chevaux",
+   "en": "horse → horses",
+   "zh": "马"
+  },
+  {
+   "inf": "journal",
+   "x": "journaux",
+   "en": "newspaper → newspapers",
+   "zh": "报纸"
+  },
+  {
+   "inf": "animal",
+   "x": "animaux",
+   "en": "animal → animals",
+   "zh": "动物"
+  },
+  {
+   "inf": "travail",
+   "x": "travaux",
+   "en": "work → works",
+   "zh": "工作"
+  },
+  {
+   "inf": "vitrail",
+   "x": "vitraux",
+   "en": "stained glass → stained glasses",
+   "zh": "彩绘玻璃"
+  },
+  {
+   "inf": "jeu",
+   "x": "jeux",
+   "en": "game → games",
+   "zh": "游戏"
+  },
+  {
+   "inf": "feu",
+   "x": "feux",
+   "en": "fire → fires",
+   "zh": "火"
+  },
+  {
+   "inf": "bijou",
+   "x": "bijoux",
+   "en": "jewel → jewels",
+   "zh": "珠宝"
+  },
+  {
+   "inf": "genou",
+   "x": "genoux",
+   "en": "knee → knees",
+   "zh": "膝盖"
+  },
+  {
+   "inf": "bateau",
+   "eaux": "bateaux",
+   "en": "boat → boats",
+   "zh": "船"
+  },
+  {
+   "inf": "château",
+   "eaux": "châteaux",
+   "en": "castle → castles",
+   "zh": "城堡"
+  },
+  {
+   "inf": "cadeau",
+   "eaux": "cadeaux",
+   "en": "gift → gifts",
+   "zh": "礼物"
+  },
+  {
+   "inf": "tableau",
+   "eaux": "tableaux",
+   "en": "painting → paintings",
+   "zh": "画"
+  },
+  {
+   "inf": "manteau",
+   "eaux": "manteaux",
+   "en": "coat → coats",
+   "zh": "大衣"
+  },
+  {
+   "inf": "chapeau",
+   "eaux": "chapeaux",
+   "en": "hat → hats",
+   "zh": "帽子"
+  },
+  {
+   "inf": "gâteau",
+   "eaux": "gâteaux",
+   "en": "cake → cakes",
+   "zh": "蛋糕"
+  },
+  {
+   "inf": "oiseau",
+   "eaux": "oiseaux",
+   "en": "bird → birds",
+   "zh": "鸟"
+  },
+  {
+   "inf": "eau",
+   "eaux": "eaux",
+   "en": "water → waters",
+   "zh": "水"
+  }
+ ],
+ "tierNames": [
+  {
+   "band": "A1",
+   "names": [
+    "être",
+    "avoir",
+    "faire",
+    "dire",
+    "aller",
+    "voir",
+    "savoir",
+    "pouvoir",
+    "venir",
+    "vouloir",
+    "devoir",
+    "prendre",
+    "donner",
+    "parler",
+    "aimer",
+    "mettre",
+    "passer",
+    "regarder",
+    "demander",
+    "partir"
+   ]
+  },
+  {
+   "band": "A2",
+   "names": [
+    "comprendre",
+    "attendre",
+    "répondre",
+    "connaître",
+    "croire",
+    "suivre",
+    "écrire",
+    "lire",
+    "vivre",
+    "tenir",
+    "arriver",
+    "entrer",
+    "rester",
+    "tomber",
+    "sortir",
+    "monter",
+    "finir",
+    "choisir",
+    "réussir",
+    "penser"
+   ]
+  },
+  {
+   "band": "B1",
+   "names": [
+    "naître",
+    "mourir",
+    "ouvrir",
+    "offrir",
+    "souffrir",
+    "découvrir",
+    "conduire",
+    "construire",
+    "détruire",
+    "produire",
+    "battre",
+    "rompre",
+    "résoudre",
+    "servir",
+    "dormir",
+    "mentir",
+    "sentir",
+    "courir",
+    "rire",
+    "atteindre"
+   ]
+  }
+ ],
+ "i18n": {
+  "fr": {
+   "menu.back": "Reprendre la partie",
+   "menu.continue": "Niveau suivant",
+   "menu.levels": "Niveaux",
+   "menu.daily": "Défi du jour",
+   "menu.endless": "Infini",
+   "menu.survival": "Survie",
+   "menu.survivalnew": "Chaque paire contre la montre !",
+   "menu.needlevel": "Terminez un niveau pour débloquer",
+   "menu.newdaily": "Une nouvelle grille chaque jour",
+   "menu.endlessnew": "Chasse aux points avec votre collection",
+   "menu.dailydone": "Déjà terminé aujourd'hui — nouvelle grille demain !",
+   "mode.endless": "Infini",
+   "mode.daily": "Défi du jour",
+   "mode.survival": "Survie",
+   "result.timeup": "Temps écoulé !",
+   "result.today": "Aujourd'hui",
+   "menu.help": "Règles du jeu",
+   "menu.settings": "Réglages",
+   "dock.hint": "Indice",
+   "dock.book": "Collection",
+   "mi.endless": "Chasse aux points avec vos mots collectés : la série continue après un tableau vide.",
+   "mi.daily": "180 secondes, une fois par jour. Tout le monde a la même grille.",
+   "mi.survival": "Chaque paire en 15 secondes — sinon c'est fini. Les faux clics sont permis.",
+   "mi.start": "Commencer",
+   "mi.back": "Retour",
+   "legend.sg": "imparfait (je)",
+   "legend.pl": "imparfait (nous)",
+   "legend.pp": "participe passé",
+   "short.sg": "impf.",
+   "short.pl": "impf. pl.",
+   "short.pp": "part.",
+   "legend.p1": "présent (je)",
+   "legend.p3": "présent (il/elle)",
+   "legend.p6": "présent (nous)",
+   "short.p1": "je",
+   "short.p3": "il/elle",
+   "short.p6": "nous",
+   "legend.pr.obj": "pronom tonique",
+   "legend.pr.pos": "possessif",
+   "legend.pr.ref": "réfléchi",
+   "short.pr.obj": "tonique",
+   "short.pr.pos": "poss.",
+   "short.pr.ref": "réfl.",
+   "band.pr": "Pronoms",
+   "band.ps": "Présent des verbes",
+   "band.ln": "Articles (le/la)",
+   "band.mv": "Pluriels",
+   "card.sent": "Exemple",
+   "legend.le": "article le",
+   "legend.la": "article la",
+   "short.le": "le",
+   "short.la": "la",
+   "legend.s": "pluriel en -s",
+   "legend.x": "pluriel en -x",
+   "legend.eaux": "pluriel en -eaux",
+   "short.s": "-s",
+   "short.x": "-x",
+   "short.eaux": "-eaux",
+   "legend.dh": "article (le/la)",
+   "short.dh": "le/la",
+   "set.title": "Réglages",
+   "set.style": "Style d'illustration",
+   "set.lang": "Langue",
+   "set.sound": "Sons",
+   "set.tts": "Lecture vocale",
+   "set.hintwait": "Délai d'indice",
+   "set.banner": "Durée du bandeau",
+   "set.theme": "Thème",
+   "theme.grug": "Croquis",
+   "theme.papier": "Post-it",
+   "set.dark": "Mode sombre",
+   "opt.off": "Off",
+   "opt.on": "On",
+   "set.voice": "Voix",
+   "set.voicetest": "Essayer",
+   "set.novoice": "Aucune voix française trouvée. Chrome : Réglages → Langues → Français",
+   "tts.blocked": "Pas de son dans cette fenêtre — testez la Lecture vocale dans Chrome ou Safari.",
+   "result.title": "Grille terminée !",
+   "result.done": "Toutes les paires trouvées.",
+   "result.record": "nouveau record !",
+   "result.best": "record",
+   "btn.again": "Recommencer",
+   "btn.menu": "Menu",
+   "btn.next": "Niveau suivant →",
+   "toast.shuffle": "Plus de combinaisons — mélange !",
+   "toast.nopair": "Aucune paire — mélange !",
+   "book.title": "Collection",
+   "book.locked": "Pas encore apparié",
+   "book.lockedsub": "Appariez ce mot pour le collectionner.",
+   "book.view": "Toucher pour voir",
+   "help.title": "Règles du jeu",
+   "help.p1": "Reliez le mot à sa forme : touchez le mot puis la forme du même mot reliée par un chemin avec au plus 2 virages (à travers les cases vides ou par le bord). Chaque niveau travaille une seule forme.",
+   "help.goal": "But : trouvez toutes les paires avant de bloquer. Sinon la grille est mélangée.",
+   "help.score": "Score : 15 points par paire. Les paires rapides donnent un bonus de série.",
+   "help.rules": "Cinq groupes, chacun dans son ordre : Pronoms (je ↔ moi / mon / me), Présent (aller ↔ je vais), Articles le/la (même groupe de mots en deux niveaux : d'abord livre ↔ le livre, puis livre ↔ le), Pluriels (livre ↔ livres) et imparfait/participe A1–B1. Les groupes sont indépendants — commencez où vous voulez.",
+   "help.modes": "Modes : après un niveau terminé, vous débloquez Infini, Survie et le Défi du jour (180 secondes, une fois par jour).",
+   "help.stuck": "Bloqué ? Touchez Indice — ou patientez. Les bords autour du tableau font partie du jeu.",
+   "demo.step1": "1 · Touchez le mot",
+   "demo.step2": "2 · Touchez sa forme",
+   "demo.step3": "3 · La ligne se dessine…",
+   "demo.go": "À vous !",
+   "combo.m3": "Bien !",
+   "combo.m5": "Génial !",
+   "combo.m8": "Formidable !",
+   "combo.m12": "Légendaire !"
+  },
+  "zh": {
+   "band.ln": "冠词 le/la",
+   "legend.sg": "未完成过去(je)",
+   "legend.pl": "未完成过去(nous)",
+   "legend.pp": "过去分词",
+   "short.sg": "未完过",
+   "short.pl": "未完过复",
+   "short.pp": "分词",
+   "legend.p1": "现在时 je",
+   "legend.p3": "现在时 il/elle",
+   "legend.p6": "现在时 nous",
+   "short.p1": "je 形",
+   "short.p3": "il/elle 形",
+   "short.p6": "nous 形",
+   "legend.le": "定冠词 le",
+   "legend.la": "定冠词 la",
+   "short.le": "le",
+   "short.la": "la",
+   "legend.s": "复数 -s",
+   "legend.x": "复数 -x",
+   "legend.eaux": "复数 -eaux",
+   "short.s": "-s",
+   "short.x": "-x",
+   "short.eaux": "-eaux",
+   "legend.dh": "定冠词 le/la",
+   "short.dh": "le/la",
+   "legend.pr.obj": "重读代词",
+   "legend.pr.pos": "主有形容词",
+   "legend.pr.ref": "自反代词",
+   "short.pr.obj": "重读",
+   "short.pr.pos": "主有",
+   "short.pr.ref": "自反",
+   "help.rules": "五组各有独立顺序:代词(je ↔ moi / mon / me)、动词现在时人称(je / il-elle / nous)、冠词 le/la(同一组词两关:先 le livre 给出答案,再只剩 le)、名词复数(livre ↔ livres)、未完成过去式+过去分词 A1–B1(单数→复数→分词)。各组互不锁关,可分别开始。"
+  },
+  "en": {
+   "band.ln": "Articles (le/la)",
+   "legend.sg": "imperfect (je)",
+   "legend.pl": "imperfect (nous)",
+   "legend.pp": "past participle",
+   "short.sg": "impf.",
+   "short.pl": "impf. pl.",
+   "short.pp": "part.",
+   "legend.p1": "present (je)",
+   "legend.p3": "present (il/elle)",
+   "legend.p6": "present (nous)",
+   "short.p1": "je",
+   "short.p3": "il/elle",
+   "short.p6": "nous",
+   "legend.le": "article le",
+   "legend.la": "article la",
+   "short.le": "le",
+   "short.la": "la",
+   "legend.s": "plural -s",
+   "legend.x": "plural -x",
+   "legend.eaux": "plural -eaux",
+   "short.s": "-s",
+   "short.x": "-x",
+   "short.eaux": "-eaux",
+   "legend.dh": "article (le/la)",
+   "short.dh": "le/la",
+   "legend.pr.obj": "stress pronoun",
+   "legend.pr.pos": "possessive",
+   "legend.pr.ref": "reflexive",
+   "short.pr.obj": "stress",
+   "short.pr.pos": "poss.",
+   "short.pr.ref": "refl.",
+   "help.rules": "Five groups, each with its own order: Pronouns (je ↔ moi / mon / me), Present tense (aller ↔ je vais), Articles le/la (same word group in two levels — first livre ↔ le livre, then livre ↔ le), Plurals (livre ↔ livres), and imperfect/participle A1–B1. The groups unlock separately — start anywhere."
+  }
+ },
+ "shape": {
+  "le": "k-de",
+  "la": "k-ht",
+  "s": "k-de",
+  "x": "k-ht",
+  "eaux": "k-ap",
+  "dh": "k-dh"
+ }
+}

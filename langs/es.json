@@ -1,0 +1,1296 @@
+{
+ "meta": {
+  "code": "es",
+  "ui": "Español",
+  "tts": "es-ES",
+  "save": "linkmatches.v1",
+  "title": "Enlazar · verbos y sustantivos españoles",
+  "htmlLang": "es",
+  "ln": [
+   "el",
+   "la"
+  ],
+  "mv": [
+   "s",
+   "es",
+   "ces"
+  ],
+  "pron": {
+   "p1": "yo",
+   "p3": "él",
+   "p6": "nosotros"
+  }
+ },
+ "keys": {
+  "legend": {
+   "sg": "indefinido (yo)",
+   "pl": "indefinido (ellos)",
+   "pp": "participio",
+   "p1": "presente (yo)",
+   "p3": "presente (él/ella)",
+   "p6": "presente (nosotros)",
+   "el": "artículo el",
+   "la": "artículo la",
+   "s": "plural en -s",
+   "es": "plural en -es",
+   "ces": "plural -z → -ces",
+   "dh": "artículo (el/la)"
+  },
+  "short": {
+   "sg": "indef.",
+   "pl": "indef. pl.",
+   "pp": "part.",
+   "p1": "yo",
+   "p3": "él/ella",
+   "p6": "nosotros",
+   "el": "el",
+   "la": "la",
+   "s": "-s",
+   "es": "-es",
+   "ces": "-ces",
+   "dh": "el/la"
+  }
+ },
+ "verbs": [
+  {
+   "inf": "ser",
+   "sg": "fui",
+   "pl": "fueron",
+   "pp": "sido",
+   "p1": "soy",
+   "p3": "es",
+   "p6": "somos",
+   "en": "to be (essence)",
+   "zh": "是"
+  },
+  {
+   "inf": "estar",
+   "sg": "estuve",
+   "pl": "estuvieron",
+   "pp": "estado",
+   "p1": "estoy",
+   "p3": "está",
+   "p6": "estamos",
+   "en": "to be (state)",
+   "zh": "在/处于"
+  },
+  {
+   "inf": "tener",
+   "sg": "tuve",
+   "pl": "tuvieron",
+   "pp": "tenido",
+   "p1": "tengo",
+   "p3": "tiene",
+   "p6": "tenemos",
+   "en": "to have",
+   "zh": "有"
+  },
+  {
+   "inf": "hacer",
+   "sg": "hice",
+   "pl": "hicieron",
+   "pp": "hecho",
+   "p1": "hago",
+   "p3": "hace",
+   "p6": "hacemos",
+   "en": "to do",
+   "zh": "做"
+  },
+  {
+   "inf": "ir",
+   "sg": "fui",
+   "pl": "fueron",
+   "pp": "ido",
+   "p1": "voy",
+   "p3": "va",
+   "p6": "vamos",
+   "en": "to go",
+   "zh": "去"
+  },
+  {
+   "inf": "poder",
+   "sg": "pude",
+   "pl": "pudieron",
+   "pp": "podido",
+   "p1": "puedo",
+   "p3": "puede",
+   "p6": "podemos",
+   "en": "can",
+   "zh": "能"
+  },
+  {
+   "inf": "decir",
+   "sg": "dije",
+   "pl": "dijeron",
+   "pp": "dicho",
+   "p1": "digo",
+   "p3": "dice",
+   "p6": "decimos",
+   "en": "to say",
+   "zh": "说"
+  },
+  {
+   "inf": "ver",
+   "sg": "vi",
+   "pl": "vieron",
+   "pp": "visto",
+   "p1": "veo",
+   "p3": "ve",
+   "p6": "vemos",
+   "en": "to see",
+   "zh": "看见"
+  },
+  {
+   "inf": "dar",
+   "sg": "di",
+   "pl": "dieron",
+   "pp": "dado",
+   "p1": "doy",
+   "p3": "da",
+   "p6": "damos",
+   "en": "to give",
+   "zh": "给"
+  },
+  {
+   "inf": "saber",
+   "sg": "supe",
+   "pl": "supieron",
+   "pp": "sabido",
+   "p1": "sé",
+   "p3": "sabe",
+   "p6": "sabemos",
+   "en": "to know",
+   "zh": "知道"
+  },
+  {
+   "inf": "querer",
+   "sg": "quise",
+   "pl": "quisieron",
+   "pp": "querido",
+   "p1": "quiero",
+   "p3": "quiere",
+   "p6": "queremos",
+   "en": "to want",
+   "zh": "想要"
+  },
+  {
+   "inf": "venir",
+   "sg": "vine",
+   "pl": "vinieron",
+   "pp": "venido",
+   "p1": "vengo",
+   "p3": "viene",
+   "p6": "venimos",
+   "en": "to come",
+   "zh": "来"
+  },
+  {
+   "inf": "poner",
+   "sg": "puse",
+   "pl": "pusieron",
+   "pp": "puesto",
+   "p1": "pongo",
+   "p3": "pone",
+   "p6": "ponemos",
+   "en": "to put",
+   "zh": "放"
+  },
+  {
+   "inf": "hablar",
+   "sg": "hablé",
+   "pl": "hablaron",
+   "pp": "hablado",
+   "p1": "hablo",
+   "p3": "habla",
+   "p6": "hablamos",
+   "en": "to speak",
+   "zh": "说话"
+  },
+  {
+   "inf": "comer",
+   "sg": "comí",
+   "pl": "comieron",
+   "pp": "comido",
+   "p1": "como",
+   "p3": "come",
+   "p6": "comemos",
+   "en": "to eat",
+   "zh": "吃"
+  },
+  {
+   "inf": "vivir",
+   "sg": "viví",
+   "pl": "vivieron",
+   "pp": "vivido",
+   "p1": "vivo",
+   "p3": "vive",
+   "p6": "vivimos",
+   "en": "to live",
+   "zh": "生活"
+  },
+  {
+   "inf": "mirar",
+   "sg": "miré",
+   "pl": "miraron",
+   "pp": "mirado",
+   "p1": "miro",
+   "p3": "mira",
+   "p6": "miramos",
+   "en": "to look",
+   "zh": "看"
+  },
+  {
+   "inf": "escuchar",
+   "sg": "escuché",
+   "pl": "escucharon",
+   "pp": "escuchado",
+   "p1": "escucho",
+   "p3": "escucha",
+   "p6": "escuchamos",
+   "en": "to listen",
+   "zh": "听"
+  },
+  {
+   "inf": "trabajar",
+   "sg": "trabajé",
+   "pl": "trabajaron",
+   "pp": "trabajado",
+   "p1": "trabajo",
+   "p3": "trabaja",
+   "p6": "trabajamos",
+   "en": "to work",
+   "zh": "工作"
+  },
+  {
+   "inf": "entender",
+   "sg": "entendí",
+   "pl": "entendieron",
+   "pp": "entendido",
+   "p1": "entiendo",
+   "p3": "entiende",
+   "p6": "entendemos",
+   "en": "to understand",
+   "zh": "理解"
+  },
+  {
+   "inf": "conocer",
+   "sg": "conocí",
+   "pl": "conocieron",
+   "pp": "conocido",
+   "en": "to know (a person)",
+   "zh": "认识"
+  },
+  {
+   "inf": "volver",
+   "sg": "volví",
+   "pl": "volvieron",
+   "pp": "vuelto",
+   "en": "to return",
+   "zh": "返回"
+  },
+  {
+   "inf": "pasar",
+   "sg": "pasé",
+   "pl": "pasaron",
+   "pp": "pasado",
+   "en": "to pass",
+   "zh": "经过"
+  },
+  {
+   "inf": "parecer",
+   "sg": "parecí",
+   "pl": "parecieron",
+   "pp": "parecido",
+   "en": "to seem",
+   "zh": "显得"
+  },
+  {
+   "inf": "quedar",
+   "sg": "quedé",
+   "pl": "quedaron",
+   "pp": "quedado",
+   "en": "to stay",
+   "zh": "留下"
+  },
+  {
+   "inf": "llevar",
+   "sg": "llevé",
+   "pl": "llevaron",
+   "pp": "llevado",
+   "en": "to carry",
+   "zh": "携带"
+  },
+  {
+   "inf": "dejar",
+   "sg": "dejé",
+   "pl": "dejaron",
+   "pp": "dejado",
+   "en": "to leave (behind)",
+   "zh": "留下/放下"
+  },
+  {
+   "inf": "seguir",
+   "sg": "seguí",
+   "pl": "siguieron",
+   "pp": "seguido",
+   "en": "to follow",
+   "zh": "跟随"
+  },
+  {
+   "inf": "encontrar",
+   "sg": "encontré",
+   "pl": "encontraron",
+   "pp": "encontrado",
+   "en": "to find",
+   "zh": "找到"
+  },
+  {
+   "inf": "salir",
+   "sg": "salí",
+   "pl": "salieron",
+   "pp": "salido",
+   "en": "to go out",
+   "zh": "出去"
+  },
+  {
+   "inf": "empezar",
+   "sg": "empecé",
+   "pl": "empezaron",
+   "pp": "empezado",
+   "en": "to start",
+   "zh": "开始"
+  },
+  {
+   "inf": "pensar",
+   "sg": "pensé",
+   "pl": "pensaron",
+   "pp": "pensado",
+   "en": "to think",
+   "zh": "思考"
+  },
+  {
+   "inf": "llegar",
+   "sg": "llegué",
+   "pl": "llegaron",
+   "pp": "llegado",
+   "en": "to arrive",
+   "zh": "到达"
+  },
+  {
+   "inf": "escribir",
+   "sg": "escribí",
+   "pl": "escribieron",
+   "pp": "escrito",
+   "en": "to write",
+   "zh": "写"
+  },
+  {
+   "inf": "leer",
+   "sg": "leí",
+   "pl": "leyeron",
+   "pp": "leído",
+   "en": "to read",
+   "zh": "读"
+  },
+  {
+   "inf": "caer",
+   "sg": "caí",
+   "pl": "cayeron",
+   "pp": "caído",
+   "en": "to fall",
+   "zh": "掉落"
+  },
+  {
+   "inf": "oír",
+   "sg": "oí",
+   "pl": "oyeron",
+   "pp": "oído",
+   "en": "to hear",
+   "zh": "听见"
+  },
+  {
+   "inf": "jugar",
+   "sg": "jugué",
+   "pl": "jugaron",
+   "pp": "jugado",
+   "en": "to play",
+   "zh": "玩"
+  },
+  {
+   "inf": "olvidar",
+   "sg": "olvidé",
+   "pl": "olvidaron",
+   "pp": "olvidado",
+   "en": "to forget",
+   "zh": "忘记"
+  },
+  {
+   "inf": "perder",
+   "sg": "perdí",
+   "pl": "perdieron",
+   "pp": "perdido",
+   "en": "to lose",
+   "zh": "丢失"
+  },
+  {
+   "inf": "traer",
+   "sg": "traje",
+   "pl": "trajeron",
+   "pp": "traído",
+   "en": "to bring",
+   "zh": "带来"
+  },
+  {
+   "inf": "conducir",
+   "sg": "conduje",
+   "pl": "condujeron",
+   "pp": "conducido",
+   "en": "to drive",
+   "zh": "驾驶"
+  },
+  {
+   "inf": "traducir",
+   "sg": "traduje",
+   "pl": "tradujeron",
+   "pp": "traducido",
+   "en": "to translate",
+   "zh": "翻译"
+  },
+  {
+   "inf": "creer",
+   "sg": "creí",
+   "pl": "creyeron",
+   "pp": "creído",
+   "en": "to believe",
+   "zh": "相信"
+  },
+  {
+   "inf": "construir",
+   "sg": "construí",
+   "pl": "construyeron",
+   "pp": "construido",
+   "en": "to build",
+   "zh": "建造"
+  },
+  {
+   "inf": "destruir",
+   "sg": "destruí",
+   "pl": "destruyeron",
+   "pp": "destruido",
+   "en": "to destroy",
+   "zh": "摧毁"
+  },
+  {
+   "inf": "elegir",
+   "sg": "elegí",
+   "pl": "eligieron",
+   "pp": "elegido",
+   "en": "to choose",
+   "zh": "选择"
+  },
+  {
+   "inf": "pedir",
+   "sg": "pedí",
+   "pl": "pidieron",
+   "pp": "pedido",
+   "en": "to ask for",
+   "zh": "请求"
+  },
+  {
+   "inf": "servir",
+   "sg": "serví",
+   "pl": "sirvieron",
+   "pp": "servido",
+   "en": "to serve",
+   "zh": "服务"
+  },
+  {
+   "inf": "repetir",
+   "sg": "repetí",
+   "pl": "repitieron",
+   "pp": "repetido",
+   "en": "to repeat",
+   "zh": "重复"
+  },
+  {
+   "inf": "vestir",
+   "sg": "vestí",
+   "pl": "vistieron",
+   "pp": "vestido",
+   "en": "to dress",
+   "zh": "穿衣"
+  },
+  {
+   "inf": "dormir",
+   "sg": "dormí",
+   "pl": "durmieron",
+   "pp": "dormido",
+   "en": "to sleep",
+   "zh": "睡觉"
+  },
+  {
+   "inf": "morir",
+   "sg": "morí",
+   "pl": "murieron",
+   "pp": "muerto",
+   "en": "to die",
+   "zh": "死亡"
+  },
+  {
+   "inf": "contar",
+   "sg": "conté",
+   "pl": "contaron",
+   "pp": "contado",
+   "en": "to count / tell",
+   "zh": "数/讲述"
+  },
+  {
+   "inf": "mostrar",
+   "sg": "mostré",
+   "pl": "mostraron",
+   "pp": "mostrado",
+   "en": "to show",
+   "zh": "展示"
+  },
+  {
+   "inf": "recordar",
+   "sg": "recordé",
+   "pl": "recordaron",
+   "pp": "recordado",
+   "en": "to remember",
+   "zh": "记得"
+  },
+  {
+   "inf": "nacer",
+   "sg": "nací",
+   "pl": "nacieron",
+   "pp": "nacido",
+   "en": "to be born",
+   "zh": "出生"
+  },
+  {
+   "inf": "convertir",
+   "sg": "convertí",
+   "pl": "convirtieron",
+   "pp": "convertido",
+   "en": "to convert",
+   "zh": "转变"
+  },
+  {
+   "inf": "resolver",
+   "sg": "resolví",
+   "pl": "resolvieron",
+   "pp": "resuelto",
+   "en": "to solve",
+   "zh": "解决"
+  },
+  {
+   "inf": "enviar",
+   "sg": "envié",
+   "pl": "enviaron",
+   "pp": "enviado",
+   "en": "to send",
+   "zh": "发送"
+  }
+ ],
+ "pronouns": [
+  {
+   "inf": "yo",
+   "sg": "mí",
+   "pl": "mi",
+   "pp": "me",
+   "en": "I / me / my / myself",
+   "zh": "我"
+  },
+  {
+   "inf": "tú",
+   "sg": "ti",
+   "pl": "tu",
+   "pp": "te",
+   "en": "you / your / yourself",
+   "zh": "你"
+  },
+  {
+   "inf": "él",
+   "sg": "él",
+   "pl": "su",
+   "pp": "lo",
+   "en": "he / him / his",
+   "zh": "他"
+  },
+  {
+   "inf": "ella",
+   "sg": "ella",
+   "pl": "su",
+   "pp": "la",
+   "en": "she / her / hers",
+   "zh": "她"
+  },
+  {
+   "inf": "nosotros",
+   "sg": "nosotros",
+   "pl": "nuestro",
+   "pp": "nos",
+   "en": "we / us / our / ourselves",
+   "zh": "我们"
+  },
+  {
+   "inf": "vosotros",
+   "sg": "vosotros",
+   "pl": "vuestro",
+   "pp": "os",
+   "en": "you (pl) / your",
+   "zh": "你们"
+  },
+  {
+   "inf": "ustedes",
+   "sg": "ustedes",
+   "pl": "su",
+   "pp": "se",
+   "en": "you (formal pl) / their",
+   "zh": "您们"
+  }
+ ],
+ "nouns": [
+  {
+   "inf": "libro",
+   "el": "el libro",
+   "en": "the book",
+   "zh": "书"
+  },
+  {
+   "inf": "día",
+   "el": "el día",
+   "en": "the day",
+   "zh": "天"
+  },
+  {
+   "inf": "hombre",
+   "el": "el hombre",
+   "en": "the man",
+   "zh": "男人"
+  },
+  {
+   "inf": "pueblo",
+   "el": "el pueblo",
+   "en": "the village",
+   "zh": "村庄"
+  },
+  {
+   "inf": "campo",
+   "el": "el campo",
+   "en": "the countryside",
+   "zh": "田野"
+  },
+  {
+   "inf": "tiempo",
+   "el": "el tiempo",
+   "en": "the time",
+   "zh": "时间"
+  },
+  {
+   "inf": "trabajo",
+   "el": "el trabajo",
+   "en": "the work",
+   "zh": "工作"
+  },
+  {
+   "inf": "año",
+   "el": "el año",
+   "en": "the year",
+   "zh": "年"
+  },
+  {
+   "inf": "mundo",
+   "el": "el mundo",
+   "en": "the world",
+   "zh": "世界"
+  },
+  {
+   "inf": "perro",
+   "el": "el perro",
+   "en": "the dog",
+   "zh": "狗"
+  },
+  {
+   "inf": "caballo",
+   "el": "el caballo",
+   "en": "the horse",
+   "zh": "马"
+  },
+  {
+   "inf": "árbol",
+   "el": "el árbol",
+   "en": "the tree",
+   "zh": "树"
+  },
+  {
+   "inf": "sol",
+   "el": "el sol",
+   "en": "the sun",
+   "zh": "太阳"
+  },
+  {
+   "inf": "regalo",
+   "el": "el regalo",
+   "en": "the gift",
+   "zh": "礼物"
+  },
+  {
+   "inf": "barco",
+   "el": "el barco",
+   "en": "the boat",
+   "zh": "船"
+  },
+  {
+   "inf": "mercado",
+   "el": "el mercado",
+   "en": "the market",
+   "zh": "市场"
+  },
+  {
+   "inf": "camino",
+   "el": "el camino",
+   "en": "the road",
+   "zh": "路"
+  },
+  {
+   "inf": "cuarto",
+   "el": "el cuarto",
+   "en": "the room",
+   "zh": "房间"
+  },
+  {
+   "inf": "casa",
+   "la": "la casa",
+   "en": "the house",
+   "zh": "房子"
+  },
+  {
+   "inf": "mesa",
+   "la": "la mesa",
+   "en": "the table",
+   "zh": "桌子"
+  },
+  {
+   "inf": "puerta",
+   "la": "la puerta",
+   "en": "the door",
+   "zh": "门"
+  },
+  {
+   "inf": "ciudad",
+   "la": "la ciudad",
+   "en": "the city",
+   "zh": "城市"
+  },
+  {
+   "inf": "vida",
+   "la": "la vida",
+   "en": "the life",
+   "zh": "生命"
+  },
+  {
+   "inf": "madre",
+   "la": "la madre",
+   "en": "the mother",
+   "zh": "母亲"
+  },
+  {
+   "inf": "noche",
+   "la": "la noche",
+   "en": "the night",
+   "zh": "夜晚"
+  },
+  {
+   "inf": "calle",
+   "la": "la calle",
+   "en": "the street",
+   "zh": "街道"
+  },
+  {
+   "inf": "ventana",
+   "la": "la ventana",
+   "en": "the window",
+   "zh": "窗户"
+  },
+  {
+   "inf": "carta",
+   "la": "la carta",
+   "en": "the letter",
+   "zh": "信"
+  },
+  {
+   "inf": "playa",
+   "la": "la playa",
+   "en": "the beach",
+   "zh": "海滩"
+  },
+  {
+   "inf": "montaña",
+   "la": "la montaña",
+   "en": "the mountain",
+   "zh": "山"
+  },
+  {
+   "inf": "flor",
+   "la": "la flor",
+   "en": "the flower",
+   "zh": "花"
+  },
+  {
+   "inf": "semana",
+   "la": "la semana",
+   "en": "the week",
+   "zh": "星期"
+  },
+  {
+   "inf": "cosa",
+   "la": "la cosa",
+   "en": "the thing",
+   "zh": "东西"
+  },
+  {
+   "inf": "escuela",
+   "la": "la escuela",
+   "en": "the school",
+   "zh": "学校"
+  },
+  {
+   "inf": "silla",
+   "la": "la silla",
+   "en": "the chair",
+   "zh": "椅子"
+  },
+  {
+   "inf": "taza",
+   "la": "la taza",
+   "en": "the cup",
+   "zh": "杯子"
+  },
+  {
+   "inf": "casa",
+   "s": "casas",
+   "en": "house → houses",
+   "zh": "房子"
+  },
+  {
+   "inf": "libro",
+   "s": "libros",
+   "en": "book → books",
+   "zh": "书"
+  },
+  {
+   "inf": "mesa",
+   "s": "mesas",
+   "en": "table → tables",
+   "zh": "桌子"
+  },
+  {
+   "inf": "día",
+   "s": "días",
+   "en": "day → days",
+   "zh": "天"
+  },
+  {
+   "inf": "perro",
+   "s": "perros",
+   "en": "dog → dogs",
+   "zh": "狗"
+  },
+  {
+   "inf": "sol",
+   "s": "soles",
+   "en": "sun → suns",
+   "zh": "太阳"
+  },
+  {
+   "inf": "regalo",
+   "s": "regalos",
+   "en": "gift → gifts",
+   "zh": "礼物"
+  },
+  {
+   "inf": "barco",
+   "s": "barcos",
+   "en": "boat → boats",
+   "zh": "船"
+  },
+  {
+   "inf": "mundo",
+   "s": "mundos",
+   "en": "world → worlds",
+   "zh": "世界"
+  },
+  {
+   "inf": "ciudad",
+   "es": "ciudades",
+   "en": "city → cities",
+   "zh": "城市"
+  },
+  {
+   "inf": "mujer",
+   "es": "mujeres",
+   "en": "woman → women",
+   "zh": "女人"
+  },
+  {
+   "inf": "animal",
+   "es": "animales",
+   "en": "animal → animals",
+   "zh": "动物"
+  },
+  {
+   "inf": "árbol",
+   "es": "árboles",
+   "en": "tree → trees",
+   "zh": "树"
+  },
+  {
+   "inf": "mes",
+   "es": "meses",
+   "en": "month → months",
+   "zh": "月份"
+  },
+  {
+   "inf": "papel",
+   "es": "papeles",
+   "en": "paper → papers",
+   "zh": "纸"
+  },
+  {
+   "inf": "profesor",
+   "es": "profesores",
+   "en": "teacher → teachers",
+   "zh": "老师"
+  },
+  {
+   "inf": "país",
+   "es": "países",
+   "en": "country → countries",
+   "zh": "国家"
+  },
+  {
+   "inf": "ley",
+   "es": "leyes",
+   "en": "law → laws",
+   "zh": "法律"
+  },
+  {
+   "inf": "voz",
+   "ces": "voces",
+   "en": "voice → voices",
+   "zh": "声音"
+  },
+  {
+   "inf": "paz",
+   "ces": "paces",
+   "en": "peace → peaces",
+   "zh": "和平"
+  },
+  {
+   "inf": "luz",
+   "ces": "luces",
+   "en": "light → lights",
+   "zh": "灯"
+  },
+  {
+   "inf": "vez",
+   "ces": "veces",
+   "en": "time → times",
+   "zh": "次数"
+  },
+  {
+   "inf": "feliz",
+   "ces": "felices",
+   "en": "happy → happy (pl)",
+   "zh": "快乐的"
+  },
+  {
+   "inf": "lápiz",
+   "ces": "lápices",
+   "en": "pencil → pencils",
+   "zh": "铅笔"
+  },
+  {
+   "inf": "nariz",
+   "ces": "narices",
+   "en": "nose → noses",
+   "zh": "鼻子"
+  },
+  {
+   "inf": "cruz",
+   "ces": "cruces",
+   "en": "cross → crosses",
+   "zh": "十字"
+  },
+  {
+   "inf": "raíz",
+   "ces": "raíces",
+   "en": "root → roots",
+   "zh": "根"
+  }
+ ],
+ "tierNames": [
+  {
+   "band": "A1",
+   "names": [
+    "ser",
+    "estar",
+    "tener",
+    "hacer",
+    "ir",
+    "poder",
+    "decir",
+    "ver",
+    "dar",
+    "saber",
+    "querer",
+    "venir",
+    "poner",
+    "hablar",
+    "comer",
+    "vivir",
+    "mirar",
+    "escuchar",
+    "trabajar",
+    "entender"
+   ]
+  },
+  {
+   "band": "A2",
+   "names": [
+    "conocer",
+    "volver",
+    "pasar",
+    "parecer",
+    "quedar",
+    "llevar",
+    "dejar",
+    "seguir",
+    "encontrar",
+    "salir",
+    "empezar",
+    "pensar",
+    "llegar",
+    "escribir",
+    "leer",
+    "caer",
+    "oír",
+    "jugar",
+    "olvidar",
+    "perder"
+   ]
+  },
+  {
+   "band": "B1",
+   "names": [
+    "traer",
+    "conducir",
+    "traducir",
+    "creer",
+    "construir",
+    "destruir",
+    "elegir",
+    "pedir",
+    "servir",
+    "repetir",
+    "vestir",
+    "dormir",
+    "morir",
+    "contar",
+    "mostrar",
+    "recordar",
+    "nacer",
+    "convertir",
+    "resolver",
+    "enviar"
+   ]
+  }
+ ],
+ "i18n": {
+  "es": {
+   "menu.back": "Reanudar la partida",
+   "menu.continue": "Nivel siguiente",
+   "menu.levels": "Niveles",
+   "menu.daily": "Reto del día",
+   "menu.endless": "Infinito",
+   "menu.survival": "Supervivencia",
+   "menu.survivalnew": "¡Cada pareja contra el reloj!",
+   "menu.needlevel": "Termina un nivel para desbloquear",
+   "menu.newdaily": "Una cuadrícula nueva cada día",
+   "menu.endlessnew": "Caza de puntos con tu colección",
+   "menu.dailydone": "Ya completado hoy — nueva cuadrícula mañana",
+   "mode.endless": "Infinito",
+   "mode.daily": "Reto del día",
+   "mode.survival": "Supervivencia",
+   "result.timeup": "¡Tiempo agotado!",
+   "result.today": "Hoy",
+   "menu.help": "Cómo se juega",
+   "menu.settings": "Ajustes",
+   "dock.hint": "Pista",
+   "dock.book": "Colección",
+   "mi.endless": "Caza de puntos con tus palabras coleccionadas: la serie continúa tras limpiar el tablero.",
+   "mi.daily": "180 segundos, una vez al día. Todos reciben la misma cuadrícula.",
+   "mi.survival": "Cada pareja en 15 segundos — si no, se acaba. Los toques errados no fallan.",
+   "mi.start": "Empezar",
+   "mi.back": "Volver",
+   "legend.sg": "indefinido (yo)",
+   "legend.pl": "indefinido (ellos)",
+   "legend.pp": "participio",
+   "short.sg": "indef.",
+   "short.pl": "indef. pl.",
+   "short.pp": "part.",
+   "legend.p1": "presente (yo)",
+   "legend.p3": "presente (él/ella)",
+   "legend.p6": "presente (nosotros)",
+   "short.p1": "yo",
+   "short.p3": "él/ella",
+   "short.p6": "nosotros",
+   "legend.pr.obj": "pronombre tónico",
+   "legend.pr.pos": "posesivo",
+   "legend.pr.ref": "reflexivo",
+   "short.pr.obj": "tónico",
+   "short.pr.pos": "poses.",
+   "short.pr.ref": "refl.",
+   "band.pr": "Pronombres",
+   "band.ps": "Presente de verbos",
+   "band.ln": "Artículos (el/la)",
+   "band.mv": "Plurales",
+   "card.sent": "Ejemplo",
+   "legend.el": "artículo el",
+   "legend.la": "artículo la",
+   "short.el": "el",
+   "short.la": "la",
+   "legend.s": "plural en -s",
+   "legend.es": "plural en -es",
+   "legend.ces": "plural -z → -ces",
+   "short.s": "-s",
+   "short.es": "-es",
+   "short.ces": "-ces",
+   "legend.dh": "artículo (el/la)",
+   "short.dh": "el/la",
+   "set.title": "Ajustes",
+   "set.style": "Estilo de dibujo",
+   "set.lang": "Idioma",
+   "set.sound": "Sonido",
+   "set.tts": "Lectura en voz alta",
+   "set.hintwait": "Espera de pista",
+   "set.banner": "Duración del cartel",
+   "set.theme": "Tema",
+   "theme.grug": "Boceto",
+   "theme.papier": "Post-it",
+   "set.dark": "Modo oscuro",
+   "opt.off": "No",
+   "opt.on": "Sí",
+   "set.voice": "Voz",
+   "set.voicetest": "Probar",
+   "set.novoice": "No hay voz española. Chrome: Ajustes → Idiomas → Español",
+   "tts.blocked": "Sin sonido en esta ventana — prueba la lectura en voz alta en Chrome o Safari.",
+   "result.title": "¡Cuadrícula completada!",
+   "result.done": "Todas las parejas encontradas.",
+   "result.record": "¡nuevo récord!",
+   "result.best": "récord",
+   "btn.again": "Otra vez",
+   "btn.menu": "Menú",
+   "btn.next": "Nivel siguiente →",
+   "toast.shuffle": "Sin combinaciones — ¡barajado!",
+   "toast.nopair": "Sin parejas — ¡barajado!",
+   "book.title": "Colección",
+   "book.locked": "Aún no emparejado",
+   "book.lockedsub": "Empareja esta palabra para coleccionarla.",
+   "book.view": "Toca para ver",
+   "help.title": "Cómo se juega",
+   "help.p1": "Une la palabra con su forma: toca la palabra y luego la forma de la misma palabra unida por un camino con máximo 2 curvas (a través de casillas vacías o por el borde). Cada nivel practica una sola forma.",
+   "help.goal": "Objetivo: encuentra todas las parejas antes de atascarte. Si no, el tablero se baraja.",
+   "help.score": "Puntos: 15 por pareja. Las parejas rápidas dan bonificación de serie.",
+   "help.rules": "Cinco grupos, cada uno con su propio orden: Pronombres (yo ↔ mí / mi / me), Presente (ir ↔ yo voy), Artículos el/la (el mismo grupo de palabras en dos niveles: primero libro ↔ el libro, luego libro ↔ el), Plurales (libro ↔ libros) e indefinido/participio A1–B1. Los grupos son independientes — empieza donde quieras.",
+   "help.modes": "Modos: tras terminar un nivel desbloqueas Infinito, Supervivencia y el Reto del día (180 segundos, una vez al día).",
+   "help.stuck": "¿Atascado? Toca Pista — o espera un momento. Los bordes del tablero forman parte del juego.",
+   "demo.step1": "1 · Toca la palabra",
+   "demo.step2": "2 · Toca su forma",
+   "demo.step3": "3 · La línea se dibuja sola…",
+   "demo.go": "¡Tu turno!",
+   "combo.m3": "¡Bien!",
+   "combo.m5": "¡Genial!",
+   "combo.m8": "¡Formidable!",
+   "combo.m12": "¡Legendario!"
+  },
+  "zh": {
+   "band.ln": "冠词 el/la",
+   "legend.sg": "简单过去时(yo)",
+   "legend.pl": "简单过去时(ellos)",
+   "legend.pp": "过去分词",
+   "short.sg": "简过",
+   "short.pl": "简过复",
+   "short.pp": "分词",
+   "legend.p1": "现在时 yo",
+   "legend.p3": "现在时 él/ella",
+   "legend.p6": "现在时 nosotros",
+   "short.p1": "yo 形",
+   "short.p3": "él 形",
+   "short.p6": "nosotros 形",
+   "legend.el": "定冠词 el",
+   "legend.la": "定冠词 la",
+   "short.el": "el",
+   "short.la": "la",
+   "legend.s": "复数 -s",
+   "legend.es": "复数 -es",
+   "legend.ces": "复数 -z→-ces",
+   "short.s": "-s",
+   "short.es": "-es",
+   "short.ces": "-ces",
+   "legend.dh": "定冠词 el/la",
+   "short.dh": "el/la",
+   "legend.pr.obj": "重读代词",
+   "legend.pr.pos": "物主形容词",
+   "legend.pr.ref": "反身代词",
+   "short.pr.obj": "重读",
+   "short.pr.pos": "物主",
+   "short.pr.ref": "反身",
+   "help.rules": "五组各有独立顺序:代词(yo ↔ mí / mi / me)、动词现在时人称(yo / él / nosotros)、冠词 el/la(同一组词两关:先 el libro 给出答案,再只剩 el)、名词复数(libro ↔ libros)、简单过去时+过去分词 A1–B1(单数→复数→分词)。各组互不锁关,可分别开始。"
+  },
+  "en": {
+   "band.ln": "Articles (el/la)",
+   "legend.sg": "preterite (yo)",
+   "legend.pl": "preterite (ellos)",
+   "legend.pp": "past participle",
+   "short.sg": "pret.",
+   "short.pl": "pret. pl.",
+   "short.pp": "part.",
+   "legend.p1": "present (yo)",
+   "legend.p3": "present (él/ella)",
+   "legend.p6": "present (nosotros)",
+   "short.p1": "yo",
+   "short.p3": "él/ella",
+   "short.p6": "nosotros",
+   "legend.el": "article el",
+   "legend.la": "article la",
+   "short.el": "el",
+   "short.la": "la",
+   "legend.s": "plural -s",
+   "legend.es": "plural -es",
+   "legend.ces": "plural -z → -ces",
+   "short.s": "-s",
+   "short.es": "-es",
+   "short.ces": "-ces",
+   "legend.dh": "article (el/la)",
+   "short.dh": "el/la",
+   "legend.pr.obj": "stress pronoun",
+   "legend.pr.pos": "possessive",
+   "legend.pr.ref": "reflexive",
+   "short.pr.obj": "stress",
+   "short.pr.pos": "poss.",
+   "short.pr.ref": "refl.",
+   "help.rules": "Five groups, each with its own order: Pronouns (yo ↔ mí / mi / me), Present tense (ir ↔ yo voy), Articles el/la (same word group in two levels — first libro ↔ el libro, then libro ↔ el), Plurals (libro ↔ libros), and preterite/participle A1–B1. The groups unlock separately — start anywhere."
+  }
+ },
+ "shape": {
+  "el": "k-de",
+  "la": "k-ht",
+  "s": "k-de",
+  "es": "k-ht",
+  "ces": "k-ap",
+  "dh": "k-dh"
+ }
+}
