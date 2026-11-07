@@ -38,12 +38,16 @@ gamified-learning/
 ├── four-match/
 │   ├── index.html      ← 四消原型(已否决留档;存档 nlm4.*、钩子 NLM4)
 │   └── README.md       ← 游戏说明
+├── link-match-fr/  link-match-es/  link-match-pt/  link-match-de/
+│   └── index.html      ← 法/西/葡/德变体(tools/gen-variants.py 生成;勿手改,存档 linkmatch{fr,es,pt,de}.v1)
+├── langs/              ← 四语言数据 JSON(动词变位/名词/三语 UI)
+├── tools/              ← gen-variants.py(生成器)+ variant-smoke.mjs(变体冒烟)
 └── LICENSE             ← PolyForm Noncommercial 1.0.0(公开但非商业)
 ```
 
 - **单文件铁律**:游戏全部内联(HTML/CSS/JS/插画 SVG),不加构建、不加外部资源。
 - **界面语言**:默认全荷兰语(`lang="nl"`),所有文案走 `I18N` 词典 + `data-i18n`;中文是设置里的可选项。与用户沟通用中文。
-- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{gUnlocked{PR/PS/LN/MV/PT:组内解锁关数,启动时由 done 重算}, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder("v5"), settings{...}}`(lUnlocked 全局链已退役);four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);demo 云登录态=`linkmatchdemo.auth`(`{token, username}`,云端整包档存 Cloudflare D1);改结构要保持向后兼容(merge 默认值+云端 cloudMerge:数值取大/布尔取或/数组并集/对象递归/其余本地优先);改关卡顺序要像 v1.5 一样做映射迁移。
+- **存档**:tile-match=`nlm3.prototype.v1`,结构 `{unlocked, collected[], style, counts{}, best{}, dailyBest{}, dailyDone, done{}, lastLevel, settings{...含 theme}}`;link-match=`linkmatch.v1`,结构 `{gUnlocked{PR/PS/LN/MV/PT:组内解锁关数,启动时由 done 重算}, done{}, best{}(关卡+Oneindig+Survival), dailyBest{日期:分}, dailyDone, counts{}, style, lvOrder("v5"), settings{...}}`(lUnlocked 全局链已退役);four-match=`nlm4.prototype.v1`(轻量 `{unlocked, best{}, done{}, collected[]}`);多语言变体存档=`linkmatch{fr,es,pt,de}.v1`(结构与主档同构);demo 云登录态=`linkmatchdemo.auth`(`{token, username}`,云端整包档存 Cloudflare D1);改结构要保持向后兼容(merge 默认值+云端 cloudMerge:数值取大/布尔取或/数组并集/对象递归/其余本地优先);改关卡顺序要像 v1.5 一样做映射迁移。
 - **调试钩子**:`window.NLM3`(state/swap/findMove/countMoves/settings),自动化 QA 全靠它,别删。
 - **QA 流程**:`python3 -m http.server 8461` → 浏览器自动化:bot 用 `NLM3.findMove()+swap` 循环走棋、自动点掉首次解锁卡;截图查手机(390×844)和桌面两档;检查 console 无错。**自动化会写真实存档:开始前备份 localStorage,结束后清空恢复**,否则会污染用户进度(unlocked/lastLevel/done 被 bot 刷掉)。
 - **部署**:git push 到 main → GitHub Pages 自动发布(仓库 public,root 部署)。
@@ -56,6 +60,10 @@ gamified-learning/
 - 图标用与插画同风格的代码绘制 SVG,不用 emoji。
 - 按钮、触控目标要大;底部不贴屏幕边缘(iOS 误触)。
 - 难度宁易勿难:开局保底 ≥2 解、无步数限制(计分制)、闲置自动提示。
+
+## 当前状态(2026-11-07)
+
+- **多语言变体(2026-11-07,法/西/葡/德;PR 待并)**:`link-match` 引擎参数化(LANG_META:代码/UI 名/TTS/存档键/冠词复数字段表 ln·mv/人称前缀 pron;NOUN_SHAPE+shapeKey 字段→形状映射;`==LANG:DATA/KEYS/I18N==` 标记区圈定语言内容),`tools/gen-variants.py` 从 `langs/{fr,es,pt,de}.json` 生成四个**单文件零依赖**变体 `link-match-{fr,es,pt,de}/`。每语 60 动词(法 imparfait/西葡 pretérito/德 Präteritum 单复数+分词,A1 加现三人称)+7 代词+63–72 名词;五组结构与荷兰语一致(LN 每组词两关:短语↔裸冠词 → 名词↔裸冠词;两关都朗读全短语)。变体 UI 默认目标语言,zh/en 可切。**引擎修复改 link-match 母本 → 重跑 `python3 tools/gen-variants.py fr es pt de`,变体勿手改**;`node tools/variant-smoke.mjs link-match-<code>` 校验。词源=各语标准参考变位表;葡语 pt-PT、西语含 vosotros。落地页加四语入口。QA:四语语法+冒烟+浏览器全量扫盘(fr 50/es 50/pt 51/de 53 关)零错误,荷兰语母本回归全绿。
 
 ## 当前状态(2026-11-04)
 

@@ -1,0 +1,1360 @@
+{
+ "meta": {
+  "code": "pt",
+  "ui": "Português",
+  "tts": "pt-PT",
+  "save": "linkmatchpt.v1",
+  "title": "Ligar · verbos e nomes portugueses",
+  "htmlLang": "pt",
+  "ln": [
+   "o",
+   "a"
+  ],
+  "mv": [
+   "s",
+   "ns",
+   "oes",
+   "is"
+  ],
+  "pron": {
+   "p1": "eu",
+   "p3": "ele",
+   "p6": "nós"
+  }
+ },
+ "keys": {
+  "legend": {
+   "sg": "pretérito (eu)",
+   "pl": "pretérito (eles)",
+   "pp": "particípio",
+   "p1": "presente (eu)",
+   "p3": "presente (ele/ela)",
+   "p6": "presente (nós)",
+   "o": "artigo o",
+   "a": "artigo a",
+   "s": "plural em -s",
+   "ns": "plural -m → -ns",
+   "oes": "plural -ão → -ões",
+   "is": "plural -l → -is",
+   "dh": "artigo (o/a)"
+  },
+  "short": {
+   "sg": "pret.",
+   "pl": "pret. pl.",
+   "pp": "part.",
+   "p1": "eu",
+   "p3": "ele/ela",
+   "p6": "nós",
+   "o": "o",
+   "a": "a",
+   "s": "-s",
+   "ns": "-ns",
+   "oes": "-ões",
+   "is": "-is",
+   "dh": "o/a"
+  }
+ },
+ "verbs": [
+  {
+   "inf": "ser",
+   "sg": "fui",
+   "pl": "foram",
+   "pp": "sido",
+   "p1": "sou",
+   "p3": "é",
+   "p6": "somos",
+   "en": "to be (essence)",
+   "zh": "是"
+  },
+  {
+   "inf": "estar",
+   "sg": "estive",
+   "pl": "estiveram",
+   "pp": "estado",
+   "p1": "estou",
+   "p3": "está",
+   "p6": "estamos",
+   "en": "to be (state)",
+   "zh": "在/处于"
+  },
+  {
+   "inf": "ter",
+   "sg": "tive",
+   "pl": "tiveram",
+   "pp": "tido",
+   "p1": "tenho",
+   "p3": "tem",
+   "p6": "temos",
+   "en": "to have",
+   "zh": "有"
+  },
+  {
+   "inf": "fazer",
+   "sg": "fiz",
+   "pl": "fizeram",
+   "pp": "feito",
+   "p1": "faço",
+   "p3": "faz",
+   "p6": "fazemos",
+   "en": "to do",
+   "zh": "做"
+  },
+  {
+   "inf": "ir",
+   "sg": "fui",
+   "pl": "foram",
+   "pp": "ido",
+   "p1": "vou",
+   "p3": "vai",
+   "p6": "vamos",
+   "en": "to go",
+   "zh": "去"
+  },
+  {
+   "inf": "poder",
+   "sg": "pude",
+   "pl": "puderam",
+   "pp": "podido",
+   "p1": "posso",
+   "p3": "pode",
+   "p6": "podemos",
+   "en": "can",
+   "zh": "能"
+  },
+  {
+   "inf": "dizer",
+   "sg": "disse",
+   "pl": "disseram",
+   "pp": "dito",
+   "p1": "digo",
+   "p3": "diz",
+   "p6": "dizemos",
+   "en": "to say",
+   "zh": "说"
+  },
+  {
+   "inf": "ver",
+   "sg": "vi",
+   "pl": "viram",
+   "pp": "visto",
+   "p1": "vejo",
+   "p3": "vê",
+   "p6": "vemos",
+   "en": "to see",
+   "zh": "看见"
+  },
+  {
+   "inf": "dar",
+   "sg": "dei",
+   "pl": "deram",
+   "pp": "dado",
+   "p1": "dou",
+   "p3": "dá",
+   "p6": "damos",
+   "en": "to give",
+   "zh": "给"
+  },
+  {
+   "inf": "saber",
+   "sg": "soube",
+   "pl": "souberam",
+   "pp": "sabido",
+   "p1": "sei",
+   "p3": "sabe",
+   "p6": "sabemos",
+   "en": "to know",
+   "zh": "知道"
+  },
+  {
+   "inf": "querer",
+   "sg": "quis",
+   "pl": "quiseram",
+   "pp": "querido",
+   "p1": "quero",
+   "p3": "quer",
+   "p6": "queremos",
+   "en": "to want",
+   "zh": "想要"
+  },
+  {
+   "inf": "vir",
+   "sg": "vim",
+   "pl": "vieram",
+   "pp": "vindo",
+   "p1": "venho",
+   "p3": "vem",
+   "p6": "vimos",
+   "en": "to come",
+   "zh": "来"
+  },
+  {
+   "inf": "pôr",
+   "sg": "pus",
+   "pl": "puseram",
+   "pp": "posto",
+   "p1": "ponho",
+   "p3": "põe",
+   "p6": "pomos",
+   "en": "to put",
+   "zh": "放"
+  },
+  {
+   "inf": "falar",
+   "sg": "falei",
+   "pl": "falaram",
+   "pp": "falado",
+   "p1": "falo",
+   "p3": "fala",
+   "p6": "falamos",
+   "en": "to speak",
+   "zh": "说话"
+  },
+  {
+   "inf": "comer",
+   "sg": "comi",
+   "pl": "comeram",
+   "pp": "comido",
+   "p1": "como",
+   "p3": "come",
+   "p6": "comemos",
+   "en": "to eat",
+   "zh": "吃"
+  },
+  {
+   "inf": "viver",
+   "sg": "vivi",
+   "pl": "viveram",
+   "pp": "vivido",
+   "p1": "vivo",
+   "p3": "vive",
+   "p6": "vivemos",
+   "en": "to live",
+   "zh": "生活"
+  },
+  {
+   "inf": "olhar",
+   "sg": "olhei",
+   "pl": "olharam",
+   "pp": "olhado",
+   "p1": "olho",
+   "p3": "olha",
+   "p6": "olhamos",
+   "en": "to look",
+   "zh": "看"
+  },
+  {
+   "inf": "chegar",
+   "sg": "cheguei",
+   "pl": "chegaram",
+   "pp": "chegado",
+   "p1": "chego",
+   "p3": "chega",
+   "p6": "chegamos",
+   "en": "to arrive",
+   "zh": "到达"
+  },
+  {
+   "inf": "trabalhar",
+   "sg": "trabalhei",
+   "pl": "trabalharam",
+   "pp": "trabalhado",
+   "p1": "trabalho",
+   "p3": "trabalha",
+   "p6": "trabalhamos",
+   "en": "to work",
+   "zh": "工作"
+  },
+  {
+   "inf": "entender",
+   "sg": "entendi",
+   "pl": "entenderam",
+   "pp": "entendido",
+   "p1": "entendo",
+   "p3": "entende",
+   "p6": "entendemos",
+   "en": "to understand",
+   "zh": "理解"
+  },
+  {
+   "inf": "abrir",
+   "sg": "abri",
+   "pl": "abriram",
+   "pp": "aberto",
+   "en": "to open",
+   "zh": "打开"
+  },
+  {
+   "inf": "escrever",
+   "sg": "escrevi",
+   "pl": "escreveram",
+   "pp": "escrito",
+   "en": "to write",
+   "zh": "写"
+  },
+  {
+   "inf": "ler",
+   "sg": "li",
+   "pl": "leram",
+   "pp": "lido",
+   "en": "to read",
+   "zh": "读"
+  },
+  {
+   "inf": "ouvir",
+   "sg": "ouvi",
+   "pl": "ouviram",
+   "pp": "ouvido",
+   "en": "to hear",
+   "zh": "听见"
+  },
+  {
+   "inf": "perder",
+   "sg": "perdi",
+   "pl": "perderam",
+   "pp": "perdido",
+   "en": "to lose",
+   "zh": "丢失"
+  },
+  {
+   "inf": "vender",
+   "sg": "vendi",
+   "pl": "venderam",
+   "pp": "vendido",
+   "en": "to sell",
+   "zh": "卖"
+  },
+  {
+   "inf": "beber",
+   "sg": "bebi",
+   "pl": "beberam",
+   "pp": "bebido",
+   "en": "to drink",
+   "zh": "喝"
+  },
+  {
+   "inf": "receber",
+   "sg": "recebi",
+   "pl": "receberam",
+   "pp": "recebido",
+   "en": "to receive",
+   "zh": "收到"
+  },
+  {
+   "inf": "aprender",
+   "sg": "aprendi",
+   "pl": "aprenderam",
+   "pp": "aprendido",
+   "en": "to learn",
+   "zh": "学习"
+  },
+  {
+   "inf": "correr",
+   "sg": "corri",
+   "pl": "correram",
+   "pp": "corrido",
+   "en": "to run",
+   "zh": "跑"
+  },
+  {
+   "inf": "cair",
+   "sg": "caí",
+   "pl": "caíram",
+   "pp": "caído",
+   "en": "to fall",
+   "zh": "掉落"
+  },
+  {
+   "inf": "partir",
+   "sg": "parti",
+   "pl": "partiram",
+   "pp": "partido",
+   "en": "to leave",
+   "zh": "离开"
+  },
+  {
+   "inf": "sentir",
+   "sg": "senti",
+   "pl": "sentiram",
+   "pp": "sentido",
+   "en": "to feel",
+   "zh": "感觉"
+  },
+  {
+   "inf": "preferir",
+   "sg": "preferi",
+   "pl": "preferiram",
+   "pp": "preferido",
+   "en": "to prefer",
+   "zh": "偏好"
+  },
+  {
+   "inf": "repetir",
+   "sg": "repeti",
+   "pl": "repetiram",
+   "pp": "repetido",
+   "en": "to repeat",
+   "zh": "重复"
+  },
+  {
+   "inf": "vestir",
+   "sg": "vesti",
+   "pl": "vestiram",
+   "pp": "vestido",
+   "en": "to dress",
+   "zh": "穿衣"
+  },
+  {
+   "inf": "dormir",
+   "sg": "dormi",
+   "pl": "dormiram",
+   "pp": "dormido",
+   "en": "to sleep",
+   "zh": "睡觉"
+  },
+  {
+   "inf": "morrer",
+   "sg": "morri",
+   "pl": "morreram",
+   "pp": "morto",
+   "en": "to die",
+   "zh": "死亡"
+  },
+  {
+   "inf": "contar",
+   "sg": "contei",
+   "pl": "contaram",
+   "pp": "contado",
+   "en": "to count / tell",
+   "zh": "数/讲述"
+  },
+  {
+   "inf": "escolher",
+   "sg": "escolhi",
+   "pl": "escolheram",
+   "pp": "escolhido",
+   "en": "to choose",
+   "zh": "选择"
+  },
+  {
+   "inf": "pedir",
+   "sg": "pedi",
+   "pl": "pediram",
+   "pp": "pedido",
+   "en": "to ask for",
+   "zh": "请求"
+  },
+  {
+   "inf": "medir",
+   "sg": "medi",
+   "pl": "mediram",
+   "pp": "medido",
+   "en": "to measure",
+   "zh": "测量"
+  },
+  {
+   "inf": "dirigir",
+   "sg": "dirigi",
+   "pl": "dirigiram",
+   "pp": "dirigido",
+   "en": "to drive",
+   "zh": "驾驶"
+  },
+  {
+   "inf": "fugir",
+   "sg": "fugi",
+   "pl": "fugiram",
+   "pp": "fugido",
+   "en": "to flee",
+   "zh": "逃离"
+  },
+  {
+   "inf": "recomendar",
+   "sg": "recomendei",
+   "pl": "recomendaram",
+   "pp": "recomendado",
+   "en": "to recommend",
+   "zh": "推荐"
+  },
+  {
+   "inf": "começar",
+   "sg": "comecei",
+   "pl": "começaram",
+   "pp": "começado",
+   "en": "to start",
+   "zh": "开始"
+  },
+  {
+   "inf": "procurar",
+   "sg": "procurei",
+   "pl": "procuraram",
+   "pp": "procurado",
+   "en": "to look for",
+   "zh": "寻找"
+  },
+  {
+   "inf": "aparecer",
+   "sg": "apareci",
+   "pl": "apareceram",
+   "pp": "aparecido",
+   "en": "to appear",
+   "zh": "出现"
+  },
+  {
+   "inf": "desaparecer",
+   "sg": "desapareci",
+   "pl": "desapareceram",
+   "pp": "desaparecido",
+   "en": "to disappear",
+   "zh": "消失"
+  },
+  {
+   "inf": "crescer",
+   "sg": "cresci",
+   "pl": "cresceram",
+   "pp": "crescido",
+   "en": "to grow",
+   "zh": "成长"
+  },
+  {
+   "inf": "pertencer",
+   "sg": "pertenci",
+   "pl": "pertenceram",
+   "pp": "pertencido",
+   "en": "to belong",
+   "zh": "属于"
+  },
+  {
+   "inf": "conhecer",
+   "sg": "conheci",
+   "pl": "conheceram",
+   "pp": "conhecido",
+   "en": "to know (a person)",
+   "zh": "认识"
+  },
+  {
+   "inf": "agradecer",
+   "sg": "agradeço",
+   "pl": "agradeceram",
+   "pp": "agradecido",
+   "en": "to thank",
+   "zh": "感谢"
+  },
+  {
+   "inf": "parecer",
+   "sg": "pareci",
+   "pl": "pareceram",
+   "pp": "parecido",
+   "en": "to seem",
+   "zh": "显得"
+  },
+  {
+   "inf": "obedecer",
+   "sg": "obedeci",
+   "pl": "obedeceram",
+   "pp": "obedecido",
+   "en": "to obey",
+   "zh": "服从"
+  },
+  {
+   "inf": "torcer",
+   "sg": "torci",
+   "pl": "torceram",
+   "pp": "torcido",
+   "en": "to twist / cheer",
+   "zh": "扭转/助威"
+  },
+  {
+   "inf": "mudar",
+   "sg": "mudei",
+   "pl": "mudaram",
+   "pp": "mudado",
+   "en": "to change",
+   "zh": "改变"
+  },
+  {
+   "inf": "atravessar",
+   "sg": "atravessei",
+   "pl": "atravessaram",
+   "pp": "atravessado",
+   "en": "to cross",
+   "zh": "穿过"
+  },
+  {
+   "inf": "cantar",
+   "sg": "cantei",
+   "pl": "cantaram",
+   "pp": "cantado",
+   "en": "to sing",
+   "zh": "唱歌"
+  },
+  {
+   "inf": "dançar",
+   "sg": "dancei",
+   "pl": "dançaram",
+   "pp": "dançado",
+   "en": "to dance",
+   "zh": "跳舞"
+  }
+ ],
+ "pronouns": [
+  {
+   "inf": "eu",
+   "sg": "mim",
+   "pl": "meu",
+   "pp": "me",
+   "en": "I / me / my / myself",
+   "zh": "我"
+  },
+  {
+   "inf": "tu",
+   "sg": "ti",
+   "pl": "teu",
+   "pp": "te",
+   "en": "you / your / yourself",
+   "zh": "你"
+  },
+  {
+   "inf": "ele",
+   "sg": "o",
+   "pl": "seu",
+   "pp": "se",
+   "en": "he / him / his / himself",
+   "zh": "他"
+  },
+  {
+   "inf": "ela",
+   "sg": "a",
+   "pl": "seu",
+   "pp": "se",
+   "en": "she / her / hers / herself",
+   "zh": "她"
+  },
+  {
+   "inf": "nós",
+   "sg": "nós",
+   "pl": "nosso",
+   "pp": "nos",
+   "en": "we / us / our / ourselves",
+   "zh": "我们"
+  },
+  {
+   "inf": "vós",
+   "sg": "vos",
+   "pl": "vosso",
+   "pp": "vos",
+   "en": "you (pl) / your",
+   "zh": "你们"
+  },
+  {
+   "inf": "eles",
+   "sg": "os",
+   "pl": "seu",
+   "pp": "se",
+   "en": "they / them / their / themselves",
+   "zh": "他们"
+  }
+ ],
+ "nouns": [
+  {
+   "inf": "livro",
+   "o": "o livro",
+   "en": "the book",
+   "zh": "书"
+  },
+  {
+   "inf": "dia",
+   "o": "o dia",
+   "en": "the day",
+   "zh": "天"
+  },
+  {
+   "inf": "homem",
+   "o": "o homem",
+   "en": "the man",
+   "zh": "男人"
+  },
+  {
+   "inf": "tempo",
+   "o": "o tempo",
+   "en": "the time",
+   "zh": "时间"
+  },
+  {
+   "inf": "trabalho",
+   "o": "o trabalho",
+   "en": "the work",
+   "zh": "工作"
+  },
+  {
+   "inf": "ano",
+   "o": "o ano",
+   "en": "the year",
+   "zh": "年"
+  },
+  {
+   "inf": "mundo",
+   "o": "o mundo",
+   "en": "the world",
+   "zh": "世界"
+  },
+  {
+   "inf": "campo",
+   "o": "o campo",
+   "en": "the countryside",
+   "zh": "田野"
+  },
+  {
+   "inf": "gato",
+   "o": "o gato",
+   "en": "the cat",
+   "zh": "猫"
+  },
+  {
+   "inf": "cavalo",
+   "o": "o cavalo",
+   "en": "the horse",
+   "zh": "马"
+  },
+  {
+   "inf": "sol",
+   "o": "o sol",
+   "en": "the sun",
+   "zh": "太阳"
+  },
+  {
+   "inf": "presente",
+   "o": "o presente",
+   "en": "the gift",
+   "zh": "礼物"
+  },
+  {
+   "inf": "barco",
+   "o": "o barco",
+   "en": "the boat",
+   "zh": "船"
+  },
+  {
+   "inf": "mercado",
+   "o": "o mercado",
+   "en": "the market",
+   "zh": "市场"
+  },
+  {
+   "inf": "caminho",
+   "o": "o caminho",
+   "en": "the road",
+   "zh": "路"
+  },
+  {
+   "inf": "quarto",
+   "o": "o quarto",
+   "en": "the room",
+   "zh": "房间"
+  },
+  {
+   "inf": "prato",
+   "o": "o prato",
+   "en": "the plate",
+   "zh": "盘子"
+  },
+  {
+   "inf": "queijo",
+   "o": "o queijo",
+   "en": "the cheese",
+   "zh": "奶酪"
+  },
+  {
+   "inf": "casa",
+   "a": "a casa",
+   "en": "the house",
+   "zh": "房子"
+  },
+  {
+   "inf": "mesa",
+   "a": "a mesa",
+   "en": "the table",
+   "zh": "桌子"
+  },
+  {
+   "inf": "porta",
+   "a": "a porta",
+   "en": "the door",
+   "zh": "门"
+  },
+  {
+   "inf": "cidade",
+   "a": "a cidade",
+   "en": "the city",
+   "zh": "城市"
+  },
+  {
+   "inf": "vida",
+   "a": "a vida",
+   "en": "the life",
+   "zh": "生命"
+  },
+  {
+   "inf": "mãe",
+   "a": "a mãe",
+   "en": "the mother",
+   "zh": "母亲"
+  },
+  {
+   "inf": "noite",
+   "a": "a noite",
+   "en": "the night",
+   "zh": "夜晚"
+  },
+  {
+   "inf": "rua",
+   "a": "a rua",
+   "en": "the street",
+   "zh": "街道"
+  },
+  {
+   "inf": "janela",
+   "a": "a janela",
+   "en": "the window",
+   "zh": "窗户"
+  },
+  {
+   "inf": "carta",
+   "a": "a carta",
+   "en": "the letter",
+   "zh": "信"
+  },
+  {
+   "inf": "praia",
+   "a": "a praia",
+   "en": "the beach",
+   "zh": "海滩"
+  },
+  {
+   "inf": "montanha",
+   "a": "a montanha",
+   "en": "the mountain",
+   "zh": "山"
+  },
+  {
+   "inf": "flor",
+   "a": "a flor",
+   "en": "the flower",
+   "zh": "花"
+  },
+  {
+   "inf": "semana",
+   "a": "a semana",
+   "en": "the week",
+   "zh": "星期"
+  },
+  {
+   "inf": "coisa",
+   "a": "a coisa",
+   "en": "the thing",
+   "zh": "东西"
+  },
+  {
+   "inf": "escola",
+   "a": "a escola",
+   "en": "the school",
+   "zh": "学校"
+  },
+  {
+   "inf": "cadeira",
+   "a": "a cadeira",
+   "en": "the chair",
+   "zh": "椅子"
+  },
+  {
+   "inf": "chave",
+   "a": "a chave",
+   "en": "the key",
+   "zh": "钥匙"
+  },
+  {
+   "inf": "casa",
+   "s": "casas",
+   "en": "house → houses",
+   "zh": "房子"
+  },
+  {
+   "inf": "livro",
+   "s": "livros",
+   "en": "book → books",
+   "zh": "书"
+  },
+  {
+   "inf": "mesa",
+   "s": "mesas",
+   "en": "table → tables",
+   "zh": "桌子"
+  },
+  {
+   "inf": "dia",
+   "s": "dias",
+   "en": "day → days",
+   "zh": "天"
+  },
+  {
+   "inf": "gato",
+   "s": "gatos",
+   "en": "cat → cats",
+   "zh": "猫"
+  },
+  {
+   "inf": "presente",
+   "s": "presentes",
+   "en": "gift → gifts",
+   "zh": "礼物"
+  },
+  {
+   "inf": "barco",
+   "s": "barcos",
+   "en": "boat → boats",
+   "zh": "船"
+  },
+  {
+   "inf": "mundo",
+   "s": "mundos",
+   "en": "world → worlds",
+   "zh": "世界"
+  },
+  {
+   "inf": "prato",
+   "s": "pratos",
+   "en": "plate → plates",
+   "zh": "盘子"
+  },
+  {
+   "inf": "homem",
+   "ns": "homens",
+   "en": "man → men",
+   "zh": "男人"
+  },
+  {
+   "inf": "jardim",
+   "ns": "jardins",
+   "en": "garden → gardens",
+   "zh": "花园"
+  },
+  {
+   "inf": "som",
+   "ns": "sons",
+   "en": "sound → sounds",
+   "zh": "声音"
+  },
+  {
+   "inf": "trem",
+   "ns": "trens",
+   "en": "train → trains",
+   "zh": "火车"
+  },
+  {
+   "inf": "armazém",
+   "ns": "armazéns",
+   "en": "warehouse → warehouses",
+   "zh": "仓库"
+  },
+  {
+   "inf": "jovem",
+   "ns": "jovens",
+   "en": "young person → young people",
+   "zh": "年轻人"
+  },
+  {
+   "inf": "viagem",
+   "ns": "viagens",
+   "en": "trip → trips",
+   "zh": "旅行"
+  },
+  {
+   "inf": "montagem",
+   "ns": "montagens",
+   "en": "assembly → assemblies",
+   "zh": "组装"
+  },
+  {
+   "inf": "garçom",
+   "ns": "garçons",
+   "en": "waiter → waiters",
+   "zh": "服务员"
+  },
+  {
+   "inf": "coração",
+   "oes": "corações",
+   "en": "heart → hearts",
+   "zh": "心"
+  },
+  {
+   "inf": "leão",
+   "oes": "leões",
+   "en": "lion → lions",
+   "zh": "狮子"
+  },
+  {
+   "inf": "chão",
+   "oes": "chões",
+   "en": "ground → grounds",
+   "zh": "地面"
+  },
+  {
+   "inf": "botão",
+   "oes": "botões",
+   "en": "button → buttons",
+   "zh": "按钮"
+  },
+  {
+   "inf": "avião",
+   "oes": "aviões",
+   "en": "plane → planes",
+   "zh": "飞机"
+  },
+  {
+   "inf": "feijão",
+   "oes": "feijões",
+   "en": "bean → beans",
+   "zh": "豆"
+  },
+  {
+   "inf": "limão",
+   "oes": "limões",
+   "en": "lemon → lemons",
+   "zh": "柠檬"
+  },
+  {
+   "inf": "portão",
+   "oes": "portões",
+   "en": "gate → gates",
+   "zh": "大门"
+  },
+  {
+   "inf": "melão",
+   "oes": "melões",
+   "en": "melon → melons",
+   "zh": "瓜"
+  },
+  {
+   "inf": "animal",
+   "is": "animais",
+   "en": "animal → animals",
+   "zh": "动物"
+  },
+  {
+   "inf": "papel",
+   "is": "papéis",
+   "en": "paper → papers",
+   "zh": "纸"
+  },
+  {
+   "inf": "sol",
+   "is": "sóis",
+   "en": "sun → suns",
+   "zh": "太阳"
+  },
+  {
+   "inf": "hotel",
+   "is": "hotéis",
+   "en": "hotel → hotels",
+   "zh": "旅馆"
+  },
+  {
+   "inf": "funil",
+   "is": "funis",
+   "en": "funnel → funnels",
+   "zh": "漏斗"
+  },
+  {
+   "inf": "réptil",
+   "is": "répteis",
+   "en": "reptile → reptiles",
+   "zh": "爬行动物"
+  },
+  {
+   "inf": "canil",
+   "is": "canis",
+   "en": "kennel → kennels",
+   "zh": "狗舍"
+  },
+  {
+   "inf": "anzol",
+   "is": "anzóis",
+   "en": "fishhook → fishhooks",
+   "zh": "鱼钩"
+  },
+  {
+   "inf": "farol",
+   "is": "faróis",
+   "en": "lighthouse → lighthouses",
+   "zh": "灯塔"
+  }
+ ],
+ "tierNames": [
+  {
+   "band": "A1",
+   "names": [
+    "ser",
+    "estar",
+    "ter",
+    "fazer",
+    "ir",
+    "poder",
+    "dizer",
+    "ver",
+    "dar",
+    "saber",
+    "querer",
+    "vir",
+    "pôr",
+    "falar",
+    "comer",
+    "viver",
+    "olhar",
+    "chegar",
+    "trabalhar",
+    "entender"
+   ]
+  },
+  {
+   "band": "A2",
+   "names": [
+    "abrir",
+    "escrever",
+    "ler",
+    "ouvir",
+    "perder",
+    "vender",
+    "beber",
+    "receber",
+    "aprender",
+    "correr",
+    "cair",
+    "partir",
+    "sentir",
+    "preferir",
+    "repetir",
+    "vestir",
+    "dormir",
+    "morrer",
+    "contar",
+    "escolher"
+   ]
+  },
+  {
+   "band": "B1",
+   "names": [
+    "pedir",
+    "medir",
+    "dirigir",
+    "fugir",
+    "recomendar",
+    "começar",
+    "procurar",
+    "aparecer",
+    "desaparecer",
+    "crescer",
+    "pertencer",
+    "conhecer",
+    "agradecer",
+    "parecer",
+    "obedecer",
+    "torcer",
+    "mudar",
+    "atravessar",
+    "cantar",
+    "dançar"
+   ]
+  }
+ ],
+ "i18n": {
+  "pt": {
+   "menu.back": "Retomar o jogo",
+   "menu.continue": "Nível seguinte",
+   "menu.levels": "Níveis",
+   "menu.daily": "Desafio do dia",
+   "menu.endless": "Infinito",
+   "menu.survival": "Sobrevivência",
+   "menu.survivalnew": "Cada par contra o tempo!",
+   "menu.needlevel": "Termina um nível para desbloquear",
+   "menu.newdaily": "Uma grelha nova cada dia",
+   "menu.endlessnew": "Caça aos pontos com a tua coleção",
+   "menu.dailydone": "Já concluído hoje — grelha nova amanhã!",
+   "mode.endless": "Infinito",
+   "mode.daily": "Desafio do dia",
+   "mode.survival": "Sobrevivência",
+   "result.timeup": "Acabou o tempo!",
+   "result.today": "Hoje",
+   "menu.help": "Como jogar",
+   "menu.settings": "Definições",
+   "dock.hint": "Dica",
+   "dock.book": "Coleção",
+   "mi.endless": "Caça aos pontos com as tuas palavras colecionadas: a série continua depois de limpar a grelha.",
+   "mi.daily": "180 segundos, uma vez por dia. Todos recebem a mesma grelha.",
+   "mi.survival": "Cada par em 15 segundos — senão acaba. Tocar errado não falha.",
+   "mi.start": "Começar",
+   "mi.back": "Voltar",
+   "legend.sg": "pretérito (eu)",
+   "legend.pl": "pretérito (eles)",
+   "legend.pp": "particípio",
+   "short.sg": "pret.",
+   "short.pl": "pret. pl.",
+   "short.pp": "part.",
+   "legend.p1": "presente (eu)",
+   "legend.p3": "presente (ele/ela)",
+   "legend.p6": "presente (nós)",
+   "short.p1": "eu",
+   "short.p3": "ele/ela",
+   "short.p6": "nós",
+   "legend.pr.obj": "pronome oblíquo",
+   "legend.pr.pos": "possessivo",
+   "legend.pr.ref": "reflexivo",
+   "short.pr.obj": "oblíq.",
+   "short.pr.pos": "poss.",
+   "short.pr.ref": "refl.",
+   "band.pr": "Pronomes",
+   "band.ps": "Presente dos verbos",
+   "band.ln": "Artigos (o/a)",
+   "band.mv": "Plurais",
+   "card.sent": "Exemplo",
+   "legend.o": "artigo o",
+   "legend.a": "artigo a",
+   "short.o": "o",
+   "short.a": "a",
+   "legend.s": "plural em -s",
+   "legend.ns": "plural -m → -ns",
+   "legend.oes": "plural -ão → -ões",
+   "legend.is": "plural -l → -is",
+   "short.s": "-s",
+   "short.ns": "-ns",
+   "short.oes": "-ões",
+   "short.is": "-is",
+   "legend.dh": "artigo (o/a)",
+   "short.dh": "o/a",
+   "set.title": "Definições",
+   "set.style": "Estilo de desenho",
+   "set.lang": "Idioma",
+   "set.sound": "Som",
+   "set.tts": "Leitura em voz alta",
+   "set.hintwait": "Espera da dica",
+   "set.banner": "Duração da faixa",
+   "set.theme": "Tema",
+   "theme.grug": "Esboço",
+   "theme.papier": "Post-it",
+   "set.dark": "Modo escuro",
+   "opt.off": "Não",
+   "opt.on": "Sim",
+   "set.voice": "Voz",
+   "set.voicetest": "Testar",
+   "set.novoice": "Sem voz portuguesa. Chrome: Definições → Idiomas → Português",
+   "tts.blocked": "Sem som nesta janela — testa a Leitura em voz alta no Chrome ou Safari.",
+   "result.title": "Grelha concluída!",
+   "result.done": "Todos os pares encontrados.",
+   "result.record": "novo recorde!",
+   "result.best": "recorde",
+   "btn.again": "Repetir",
+   "btn.menu": "Menu",
+   "btn.next": "Nível seguinte →",
+   "toast.shuffle": "Sem combinações — baralhado!",
+   "toast.nopair": "Sem pares — baralhado!",
+   "book.title": "Coleção",
+   "book.locked": "Ainda não emparelhado",
+   "book.lockedsub": "Emparelha esta palavra para a colecionar.",
+   "book.view": "Toca para ver",
+   "help.title": "Como jogar",
+   "help.p1": "Liga a palavra à sua forma: toca na palavra e depois na forma da mesma palavra ligada por um caminho com no máximo 2 curvas (por casas vazias ou pela borda). Cada nível treina uma só forma.",
+   "help.goal": "Objetivo: encontra todos os pares antes de ficares preso. Senão a grelha é baralhada.",
+   "help.score": "Pontos: 15 por par. Pares rápidos dão bónus de série.",
+   "help.rules": "Cinco grupos, cada um com a sua ordem: Pronomes (eu ↔ mim / meu / me), Presente (ir ↔ eu vou), Artigos o/a (o mesmo grupo de palavras em dois níveis: primeiro livro ↔ o livro, depois livro ↔ o), Plurais (livro ↔ livros) e pretérito/particípio A1–B1. Os grupos são independentes — começa onde quiseres.",
+   "help.modes": "Modos: após concluir um nível desbloqueias Infinito, Sobrevivência e o Desafio do dia (180 segundos, uma vez por dia).",
+   "help.stuck": "Preso? Toca em Dica — ou espera um pouco. As bordas da grelha fazem parte do jogo.",
+   "demo.step1": "1 · Toca na palavra",
+   "demo.step2": "2 · Toca na sua forma",
+   "demo.step3": "3 · A linha desenha-se…",
+   "demo.go": "À tua vez!",
+   "combo.m3": "Bom!",
+   "combo.m5": "Ótimo!",
+   "combo.m8": "Formidável!",
+   "combo.m12": "Lendário!"
+  },
+  "zh": {
+   "band.ln": "冠词 o/a",
+   "legend.sg": "完成过去时(eu)",
+   "legend.pl": "完成过去时(eles)",
+   "legend.pp": "过去分词",
+   "short.sg": "过完",
+   "short.pl": "过完复",
+   "short.pp": "分词",
+   "legend.p1": "现在时 eu",
+   "legend.p3": "现在时 ele/ela",
+   "legend.p6": "现在时 nós",
+   "short.p1": "eu 形",
+   "short.p3": "ele 形",
+   "short.p6": "nós 形",
+   "legend.o": "定冠词 o",
+   "legend.a": "定冠词 a",
+   "short.o": "o",
+   "short.a": "a",
+   "legend.s": "复数 -s",
+   "legend.ns": "复数 -m→-ns",
+   "legend.oes": "复数 -ão→-ões",
+   "legend.is": "复数 -l→-is",
+   "short.s": "-s",
+   "short.ns": "-ns",
+   "short.oes": "-ões",
+   "short.is": "-is",
+   "legend.dh": "定冠词 o/a",
+   "short.dh": "o/a",
+   "legend.pr.obj": "宾格代词",
+   "legend.pr.pos": "物主代词",
+   "legend.pr.ref": "反身代词",
+   "short.pr.obj": "宾格",
+   "short.pr.pos": "物主",
+   "short.pr.ref": "反身",
+   "help.rules": "五组各有独立顺序:代词(eu ↔ mim / meu / me)、动词现在时人称(eu / ele / nós)、冠词 o/a(同一组词两关:先 o livro 给出答案,再只剩 o)、名词复数(livro ↔ livros)、完成过去时+过去分词 A1–B1(单数→复数→分词)。各组互不锁关,可分别开始。"
+  },
+  "en": {
+   "band.ln": "Articles (o/a)",
+   "legend.sg": "preterite (eu)",
+   "legend.pl": "preterite (eles)",
+   "legend.pp": "past participle",
+   "short.sg": "pret.",
+   "short.pl": "pret. pl.",
+   "short.pp": "part.",
+   "legend.p1": "present (eu)",
+   "legend.p3": "present (ele/ela)",
+   "legend.p6": "present (nós)",
+   "short.p1": "eu",
+   "short.p3": "ele/ela",
+   "short.p6": "nós",
+   "legend.o": "article o",
+   "legend.a": "article a",
+   "short.o": "o",
+   "short.a": "a",
+   "legend.s": "plural -s",
+   "legend.ns": "plural -m → -ns",
+   "legend.oes": "plural -ão → -ões",
+   "legend.is": "plural -l → -is",
+   "short.s": "-s",
+   "short.ns": "-ns",
+   "short.oes": "-ões",
+   "short.is": "-is",
+   "legend.dh": "article (o/a)",
+   "short.dh": "o/a",
+   "legend.pr.obj": "object pronoun",
+   "legend.pr.pos": "possessive",
+   "legend.pr.ref": "reflexive",
+   "short.pr.obj": "obj.",
+   "short.pr.pos": "poss.",
+   "short.pr.ref": "refl.",
+   "help.rules": "Five groups, each with its own order: Pronouns (eu ↔ mim / meu / me), Present tense (ir ↔ eu vou), Articles o/a (same word group in two levels — first livro ↔ o livro, then livro ↔ o), Plurals (livro ↔ livros), and preterite/participle A1–B1. The groups unlock separately — start anywhere."
+  }
+ },
+ "shape": {
+  "o": "k-de",
+  "a": "k-ht",
+  "s": "k-de",
+  "ns": "k-ht",
+  "oes": "k-ap",
+  "is": "k-de",
+  "dh": "k-dh"
+ }
+}

@@ -1,5 +1,13 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-11-07 · 多语言扩展(link-match → 法/西/葡/德四变体)
+
+- **架构:一个引擎 + 语言数据**。`link-match/index.html` 引擎参数化:新增 `LANG_META`(语言代码/UI 名/TTS/存档键/冠词复数字段表 ln·mv/人称前缀 pron)、`NOUN_SHAPE`+`shapeKey`(词型键→形状类,变体字段名无需新 CSS)、语音/菜单/设置/默认 UI 语/存档键全部走 LANG_META;三处 `==LANG:DATA/KEYS/I18N==` 标记区圈定语言内容。`tools/gen-variants.py` 读母本+`langs/<code>.json` 整区替换生成 `link-match-{fr,es,pt,de}/index.html`(**产物仍是单文件零依赖**;生成器对动词/名词/键/形状做一致性校验)。
+- **内容(每语)**:60 动词(A1/A2/B1 × 20;sg/pl/pp=法 imparfait、西/葡 pretérito、德 Präteritum 的单复数+过去分词;A1 加 p1/p3/p6 现三人称)、7 人称代词(宾格/物主/反身三槽复用)、63–72 名词(冠词 36:法 le·la/西 el·la/葡 o·a/德 der·die·das——德语 3 性在 4 组混编正好 3+3+3;复数 27–36:法 -s/-x/-eaux、西 -s/-es/-z→ces、葡 -s/-m→ns/-ão→ões/-l→is、德 -e/-er/-en)。**词源=各语标准参考变位表**(Le Petit Robert/RAE/Duden 级);葡语取 pt-PT(含 tu/vós 范式)、西语含 vosotros。UI:默认目标语言,zh/en 可切(通用键继承母本 zh/en,内容键逐语覆盖)。
+- **坑**:①德语 -en 复数类型键与英文释义键 `en` 撞名 → 名词释义统一走 `gloss` 字段(荷兰语 v1.22 已有先例);②引擎 wordOf 冠词分支曾硬编码 de/ht → 改 `LANG_META.ln.includes`;③生成器 LANG_META 模板漏 pron → P_PRONOUN undefined 渲染半途崩,补上。
+- **QA**:四语语法检查+`tools/variant-smoke.mjs`(分组计数/LN 成对同词/提示交替/全池覆盖/编号/存档键)全绿;浏览器逐语全量扫盘 **fr 50 / es 50 / pt 51 / de 53 关零错误**,LN 两关结构/错误冠词拒绝/朗读全短语(如 ["jour","le jour"])逐语断言,四张截图入可视化目录;荷兰语母本回归(语法/冒烟/迁移/浏览器)全绿;测试存档已清空。
+
+
 ## 2026-11-07 · v1.24(link-match)试玩定稿:LN 每组词两关(短语关→裸冠词关),总数 74→78
 
 - 用户最终结构(一组词做两关):**第一关 de vrouw ↔ de**——词侧放全短语=答案给到,与裸冠词块连接;**第二关 vrouw ↔ de**——词侧纯词,答案拿掉靠检索。两关同一组词(4 组 × 9 词,de/het 混编),配对成功都朗读全短语(de vrouw,冠词在前,attemptPair formWord 读完整字段不变)。

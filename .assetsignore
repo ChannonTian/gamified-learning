@@ -13,3 +13,5 @@ schema.sql
 wrangler.toml
 worker.js
 .assetsignore
+tools
+langs

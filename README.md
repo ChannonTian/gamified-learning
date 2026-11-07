@@ -9,7 +9,8 @@ Building a language learning game suite that really applies the latest learning 
 | 游戏 | 语言 | 内容 | 状态 |
 |---|---|---|---|
 | [link-match-demo](./link-match-demo/) | 荷兰语 | 主线产品:Taalhuis NIG I–IV 词表 50 词 / 18 关 + 无尽 / 每日(排行榜)/ 生存;**账号登录 + 云存档 + 每日排行榜** | **主线**,持续迭代 |
-| [link-match](./link-match/) | 荷兰语 | 完整版连连看(108 词 / 51 关,A1–B1 形式分组)+ 无尽 / 每日 / 生存 | 已上线,冻结待 demo 定稿后同步 |
+| [link-match](./link-match/) | 荷兰语 | 完整版连连看(148 动词 + 72 名词 / 78 关,五组:代词/人称变位/冠词/复数/过去时)+ 无尽 / 每日 / 生存 | **主线**,持续迭代 |
+| [link-match-fr](./link-match-fr/) / [-es](./link-match-es/) / [-pt](./link-match-pt/) / [-de](./link-match-de/) | 法/西/葡/德 | 同引擎多语言变体(`tools/gen-variants.py` 从 `langs/*.json` 生成;每语 60 动词+72 名词,50–53 关) | v1 上线 |
 | [tile-match](./tile-match/) | 荷兰语 | 强变化动词三消(过去式单复数 + 过去分词)+ 无尽/每日挑战 | 功能冻结(v0.87) |
 | [four-match](./four-match/) | 荷兰语 | 四消对照原型(原形+三变位同消) | 已否决,留档在线 |
 
