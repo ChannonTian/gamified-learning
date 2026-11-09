@@ -114,6 +114,7 @@ gamified-learning/
 - **link-match v1.8(2026-10-04)**:**Grug 手作主题**(用户从四方向效果图选定 D)——`settings.theme` 默认 "grug",Papier 可切回;CSS 在 `body.theme-grug:not(.dark)` 下覆盖(暗色变量级联在后不破坏);tile 歪斜走 applyTileRotations(inline transform,与 scale/translate 动画属性不冲突);字号测量按主题选字体(手写体更宽)。效果图:docs/mockups/aesthetics.html。
 - **tile-match v0.9(2026-10-04,一次性解冻做美术,功能仍冻结)**:移植 link-match v1.8/v1.9 风格——Grug 主题(Thema 设置,Grug 默认/Papier 切回)+ 字号按主题手写字体测量 ×0.93/字重500 + emoji 全清换手绘 SVG(ICO_STAR/FLAME/CLOCK/TARGET)+ 分数真胶囊(**渐变字会吞 SVG 描边**,两主题都改实底)+ grugRough 滤镜 + --hot + 菜单 ✕/点外 + TTS=0 确认音;**与 link-match 实现差异:三消词块移动走 transform translate,歪斜必须合并进同一 transform(tileRot),不能独立 rotate**;hint 开关作用域到主题圆角/色染(no-shape/no-color);顺修弹窗后兜底自愈 pickRefillTile 读 level.verbs 崩(加空回退)。
 - **tile-match v0.95(2026-10-05,同步 link-match-demo 云栈+UX)**:后端 `saves_games(user_id,game)` 新表(game='tilematch';**saves 旧表仍专属 demo,save/load 带 `?game=tilematch` 才走新表,缺省行为不变**)+ account DELETE 连带清 saves_games + Google OAuth `?game=tile`(发起端 g_game cookie,回调写 `nlm3.auth` 跳 /tile-match/,失败页同源返回;state 格式未动不碰 CSRF)。前端=demo v1.17–v1.19 同款:设置 Cloudopslag 区块+欢迎页(登录优先+Google+游客兜底,welcomeDone)+Profiel 档案页(显示名+登录态+两步删除)+cloud 引擎(4s 去抖/keepalive/cloudMerge/401 静默)+菜单语言行+**模式介绍弹窗**(点每日/无尽先弹说明+最高分+Start;每日已完成=只说明+返回)。**不做:排行榜**(daily_scores 无 game 维度,重建表有迁移风险,单独立项)→ 无 lbSent/无成绩补报。QA:curl 全套(双表隔离/cookie/删号)+浏览器全链路(欢迎页三语/游客/注册/自动同步/清档云恢复/模式弹窗)+bot 零错误。
+- **tile-match v0.96(2026-11-09,用户拍板补齐两项)**:**统一词卡**(demo v1.15 同款 `wordCardHTML(v,hi)`)——横幅与图鉴详情卡共用(四形态+swu 弧线原形+按本次消除词型高亮+释义列;横幅字号随槽高自适应),图鉴卡释义常显、点卡即关(cardTip/gloss-open/card.tip i18n 键全清);**is+perfectum**(demo v1.16 同款 `PP_ZIJN`+`ppLabel`)——磁贴/横幅/图鉴卡/朗读/图鉴列表同源显示朗读 "is + 分词"(三消含前 8 个 is 动词),computeLevelFont 按最长单词测宽+双行高度上限。**顺修存量潜伏 bug**:图鉴 coinBehind 裸调 coinS 崩(全词收集必触)+PROP 缺 11 个别名(sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/dashedCircle/speedLines/pencilPaper)——即 link-match v1.11 的修复,三消冻结期间没跟上;helper 本就在,只缺 PROP 别名。
 
 ## 已踩过的坑(别再踩)
 
@@ -133,6 +134,7 @@ gamified-learning/
 ## 引擎与 QA 类(v1.17 之前)
 
 - **交叉消除去重**:行/列连段交叉共享同一块时,消除列表必须按格去重,否则二次置 null 后 t.el 崩、busy 卡死(tile-match v0.86 修复)。
+- **共享插画库的修复必须两边同步落地,冻结也不例外**:tile-match 冻结期间错过了 link-match v1.11 的 PROP 补齐(coinBehind 裸调 coinS + 11 个 SCENES 引用缺失别名),潜伏到 v0.96 全词收集 QA 才爆——凡改 VERBS/PROP/SCENES/i18n 框架,同一次提交里把另一个产品的同类位置一起改掉(生成器变体另跑 tools/gen-variants.py)。
 - **link-match 路径坐标约定(v1.2 坑)**:`findPathOcc(occ, r1, c1, r2, c2)` 收 **0 基棋盘坐标**,内部自己 +1 转外圈;调用方**禁止再 +1**(v1.1 双重偏移 → 有路判不能连/假提示/连线画偏一格,QA bot 因相邻对在偏移系也可连而漏测)。折线回溯的根父指针(dir=-1)处要显式 push 起点 A。改引擎必跑 `node link-match/test/path-engine.test.mjs`(异构参照实现对照+折线合法性+全消链路)。
 - **drawPath 端点方向判定也是 [r,c](v1.9 坑,用户发现)**:`edge()` 里列差才是水平、行差才是垂直(`dx=nxt[1]-pt[1]`),轴序颠倒 → 端点从错误一侧出边、连线出现斜线段。复测办法:连对后导出 `#pathSvg polyline` points,断言相邻点至少共一轴(diag=false)。
 - **异步链路异常会卡死 busy**:await 链外层 try/finally 复位 busy,全局错误捕获(window.__errors)留痕;showResult/updateHUD 等「先置空后使用」的次序错误用 NLM3.errors() 排查。
