@@ -69,7 +69,7 @@
   body.theme-grug:not(.dark) .btn.primary{ background:var(--hot); color:#fbf3e6; }
   body.theme-grug:not(.dark) .score-pop{ color:#3b332a; text-shadow:0 1px 0 rgba(246,239,221,.9); }
   body.theme-grug:not(.dark) .score-pop.big{ color:var(--hot); }
-  .theme-grug #bannerArt, .theme-grug #cardArt, .theme-grug .book-art svg{ filter:url(#grugRough); }
+  .theme-grug .wc-art, .theme-grug .book-art svg{ filter:url(#grugRough); }
   body.theme-grug.dark{ --tile-s:14%; --hot:#c9563c; }
   /* ============ /主题 Grug ============ */
   body.dark{
@@ -406,32 +406,41 @@
     transition:transform .25s cubic-bezier(.3,1.2,.5,1), opacity .22s, visibility .25s;
   }
   #learnBanner.show{opacity:1; visibility:visible; transform:none;}
-  #bannerArt{width:46px; height:46px; flex:none;}
-  .b-main{flex:1; min-width:0;}
-  .b-main b{font-size:24px; font-weight:800; line-height:1.1;}
-  #bannerForms{font-size:16px; font-weight:700; color:var(--ink); opacity:.85; margin-top:2px;}
-  #bannerGloss{
-    margin-left:auto; flex:none; max-width:34%;
-    font-size:12.5px; line-height:1.35; text-align:right;
-    color:var(--ink); opacity:.6;
+  /* ---- 统一词卡(demo v1.15):横幅与图鉴详情卡共用同一种卡 ---- */
+  #learnBanner .word-card{flex:1;}
+  .word-card{display:flex; align-items:center; gap:14px; width:100%;}
+  .wc-art{width:48px; height:48px; flex:none;}
+  .wc-main{flex:1; min-width:0;}
+  .wc-forms{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font-size:17px; font-weight:700; line-height:1.2;}
+  .wc-forms .bf{color:var(--ink); opacity:.42; white-space:nowrap;}
+  .wc-forms .bf.on{font-weight:800; opacity:1; color:hsl(var(--h) 52% 40%);}
+  body.theme-grug.dark .wc-forms .bf.on{color:hsl(var(--h) 45% 66%);}
+  .wc-gloss{
+    flex:none; width:80px; margin-left:auto;
+    padding-left:12px; border-left:1.5px dashed color-mix(in srgb, currentColor 30%, transparent);
+    font-size:12.5px; line-height:1.4; text-align:right;
+    color:var(--ink); opacity:.65; word-break:break-word;
   }
+  /* 原形下划线:与磁贴同款手绘弧线(grug)/色条退化(papier),demo v1.13 同源 */
+  .swu{
+    display:inline-block; padding-bottom:3px;
+    background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%233b332a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>') left bottom/100% 6px no-repeat;
+  }
+  body.theme-grug.dark .swu{ background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M2 9 C 20 6, 40 3.5, 55 5 a3.4 3.4 0 1 0 6.2 1.8 C 68 6, 84 4.5, 98 3.2" stroke="%23d8cdb2" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>'); }
+  body:not(.theme-grug) .swu{ background:none; border-bottom:2.5px solid var(--accent); padding-bottom:1px; }
   .b-progress{position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--paper);}
   .b-progress i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#ff9d2e,#e8554a);}
   #learnBanner.show .b-progress i{animation:bprog var(--bdur,10s) linear forwards;}
   @keyframes bprog{ from{width:100%;} to{width:0;} }
 
-  /* collection card (eerste keer) — z 级高于图鉴/结果,可直接关闭 */
+  /* collection card (eerste keer) — z 级高于图鉴/结果,可直接关闭;卡体=统一词卡 */
   #cardModal{z-index:70;}
   #cardModal .panel{width:min(84vw,330px); text-align:center; cursor:pointer;}
-  #cardArt{width:150px; height:150px; margin:6px auto 2px; display:block;}
-  #cardInf{font-size:34px; font-weight:800; letter-spacing:.5px;}
-  #cardForms{font-size:13px; color:#7a8496; margin-top:6px;}
-  #cardGloss{
-    margin-top:12px; padding:10px 12px; border-radius:12px;
-    background:var(--paper); font-size:14px; color:var(--ink); display:none;
-  }
-  #cardModal.gloss-open #cardGloss{display:block;}
-  #cardTip{font-size:11px; color:#a3abb8; margin-top:12px;}
+  #cardModal .wc-art{width:110px; height:110px; margin:0 auto;}
+  #cardModal .wc-forms{font-size:20px; justify-content:center;}
+  #cardModal .wc-gloss{width:auto; max-width:60%; margin:0 auto; font-size:14px; border-left:none; padding-left:0; text-align:center; opacity:.8;}
+  #cardModal .word-card{flex-direction:column; gap:12px; margin:8px 0 4px;}
+  #cardModal .wc-main{width:100%;}
 
   /* book */
   #bookDrawer{justify-content:flex-end; align-items:stretch;}
@@ -528,15 +537,7 @@
   <div id="dock">
     <button class="dock-btn" id="btnHint"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2.8a6.6 6.6 0 0 0-4.1 11.8c.8.6 1.1 1.5 1.1 2.5h6c0-1 .3-1.9 1.1-2.5A6.6 6.6 0 0 0 12 2.8z" fill="currentColor"/><rect x="9.4" y="18.4" width="5.2" height="2.4" rx="1.2" fill="currentColor"/></svg><span data-i18n="dock.hint">Hint</span></button>
     <button class="dock-btn" id="btnBook"><svg class="ic" viewBox="0 0 24 24"><path d="M11.2 5.2C9.2 3.9 6.6 3.9 5 4.9v14c1.6-1 4.2-1 6.2.3zM12.8 5.2c2-1.3 4.6-1.3 6.2-.3v14c-1.6-1-4.2-1-6.2.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="dock.book">Verzameling</span></button>
-    <div id="learnBanner">
-      <svg id="bannerArt" viewBox="0 0 120 120"></svg>
-      <div class="b-main">
-        <b id="bannerInf"></b>
-        <div id="bannerForms"></div>
-      </div>
-      <div id="bannerGloss"></div>
-      <div class="b-progress"><i></i></div>
-    </div>
+    <div id="learnBanner"></div>
   </div>
 </div>
 
@@ -645,11 +646,7 @@
 <div class="overlay" id="cardModal">
   <div class="panel" id="cardPanel">
     <button class="close-x" id="cardClose">✕</button>
-    <svg id="cardArt" viewBox="0 0 120 120"></svg>
-    <div id="cardInf"></div>
-    <div id="cardForms"></div>
-    <div id="cardGloss"></div>
-    <div id="cardTip">Tik op de kaart voor de betekenis</div>
+    <div id="cardBody"></div>
   </div>
 </div>
 
@@ -1021,7 +1018,6 @@ const I18N={
     "set.sound":"Geluid","set.tts":"Voorlezen","set.hintwait":"Hint wachttijd",
     "set.color":"Kleurhint","set.shape":"Vormhint","set.theme":"Thema","set.dark":"Donkere modus",
     "opt.off":"Uit","opt.on":"Aan",
-    "card.tip":"Tik op de kaart voor de betekenis","card.tip2":"Tik nogmaals om verder te spelen",
     "result.title":"Level gehaald!","result.done":"Alle {n} werkwoorden verzameld.",
     "result.record":"nieuw record!","result.best":"beste","result.zetten":"zetten",
     "btn.next":"Volgende niveau →","btn.again":"Opnieuw","btn.menu":"Menu",
@@ -1056,7 +1052,6 @@ const I18N={
     "set.sound":"音效音量","set.tts":"朗读音量","set.hintwait":"提示等待时长",
     "set.color":"颜色提示","set.shape":"形状提示","set.theme":"界面主题","set.dark":"深色模式",
     "opt.off":"关","opt.on":"开",
-    "card.tip":"点击卡片查看释义","card.tip2":"再点一下继续游戏",
     "result.title":"过关!","result.done":"已收集本关全部 {n} 个动词。",
     "result.record":"新纪录!","result.best":"最佳","result.zetten":"步",
     "btn.next":"下一关 →","btn.again":"再来一次","btn.menu":"回菜单",
@@ -1092,7 +1087,6 @@ const I18N={
     "set.sound":"Sound","set.tts":"Speech","set.hintwait":"Hint wait",
     "set.color":"Colour hint","set.shape":"Shape hint","set.theme":"Theme","set.dark":"Dark mode",
     "opt.off":"Off","opt.on":"On",
-    "card.tip":"Tap the card for the meaning","card.tip2":"Tap again to keep playing",
     "result.title":"Level cleared!","result.done":"All {n} verbs collected.",
     "result.record":"new record!","result.best":"best","result.zetten":"moves",
     "btn.next":"Next level →","btn.again":"Retry","btn.menu":"Menu",
@@ -1167,7 +1161,7 @@ function speakVerb(V){
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
     try{
       window.speechSynthesis.cancel();      // 立刻打断上一组(旧链经令牌检查退出)
-      const seq=[V.inf,V.sg,V.pl,V.pp];
+      const seq=[V.inf,V.sg,V.pl,ppLabel(V)];   // is+perfectum:zijn 系读 "is + 分词"
       let i=0;
       const next=()=>{
         if(gen!==speechGen || i>=seq.length){ res(); return; }
@@ -1392,6 +1386,19 @@ function genericArt(vIdx,c){
 }
 /* ---- 道具库(场景组合用) ---- */
 const PROP={
+  /* 别名补齐(同步 link-match v1.11):SCENES 曾引用 sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/
+     dashedCircle/speedLines/pencilPaper 但 PROP 缺失,sceneSVG 抛错致图鉴崩溃(全词收集必触) */
+  sparkles:(c,x,y)=>sparkles(c,x,y),
+  gift:(c,x,y)=>gift(c,x,y),
+  heart:(c,x,y,s)=>heart(c,x,y,s||1),
+  ball:(c,x,y)=>ball(c,x,y),
+  apple:(c,x,y)=>apple(c,x,y),
+  pencilPaper:(c,x,y)=>pencilPaper(c,x,y),
+  dashedCircle:(c,x,y,r)=>dashedCircle(c,x,y,r||18),
+  speedLines:(c,x,y)=>speedLines(c,x,y),
+  arrowR:(c,x,y)=>arrow(c,x-14,y,x+14,y),
+  arrowL:(c,x,y)=>arrow(c,x+14,y,x-14,y),
+  arrowD:(c,x,y)=>arrow(c,x,y-14,x,y+14),
   glass:(c,x,y)=>`<path d="M${x-7} ${y-12} L${x-5} ${y+8} L${x+5} ${y+8} L${x+7} ${y-12} Z" fill="rgba(160,210,235,.55)" stroke="${c.ink}" stroke-width="2.2"/><path d="M${x-5.5} ${y-2} L${x+5.5} ${y-2}" stroke="${c.ink}" stroke-width="2" stroke-opacity=".45"/>`,
   chair:(c,x,y)=>`<rect x="${x-11}" y="${y-18}" width="21" height="4.5" rx="2.2" fill="${c.teal}"/><rect x="${x-10}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/><rect x="${x+7}" y="${y-15}" width="4" height="15" rx="2" fill="${c.teal}"/>`,
   rug:(c,x,y)=>`<ellipse cx="${x}" cy="${y+2}" rx="26" ry="6" fill="${c.sw?"rgba(255,201,77,.3)":"#ffd9a8"}" ${c.sw?`stroke="${c.ink}" stroke-width="2.5"`:""}/>`,
@@ -1448,7 +1455,7 @@ const PROP={
   stairs:(c,x,y)=>`<g fill="${c.sw?"rgba(255,201,77,.4)":c.acc}" ${c.sw?`stroke="${c.ink}" stroke-width="2"`:""}><rect x="${x-2}" y="${y-8}" width="14" height="8"/><rect x="${x+6}" y="${y-16}" width="14" height="8"/><rect x="${x+14}" y="${y-24}" width="14" height="8"/></g>`,
   wallBar:(c,x,y)=>`<rect x="${x+2}" y="${y-30}" width="10" height="30" rx="2" fill="${c.sw?"rgba(255,255,255,.3)":"#d8cfc0"}" stroke="${c.ink}" stroke-width="2.2"/><g stroke="${c.ink}" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55"><line x1="${x-14}" y1="${y-18}" x2="${x-4}" y2="${y-18}"/><line x1="${x-14}" y1="${y-12}" x2="${x-6}" y2="${y-12}"/></g>`,
   stinkApple:(c,x,y)=>apple(c,x,y)+`<path d="M${x+9} ${y-4} q4 -2 3 -6M${x+11} ${y+4} q4 -2 3 -6" fill="none" stroke="${c.ink}" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".55"/>`,
-  coinBehind:(c,x,y)=>coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
+  coinBehind:(c,x,y)=>PROP.coinS(c,x,y)+`<text x="${x-2}" y="${y-14}" text-anchor="middle" font-size="13" font-weight="800" fill="${c.ink}" font-family="inherit">?</text>`,
   arrowsMeet:(c,x,y)=>arrow(c,x-24,y+8,x-4,y)+arrow(c,x+24,y+8,x+4,y)+sparkles(c,x,y-6),
 };
 
@@ -1609,11 +1616,15 @@ function anyOverlayOpen(){
   return [...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
 }
 
-function wordOf(t){ return VERBS[t.v][["sg","pl","pp"][t.f]]; }
+function wordOf(t){ return t.f===2 ? ppLabel(VERBS[t.v]) : VERBS[t.v][["sg","pl","pp"][t.f]]; }
+
+/* is+perfectum(demo v1.16):zijn 系动词的完美时读/显示 "is + 分词",磁贴/横幅/卡片/图鉴/朗读同源 */
+const PP_ZIJN=new Set(["zijn","gaan","komen","beginnen","blijven","lopen","rijden","worden","vergeten"]);
+const ppLabel=V=>PP_ZIJN.has(V.inf)?"is "+V.pp:V.pp;
 
 const measureCanvas=document.createElement("canvas");
 function computeLevelFont(){
-  // 用 canvas 实测本关最长词的渲染宽度,统一字号保证任何词都完整显示;Grug 手写字体更宽,按主题选测量字体
+  // 用 canvas 实测最长「单词」定统一字号(双行 is+分词 按单词测宽,允许换行);Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
   const hand=(save.settings.theme||"grug")==="grug";
   ctx.font=`${hand?500:700} 100px ${hand?'"Chalkboard SE","Comic Sans MS",cursive':'-apple-system, "Segoe UI", system-ui, sans-serif'}`;
@@ -1622,9 +1633,14 @@ function computeLevelFont(){
   let maxW=1;
   for(const v of level.verbs){
     const V=VERBS[v];
-    for(const w of [V.sg,V.pl,V.pp]) maxW=Math.max(maxW, ctx.measureText(w).width);
+    for(const w of [V.sg,V.pl,ppLabel(V)]){
+      for(const part of w.split(" ")) maxW=Math.max(maxW, ctx.measureText(part).width);
+    }
   }
   levelFont=Math.max(9,Math.min(22, 100*usable/maxW));
+  // 双行 pp(is+分词):高度方向也须放得下(两行 × 行距)
+  const cellH=boardEl.clientHeight/ROWS;
+  levelFont=Math.min(levelFont, cellH*0.88/(2*1.05));
   if(hand) levelFont*=0.93;                  // 手写体 x 高大,再收一档防溢出(link-match v1.9#2)
 }
 function applyFontToAll(){
@@ -1936,6 +1952,13 @@ async function resolve(runs){
       const k=r*COLS+c;
       if(!cellSet.has(k)){ cellSet.add(k); cells.push([r,c]); }
     }
+    // 每个动词本次实际消掉的词型:词卡横幅按它高亮
+    const formsOf={};
+    for(const [r,c] of cells){
+      const t=board[r][c];
+      if(!t) continue;
+      (formsOf[t.v]=formsOf[t.v]||[]).push(["sg","pl","pp"][t.f]);
+    }
     blip(520+Math.min(cells.length,6)*40,.1,"triangle",.09);
     for(const [r,c] of cells){
       const t=board[r][c];
@@ -1963,7 +1986,7 @@ async function resolve(runs){
     for(const v of fresh){ await showCard(v); }
     // 所有模式:教学横幅(不阻挡操作);首次解锁的刚看过完整卡片,跳过
     for(const v of verbSet){
-      if(!fresh.includes(v)) showLearnBanner(v);
+      if(!fresh.includes(v)) showLearnBanner(v, formsOf[v]||["sg","pl","pp"]);
     }
     await sleep(340);
     boardEl.querySelectorAll(".burst").forEach(el=>el.remove());
@@ -1998,21 +2021,33 @@ function hideBanner(){
   document.getElementById("learnBanner").classList.remove("show");
   if(streak>0){ streak=0; updateHUD(); }   // 连击倒计时随卡片结束
 }
-function showLearnBanner(v){
+/* ---- 统一词卡(demo v1.15):横幅与图鉴详情卡共用;hi=要高亮的词型数组,原形带手绘弧线 ---- */
+function wordCardHTML(v,hi){
+  const V=VERBS[v];
+  const on=k=>Array.isArray(hi)&&hi.includes(k);
+  const forms=[["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppLabel(V)]]
+    .map(([k,w])=>`<span class="bf${on(k)?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
+  return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(v,save.style)}</svg><div class="wc-main"><div class="wc-forms" style="--h:${V.hue}">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
+}
+function showLearnBanner(v,hi){
   const b=document.getElementById("learnBanner");
   clearTimeout(bannerTimer);
   const same=(bannerVerb===v && b.classList.contains("show"));
   bannerVerb=v;
   if(!same){
-    const V=VERBS[v];
-    document.getElementById("bannerArt").innerHTML=artSVG(v,save.style);
-    document.getElementById("bannerInf").textContent=V.inf;
-    document.getElementById("bannerForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
-    document.getElementById("bannerGloss").textContent=glossOf(V);
-    b.classList.remove("show");
+    b.innerHTML=wordCardHTML(v,hi)+`<div class="b-progress"><i></i></div>`;
     void b.offsetWidth;                    // 强制重流,不依赖 rAF(后台标签页也能触发)
     b.classList.add("show");
-    speakVerb(V);                          // 依次朗读 原形 → 单数 → 复数 → 分词
+    // 词卡字号自适应:四形态换行超过槽高就逐级缩小(demo 同款)
+    const formsEl=b.querySelector(".wc-forms");
+    if(formsEl){
+      let fs=17;
+      formsEl.style.fontSize=fs+"px";
+      const availH=b.clientHeight-18;
+      let guard=0;
+      while(guard++<12 && formsEl.scrollHeight>availH && fs>11){ fs-=1; formsEl.style.fontSize=fs+"px"; }
+    }
+    speakVerb(VERBS[v]);                   // 依次朗读 原形 → 单数 → 复数 → (is+)分词
   }
   bannerTimer=setTimeout(hideBanner,BANNER_MS); // 同动词重复消除只重置连击倒计时
 }
@@ -2099,16 +2134,10 @@ let cardResolve=null;
 function showCard(v){
   return new Promise(res=>{
     cardResolve=res;
-    const V=VERBS[v];
-    document.getElementById("cardArt").innerHTML=artSVG(v,save.style);
-    document.getElementById("cardInf").textContent=V.inf;
-    document.getElementById("cardForms").textContent=`${V.sg} · ${V.pl} · ${V.pp}`;
-    document.getElementById("cardGloss").textContent=glossOf(V);
-    document.getElementById("cardModal").classList.remove("gloss-open");
-    document.getElementById("cardTip").textContent=t("card.tip");
+    document.getElementById("cardBody").innerHTML=wordCardHTML(v,null);   // 统一词卡:释义常显(demo v1.12 拆两段式)
     document.getElementById("cardModal").classList.add("on");
     blip(660,.12,"sine",.1); setTimeout(()=>blip(880,.14,"sine",.1),90);
-    speakVerb(V);
+    speakVerb(VERBS[v]);
   });
 }
 function closeCard(){
@@ -2411,7 +2440,7 @@ function openBook(){
         row.className="book-row"+(got?" viewable":"");
         row.innerHTML=got
           ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(i,save.style)}</svg>
-            <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp}</small></div>
+            <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${ppLabel(V)}</small></div>
             <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
           :`<div class="book-art empty">?</div>
             <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
@@ -2453,11 +2482,7 @@ document.getElementById("setHintWait").oninput=e=>{
   document.getElementById("hintWaitVal").textContent=save.settings.hintWait>0?`${save.settings.hintWait} s`:t("opt.off");
 };
 document.getElementById("cardClose").onclick=e=>{e.stopPropagation(); closeCard();};
-document.getElementById("cardPanel").onclick=()=>{
-  const m=document.getElementById("cardModal");
-  if(!m.classList.contains("gloss-open")){ m.classList.add("gloss-open"); document.getElementById("cardTip").textContent=t("card.tip2"); }
-  else closeCard();
-};
+document.getElementById("cardPanel").onclick=closeCard;   // 释义常显:点卡即关(demo v1.12)
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("on"));
 ["bookDrawer","helpModal","settingsModal","profileModal"].forEach(id=>{
   document.getElementById(id).addEventListener("click",e=>{ if(e.target.id===id) e.target.classList.remove("on"); });

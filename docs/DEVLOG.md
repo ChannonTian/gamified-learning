@@ -1,5 +1,12 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-11-09 · tile-match v0.96 统一词卡 + is+perfectum(用户拍板:把这两项也做进三消)
+
+- **统一词卡组件**(demo v1.15 同款):新增 `wordCardHTML(v,hi)`——插画+四形态(原形带手绘弧线 swu,当前词型高亮)+右侧释义列;**横幅与图鉴详情卡共用**(横幅即图鉴卡,不再两套),横幅按本次消除的实际词型高亮(resolve 构建 formsOf),四形态换行超槽高逐级缩字号;swu 三主题退化:grug 手绘弧线/暗色浅墨/papier 橙色条。**顺拆两段式点击**(demo v1.12 同款):图鉴卡释义常显、点卡即关,cardTip/gloss-open/card.tip i18n 键全清。
+- **is+perfectum**(demo v1.16 同款):`PP_ZIJN`(zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten,三消现有前 8 个)+ `ppLabel`="is + 分词";**磁贴/横幅词卡/图鉴卡/朗读/图鉴列表同源**;computeLevelFont 改按最长「单词」测宽(双行 is 允许换行)+ 双行高度上限(实测字号 17.9px 不缩,face 全部放得下);朗读序列实测 `lopen→liep→liepen→is gelopen`,非 is 动词不带。
+- **顺修存量潜伏 bug(全词收集必触)**:图鉴渲染 `coinBehind` 场景裸调 `coinS` 抛 ReferenceError——link-match v1.11 修过但三消冻结没跟上;本次补齐 PROP 别名 11 个(sparkles/gift/arrowR/arrowL/arrowD/heart/ball/apple/dashedCircle/speedLines/pencilPaper;helper 函数三消本就有,只缺 PROP 别名)+ coinBehind 改 PROP.coinS。node 扫描:SCENES 缺道具清零、裸调用仅剩别名体(有意调全局)。
+- QA:磁贴双行 is 分词完整显示(face 无溢出)、横幅词卡(四形态/高亮/弧线/进度条/滤镜)、图鉴卡渲染+点关、图鉴 85 行全渲染、bot 5 步零错误、三主题 swu 断言全过;存档备份/恢复。
+
 ## 2026-11-07 · 多语言扩展(link-match → 法/西/葡/德四变体)
 
 - **架构:一个引擎 + 语言数据**。`link-match/index.html` 引擎参数化:新增 `LANG_META`(语言代码/UI 名/TTS/存档键/冠词复数字段表 ln·mv/人称前缀 pron)、`NOUN_SHAPE`+`shapeKey`(词型键→形状类,变体字段名无需新 CSS)、语音/菜单/设置/默认 UI 语/存档键全部走 LANG_META;三处 `==LANG:DATA/KEYS/I18N==` 标记区圈定语言内容。`tools/gen-variants.py` 读母本+`langs/<code>.json` 整区替换生成 `link-match-{fr,es,pt,de}/index.html`(**产物仍是单文件零依赖**;生成器对动词/名词/键/形状做一致性校验)。
