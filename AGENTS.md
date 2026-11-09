@@ -61,6 +61,12 @@ gamified-learning/
 - 按钮、触控目标要大;底部不贴屏幕边缘(iOS 误触)。
 - 难度宁易勿难:开局保底 ≥2 解、无步数限制(计分制)、闲置自动提示。
 
+## 待办任务:主版 is/heeft + perfectum(2026-11-09 用户拍板,规格已定,待执行)
+
+- **决定**:主版 148 词**全部**标注完成时助动词并逐词核验——zijn 类显示/朗读 **"is + 分词"**,hebben 类 **"heeft + 分词"**(第三人称单数引用式,用户已确认不是 heb)。两可词(lopen/rijden/beginnen 类)按教材主流(参考 Taalhuis NIG 词表:is 标注的 9 词=zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten;其余按 ANS/Onze Taal 规则:位移/状态变化→zijn),不确定的 WebSearch 核验。
+- **实现**:VERBS 加 `aux:"is"/"heeft"` 字段;所有 pp 展示点(分词磁贴/横幅词卡第四形态/图鉴卡/朗读序列/syncSize 测宽按最长组合词)统一带助动词,磁贴可两行(is 在上,demo v1.16 PP_ZIJN+ppLabel 是参考实现——在 link-match-demo/index.html);PS 人称组/LN·MV 名词组不受影响;存档零改动。
+- **QA**:bot 全关清盘、pp 磁贴文本断言(is/heeft 前缀)、朗读序列断言、截图;提交开 PR(注意先 git fetch,主版可能被并行会话推进)。
+
 ## 当前状态(2026-11-07)
 
 - **多语言变体(2026-11-07,法/西/葡/德;PR 待并)**:`link-match` 引擎参数化(LANG_META:代码/UI 名/TTS/存档键/冠词复数字段表 ln·mv/人称前缀 pron;NOUN_SHAPE+shapeKey 字段→形状映射;`==LANG:DATA/KEYS/I18N==` 标记区圈定语言内容),`tools/gen-variants.py` 从 `langs/{fr,es,pt,de}.json` 生成四个**单文件零依赖**变体 `link-match-{fr,es,pt,de}/`。每语 60 动词(法 imparfait/西葡 pretérito/德 Präteritum 单复数+分词,A1 加现三人称)+7 代词+63–72 名词;五组结构与荷兰语一致(LN 每组词两关:短语↔裸冠词 → 名词↔裸冠词;两关都朗读全短语)。变体 UI 默认目标语言,zh/en 可切。**引擎修复改 link-match 母本 → 重跑 `python3 tools/gen-variants.py fr es pt de`,变体勿手改**;`node tools/variant-smoke.mjs link-match-<code>` 校验。词源=各语标准参考变位表;葡语 pt-PT、西语含 vosotros。落地页加四语入口。QA:四语语法+冒烟+浏览器全量扫盘(fr 50/es 50/pt 51/de 53 关)零错误,荷兰语母本回归全绿。
