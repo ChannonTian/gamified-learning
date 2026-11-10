@@ -5,13 +5,64 @@ import {test} from 'node:test';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const data=html.match(/<script>([\s\S]*?)<\/script>/)[1].split('/* ================= i18n')[0];
 const migration=html.slice(html.indexOf('const SAVE_KEY='),html.indexOf('function persist()'));
-const wordslice=html.slice(html.indexOf('const wordSrc='),html.indexOf('/* ---- 尺寸'));   // wordSrc/NOUN_FIELD/P_PRONOUN/ppFull/wordOf
+const wordslice=html.slice(html.indexOf('const wordSrc='),html.indexOf('/* ---- 尺寸'));   // wordSrc/NOUN_FIELD/P_PRONOUN/ppFull/wordOf/twinFor
 const cardslice=html.slice(html.indexOf('function wordCardHTML'),html.indexOf('function nounCardHTML'));
 function load(seed){
   const ctx=vm.createContext({window:{addEventListener(){}},localStorage:{getItem:()=>JSON.stringify(seed)}});
   vm.runInContext(data+'\n'+migration+'\nthis.result={save,LINK_LEVELS,VERBS,NOUNS,TIERS};',ctx);
   return JSON.parse(JSON.stringify(ctx.result));
 }
+test('corrupted saves load without crashing and keep all valid progress (2026-11-10 audit)',()=>{
+  const bad=load({lvOrder:'v6',done:null,best:7,counts:'x',dailyBest:null,settings:{volume:'80',hintWait:'18',bannerMs:null,dark:1}}).save;
+  assert.deepEqual(bad.done,{});
+  assert.deepEqual(bad.best,{});
+  assert.deepEqual(bad.counts,{});
+  assert.deepEqual(bad.dailyBest,{});
+  assert.equal(bad.settings.volume,80);          // 数字字符串收编
+  assert.equal(bad.settings.hintWait,18);
+  assert.equal(bad.settings.bannerMs,15);        // 非法值回默认
+  assert.equal(bad.lvOrder,'v6');
+  // 合法进度不被防御逻辑误伤
+  const good=load({lvOrder:'v6',done:{L0:true,L24:true},best:{L24:500,Survival:900},counts:{eten:3},dailyBest:{'2026-11-10':120},settings:{volume:30,hintWait:22}}).save;
+  assert.deepEqual(good.done,{L0:true,L24:true});
+  assert.deepEqual(good.best,{L24:500,Survival:900});
+  assert.deepEqual(good.counts,{eten:3});
+  assert.deepEqual(good.dailyBest,{'2026-11-10':120});
+  assert.equal(good.settings.volume,30);
+  assert.equal(good.settings.hintWait,22);
+});
+test('verb forms pinned to authoritative sources (nl.wiktionary/Groene Boekje, 2026-11-10 audit)',()=>{
+  const {VERBS}=load(null);
+  const byInf=Object.fromEntries(VERBS.map(v=>[v.inf,v]));
+  // 曾在线上的四处错误:zweg/zwam·zwammen/stolen/gemoet(Wiktionary 词干三形 + Groene Boekje 唯一收 gemoeten)
+  assert.equal(byInf.zwijgen.sg,'zweeg');
+  assert.equal(byInf.zwemmen.sg,'zwom');
+  assert.equal(byInf.zwemmen.pl,'zwommen');
+  assert.equal(byInf.stelen.pl,'stalen');
+  assert.equal(byInf.moeten.pp,'gemoeten');
+});
+test('twinFor: same-text tiles of different words pair up (LN articles, pronoun reflexives)',()=>{
+  const ctx=vm.createContext({window:{addEventListener(){}},save:{style:'A'},artSVG:()=>'',glossOf:v=>v.en,localStorage:{getItem:()=>'null'}});
+  vm.runInContext(data+'\n'+wordslice+'\nthis.result={twinFor,wordOf,VERBS,NOUNS};',ctx);
+  const {twinFor,wordOf,VERBS,NOUNS}=ctx.result;
+  const pair=(got,x,y)=>{ assert.ok(got); assert.equal(got[0],x); assert.equal(got[1],y); };   // vm 跨 realm 数组不能 deepEqual,按元素引用比
+  // LN 冠词关:man↔de 与 vrouw↔de 的两块 "de" 同形——点 man + vrouw 的 de 应命中 man 的本命 de
+  const T=(v,k,f)=>({v,k,f,src:'n',alive:true});
+  const ln=[T(0,'inf','de'),T(0,'form','de'),T(1,'inf','de'),T(1,'form','de'),T(2,'inf','ht'),T(2,'form','ht')];
+  pair(twinFor(ln[0],ln[3],ln),ln[3],ln[1]);   // man + vrouw 的 de → 换 form 身份
+  assert.equal(twinFor(ln[0],ln[5],ln),null);                // man + het(不同形)无替身
+  pair(twinFor(ln[2],ln[1],ln),ln[1],ln[3]);   // vrouw + man 的 de → 同样换 form 身份(本命 de 在场时优先换形式块)
+  assert.equal(twinFor(ln[0],ln[2],ln),null);                // inf+inf 不构成对
+  // 代词组:hij/zij(she)/zij(they) 的反身都是 zichzelf/zich——同形块可互换
+  const idx=n=>VERBS.findIndex(v=>v.pron&&v.inf===n);
+  const hij=idx('hij'), zijS=idx('zij'), zijT=VERBS.map((v,i)=>v.pron&&v.inf==='zij'?i:-1).filter(i=>i>=0).find(i=>i!==zijS);
+  const P=(v,k,f)=>({v,k,f,alive:true});
+  const pr=[P(hij,'inf','pp'),P(hij,'form','pp'),P(zijS,'inf','pp'),P(zijS,'form','pp'),P(zijT,'inf','pp'),P(zijT,'form','pp')];
+  assert.equal(wordOf(pr[3]),'zichzelf');
+  pair(twinFor(pr[0],pr[3],pr),pr[3],pr[1]);   // hij + zij 的 zichzelf → 换 form 身份
+  pair(twinFor(pr[2],pr[5],pr),pr[2],pr[4]);   // zij(she) + zij(they) 的 zich → 换 inf 身份(原形同形 zij)
+  assert.equal(twinFor(pr[0],pr[5],pr),null);                // hij + zich(不同词且不同形)无替身
+});
 test('current save survives repeated reloads with every group and mode score intact',()=>{
   const seed={lvOrder:'v6',done:{L0:true,L3:true,L12:true,L20:true,L24:true},best:{L0:100,L12:250,L24:500,Survival:900},counts:{eten:3},dailyBest:{'2026-11-10':123},dailyDone:'2026-11-10'};
   let current=seed;
