@@ -61,11 +61,9 @@ gamified-learning/
 - 按钮、触控目标要大;底部不贴屏幕边缘(iOS 误触)。
 - 难度宁易勿难:开局保底 ≥2 解、无步数限制(计分制)、闲置自动提示。
 
-## 待办任务:主版 ben/heb + perfectum(2026-11-09 用户拍板:第一人称;规格已定,待执行)
+## 当前状态(2026-11-10)
 
-- **决定**:主版 148 词**全部**标注完成时助动词并逐词核验——zijn 类显示/朗读 **"ben + 分词"**,hebben 类 **"heb + 分词"**(**第一人称 ik 式**,用户定稿;替代词典引用式 is/heeft)。类别标注按 ANS/Onze Taal 规则:位移/状态变化→zijn;demo 参考词表标注 is 的 9 词(zijn/gaan/komen/beginnen/blijven/lopen/rijden/worden/vergeten)全部属 zijn 类,不受人称影响;两可词按教材主流,不确定的 WebSearch 核验。**demo 的 9 词同步从 "is + …" 改为 "ben + …"**(两个游戏格式一致)。
-- **实现**:VERBS 加 `aux:"ben"/"heb"` 字段;所有 pp 展示点(分词磁贴/横幅词卡第四形态/图鉴卡/朗读序列/syncSize 测宽按最长组合词)统一带助动词,磁贴可两行(ben 在上;demo v1.16 PP_ZIJN+ppLabel 是参考实现——在 link-match-demo/index.html);PS 人称组/LN·MV 名词组不受影响;存档零改动。
-- **QA**:bot 全关清盘、pp 磁贴文本断言(ben/heb 前缀)、朗读序列断言、截图;提交开 PR(先 git fetch,主版可能被并行会话推进)。
+- **link-match v1.25(2026-11-10,ben/heb + perfectum 第一人称;PR 待并)**:141 个动词词条全标 `aux:"ben"/"heb"`(37 zijn 类/104 hebben 类;两可词按教材主流+查证:移动动词→ben,gelden/klinken/bestaan/vriezen 天气义/定位动词 zitten·liggen·staan·hangen→heb,genezen 复原义 ben)。pp 全展示点带助动词——分词磁贴(自然换行两行、ben 在上)/横幅词卡第四形态/图鉴列表与详情卡/连对与开卡朗读("zijn, ben geweest"),同源 `ppFull()`;`syncSize` 多词按最长单词测宽+双行高度约束。代词组(pp=反身代词)与名词条目无 aux 字段,不受影响;变体语言引擎透明。demo 9 词同步 "is + …"→"ben + …"。**顺修 v1.23 线上 bug**:LN 裸冠词磁贴 het 词显示内部键 "ht"→改存储短语首词(de/het;变体字段名即冠词不变)。顺修 staan/lopen 例句与标签一致。**存档零改动**(lvOrder 仍 v6)。测试:content-save.test.mjs 修 v1.24 后过期 5 断言+新增 aux/LN 断言(6/6);QA 浏览器同步驱动 78 关全清零错误+A1.7 朗读序列 9/9+无尽 pp 盘+图鉴+三图。**坑**:IAB 后台页定时器强节流,异步 bot 会停摆——扫盘用纯同步驱动(`startLink(i)`+`NLM3.findPair/connect`+死局同步 `reshuffleRemaining()`,顶层函数声明在页面全局可直接调);QA 种子档必须带 `lvOrder:"v6"`,否则被当远古档走全链迁移。详见 DEVLOG。
 
 ## 当前状态(2026-11-07)
 
