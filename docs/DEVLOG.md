@@ -1,5 +1,14 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-11-10 · tile-match v0.97 ben 对齐 + link-match 德语 bin/habe + 变体引擎同步(用户:"也改。德语应该也有这个问题吧?")
+
+- **tile-match v0.97**:`ppLabel` "is + 分词"→"**ben + 分词**"(PP_ZIJN 9 词词表不动;磁贴/横幅/图鉴/朗读同源,注释同步)。QA:浏览器 A1.1 棋盘 4 个 zijn 系分词磁贴全 "ben geweest/ben gegaan"、零 "is " 残留;真实消除(eten 族)朗读序列 [eten, at, aten, gegeten] 正确(hebben 类裸分词=三消/连连看 demo 一贯格式);生产函数断言 8 个 zijn 类词全 ben 前缀;横幅词卡第四形态 "ben geweest" 高亮;手机截图双行渲染正常。
+- **德语变体加完成时助动词(用户点名)**:`langs/de.json` 60 词全标 `aux`——**14 sein(bin)/46 haben(habe)**:sein 类=sein/werden/gehen/kommen/fahren/bleiben/laufen/rennen/sterben/fallen/gleiten/gelingen/sinken/erschrecken(强变化受惊义,词条释义即此义);**与荷兰语分类不同的关键词**:beginnen/vergessen 德语用 haben(Duden 标准,"hat begonnen/vergessen"),schlafen/sitzen/stehen/liegen 用 haben(南部德奥瑞才用 sein,[Grammis IDS](https://grammis.ids-mannheim.de/fragen/87));两可词 reißen/brechen 取及物义 habe,schwingen habe([Duden](https://www.duden.de/konjugation/schwingen)),gelingen sein(非人称注意:"ich bin gelungen" 少用,标签作助动词类别记号)。QA:53 关同步扫盘,**独立预言机**(按显示规则从原始数据重算磁贴/朗读对/词卡,不经引擎函数)逐关比对全过,471 对朗读序列零偏差;截图 A1.7 分词关(bin gewesen/habe geschlafen 双行+词卡 "habe getragen" 高亮)。
+- **顺修两个变体线上 bug(重新生成四变体时发现)**:①**横幅词卡人称分支硬编码荷兰语** "ik/hij/wij"——德/法/西/葡变体 PS 关连对后词卡显示错语言(v1.22b 引入,多语言上线即带);改 `withPron(f,w)` 与磁贴同源。②**法语省音缺失**:P_PRONOUN 直接拼接,avoir 磁贴显示 "je ai"(应为 "j'ai")、aimer "je aime";LANG_META 增可选 `elide`(法语 ["je"]),元音开头形式前省音(h aspiré 形式出现时生成器拦截,当前词表无此形)。QA:法语 50 关扫盘 444 对全对,截图 PS.1 "je vais/je suis" 磁贴+词卡 "avoir **j'ai** il a nous avons";西 50/葡 51 扫盘零偏差;荷兰语 78 关 696 对同一预言机回归零偏差。
+- **引擎/工具**:母本 `withPron` 单一来源(磁贴/词卡),荷兰语输出不变;`gen-variants.py` 透传 `aux`/`elide` + 校验(aux 全标或全不标;elide+h 开头形式拦截);`variant-smoke.mjs` 扩为**带引擎段**的显示断言(aux 磁贴/词卡、人称同源、省音生效、代词无 aux)——对旧版变体文件直接失败(可测出版本漂移)。四变体重新生成(de +60 aux,其余引擎同步 ~25 行)。
+- 法语也有同样的助动词区分(être/avoir,11 个être 类动词)但涉及分词性配合(allé/allée)与省音显示格式,**未动,待拍板**;西语(haber)/葡语(ter)无助动词之分,不适用。
+- 存档零改动;QA 存档备份→恢复字节一致;服务器已停、标签页已关。
+
 ## 2026-11-10 · link-match v1.25 ben/heb + perfectum(第一人称完成时,用户拍板)
 
 - **全词标注助动词**:141 个动词词条(148 减 7 代词)加 `aux:"ben"/"heb"`——37 个 zijn 类(位移/状态变化/生命阶段:demo 参考词表 8 词 zijn/gaan/komen/beginnen/blijven/lopen/rijden/vergeten + vallen/sterven/smelten/zwellen/krimpen/schrikken/treden/bederven/wijken/verlopen/rijzen/bezwijken/blijken/ontgaan/vervliegen/genezen 等)+ 104 个 hebben 类。**两可词逐词查证**:移动动词 zwemmen/springen/duiken/klimmen/kruipen/glijden/vliegen/varen→ben(教材 zijn 表主流);gelden/klinken/bestaan/vriezen(天气义)→heb([Taaladvies](https://taaladvies.net)、[inburgeringprep](https://inburgeringprep.com/vervoegen/klinken)、[Vlaanderen Team Taaladvies](https://www.vlaanderen.be/team-taaladvies/taaladviezen/voltooide-deelwoorden-met-hebben-of-zijn));genezen 取复原义(状态变化)ben;定位动词 zitten/liggen/staan/hangen→heb(北荷兰标准,ANS 两可)。**顺修 2 处例句与标签打架**:staan 例句 "is … gestaan"→"heeft"(标签 heb);lopen 例句改方向义 "daarna ben ik naar huis gelopen"(原例句活动义 heb,与 ben 标签不一致)。

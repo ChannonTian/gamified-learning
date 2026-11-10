@@ -19,7 +19,8 @@
    "p1": "je",
    "p3": "il",
    "p6": "nous"
-  }
+  },
+   "elide": ["je"]
  },
  "keys": {
   "legend": {

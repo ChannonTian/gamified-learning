@@ -677,66 +677,66 @@ window.__errs=[]; window.addEventListener("error",e=>{(window.__errs=window.__er
 /* ================= 数据(语言内容区;变体游戏由 tools/gen-variants.py 替换 ==LANG:== 区生成) ================= */
 const LANG_META={ code:"de", ui:"Deutsch", tts:"de-DE", save:"linkmatchde.v1", ln:["der", "die", "das"], mv:["e", "er", "en"], pron:{"p1": "ich", "p3": "er", "p6": "wir"} };
 const VERBS=[
-  {inf:"sein", sg:"war", pl:"waren", pp:"gewesen", p1:"bin", p3:"ist", p6:"sind", en:"to be", zh:"是"},
-  {inf:"haben", sg:"hatte", pl:"hatten", pp:"gehabt", p1:"habe", p3:"hat", p6:"haben", en:"to have", zh:"有"},
-  {inf:"werden", sg:"wurde", pl:"wurden", pp:"geworden", p1:"werde", p3:"wird", p6:"werden", en:"to become", zh:"变得"},
-  {inf:"gehen", sg:"ging", pl:"gingen", pp:"gegangen", p1:"gehe", p3:"geht", p6:"gehen", en:"to go", zh:"走"},
-  {inf:"kommen", sg:"kam", pl:"kamen", pp:"gekommen", p1:"komme", p3:"kommt", p6:"kommen", en:"to come", zh:"来"},
-  {inf:"sehen", sg:"sah", pl:"sahen", pp:"gesehen", p1:"sehe", p3:"sieht", p6:"sehen", en:"to see", zh:"看见"},
-  {inf:"geben", sg:"gab", pl:"gaben", pp:"gegeben", p1:"gebe", p3:"gibt", p6:"geben", en:"to give", zh:"给"},
-  {inf:"nehmen", sg:"nahm", pl:"nahmen", pp:"genommen", p1:"nehme", p3:"nimmt", p6:"nehmen", en:"to take", zh:"拿"},
-  {inf:"essen", sg:"aß", pl:"aßen", pp:"gegessen", p1:"esse", p3:"isst", p6:"essen", en:"to eat", zh:"吃"},
-  {inf:"trinken", sg:"trank", pl:"tranken", pp:"getrunken", p1:"trinke", p3:"trinkt", p6:"trinken", en:"to drink", zh:"喝"},
-  {inf:"sprechen", sg:"sprach", pl:"sprachen", pp:"gesprochen", p1:"spreche", p3:"spricht", p6:"sprechen", en:"to speak", zh:"说话"},
-  {inf:"lesen", sg:"las", pl:"lasen", pp:"gelesen", p1:"lese", p3:"liest", p6:"lesen", en:"to read", zh:"读"},
-  {inf:"fahren", sg:"fuhr", pl:"fuhren", pp:"gefahren", p1:"fahre", p3:"fährt", p6:"fahren", en:"to drive", zh:"行驶"},
-  {inf:"bleiben", sg:"blieb", pl:"blieben", pp:"geblieben", p1:"bleibe", p3:"bleibt", p6:"bleiben", en:"to stay", zh:"逗留"},
-  {inf:"laufen", sg:"lief", pl:"liefen", pp:"gelaufen", p1:"laufe", p3:"läuft", p6:"laufen", en:"to run", zh:"跑"},
-  {inf:"schlafen", sg:"schlief", pl:"schliefen", pp:"geschlafen", p1:"schlafe", p3:"schläft", p6:"schlafen", en:"to sleep", zh:"睡觉"},
-  {inf:"tragen", sg:"trug", pl:"trugen", pp:"getragen", p1:"trage", p3:"trägt", p6:"tragen", en:"to carry", zh:"穿/背"},
-  {inf:"treffen", sg:"traf", pl:"trafen", pp:"getroffen", p1:"treffe", p3:"trifft", p6:"treffen", en:"to meet", zh:"遇见"},
-  {inf:"waschen", sg:"wusch", pl:"wuschen", pp:"gewaschen", p1:"wasche", p3:"wäscht", p6:"waschen", en:"to wash", zh:"洗"},
-  {inf:"helfen", sg:"half", pl:"halfen", pp:"geholfen", p1:"helfe", p3:"hilft", p6:"helfen", en:"to help", zh:"帮助"},
-  {inf:"machen", sg:"machte", pl:"machten", pp:"gemacht", en:"to make", zh:"做"},
-  {inf:"sagen", sg:"sagte", pl:"sagten", pp:"gesagt", en:"to say", zh:"说"},
-  {inf:"finden", sg:"fand", pl:"fanden", pp:"gefunden", en:"to find", zh:"找到"},
-  {inf:"denken", sg:"dachte", pl:"dachten", pp:"gedacht", en:"to think", zh:"想"},
-  {inf:"wissen", sg:"wusste", pl:"wussten", pp:"gewusst", en:"to know", zh:"知道"},
-  {inf:"kennen", sg:"kannte", pl:"kannten", pp:"gekannt", en:"to know (a person)", zh:"认识"},
-  {inf:"bringen", sg:"brachte", pl:"brachten", pp:"gebracht", en:"to bring", zh:"带来"},
-  {inf:"schreiben", sg:"schrieb", pl:"schrieben", pp:"geschrieben", en:"to write", zh:"写"},
-  {inf:"sitzen", sg:"saß", pl:"saßen", pp:"gesessen", en:"to sit", zh:"坐"},
-  {inf:"stehen", sg:"stand", pl:"standen", pp:"gestanden", en:"to stand", zh:"站"},
-  {inf:"liegen", sg:"lag", pl:"lagen", pp:"gelegen", en:"to lie", zh:"躺/位于"},
-  {inf:"brennen", sg:"brannte", pl:"brannten", pp:"gebrannt", en:"to burn", zh:"燃烧"},
-  {inf:"nennen", sg:"nannte", pl:"nannten", pp:"genannt", en:"to name", zh:"称为"},
-  {inf:"rennen", sg:"rannte", pl:"rannten", pp:"gerannt", en:"to race", zh:"奔跑"},
-  {inf:"vergessen", sg:"vergaß", pl:"vergaßen", pp:"vergessen", en:"to forget", zh:"忘记"},
-  {inf:"verlieren", sg:"verlor", pl:"verloren", pp:"verloren", en:"to lose", zh:"丢失"},
-  {inf:"entscheiden", sg:"entschied", pl:"entschieden", pp:"entschieden", en:"to decide", zh:"决定"},
-  {inf:"schneiden", sg:"schnitt", pl:"schnitten", pp:"geschnitten", en:"to cut", zh:"剪"},
-  {inf:"leiden", sg:"litt", pl:"litten", pp:"gelitten", en:"to suffer", zh:"受苦"},
-  {inf:"laden", sg:"lud", pl:"luden", pp:"geladen", en:"to load", zh:"装载"},
-  {inf:"sterben", sg:"starb", pl:"starben", pp:"gestorben", en:"to die", zh:"死亡"},
-  {inf:"werfen", sg:"warf", pl:"warfen", pp:"geworfen", en:"to throw", zh:"扔"},
-  {inf:"beginnen", sg:"begann", pl:"begannen", pp:"begonnen", en:"to begin", zh:"开始"},
-  {inf:"greifen", sg:"griff", pl:"griffen", pp:"gegriffen", en:"to grip", zh:"抓住"},
-  {inf:"reißen", sg:"riss", pl:"rissen", pp:"gerissen", en:"to tear", zh:"撕"},
-  {inf:"gleiten", sg:"glitt", pl:"glitten", pp:"geglitten", en:"to glide", zh:"滑行"},
-  {inf:"streiten", sg:"stritt", pl:"stritten", pp:"gestritten", en:"to quarrel", zh:"争吵"},
-  {inf:"fallen", sg:"fiel", pl:"fielen", pp:"gefallen", en:"to fall", zh:"落下"},
-  {inf:"gelingen", sg:"gelang", pl:"gelangen", pp:"gelungen", en:"to succeed", zh:"成功"},
-  {inf:"klingen", sg:"klang", pl:"klangen", pp:"geklungen", en:"to sound", zh:"听起来"},
-  {inf:"schwingen", sg:"schwang", pl:"schwangen", pp:"geschwungen", en:"to swing", zh:"摆动"},
-  {inf:"singen", sg:"sang", pl:"sangen", pp:"gesungen", en:"to sing", zh:"唱歌"},
-  {inf:"sinken", sg:"sank", pl:"sanken", pp:"gesunken", en:"to sink", zh:"下沉"},
-  {inf:"gewinnen", sg:"gewann", pl:"gewannen", pp:"gewonnen", en:"to win", zh:"赢"},
-  {inf:"erfinden", sg:"erfand", pl:"erfanden", pp:"erfunden", en:"to invent", zh:"发明"},
-  {inf:"erschrecken", sg:"erschrak", pl:"erschraken", pp:"erschrocken", en:"to be frightened", zh:"受惊"},
-  {inf:"schwören", sg:"schwor", pl:"schworen", pp:"geschworen", en:"to swear", zh:"发誓"},
-  {inf:"stehlen", sg:"stahl", pl:"stahlen", pp:"gestohlen", en:"to steal", zh:"偷"},
-  {inf:"brechen", sg:"brach", pl:"brachen", pp:"gebrochen", en:"to break", zh:"打破"},
-  {inf:"graben", sg:"grub", pl:"gruben", pp:"gegraben", en:"to dig", zh:"挖"},
+  {inf:"sein", sg:"war", pl:"waren", pp:"gewesen", aux:"bin", p1:"bin", p3:"ist", p6:"sind", en:"to be", zh:"是"},
+  {inf:"haben", sg:"hatte", pl:"hatten", pp:"gehabt", aux:"habe", p1:"habe", p3:"hat", p6:"haben", en:"to have", zh:"有"},
+  {inf:"werden", sg:"wurde", pl:"wurden", pp:"geworden", aux:"bin", p1:"werde", p3:"wird", p6:"werden", en:"to become", zh:"变得"},
+  {inf:"gehen", sg:"ging", pl:"gingen", pp:"gegangen", aux:"bin", p1:"gehe", p3:"geht", p6:"gehen", en:"to go", zh:"走"},
+  {inf:"kommen", sg:"kam", pl:"kamen", pp:"gekommen", aux:"bin", p1:"komme", p3:"kommt", p6:"kommen", en:"to come", zh:"来"},
+  {inf:"sehen", sg:"sah", pl:"sahen", pp:"gesehen", aux:"habe", p1:"sehe", p3:"sieht", p6:"sehen", en:"to see", zh:"看见"},
+  {inf:"geben", sg:"gab", pl:"gaben", pp:"gegeben", aux:"habe", p1:"gebe", p3:"gibt", p6:"geben", en:"to give", zh:"给"},
+  {inf:"nehmen", sg:"nahm", pl:"nahmen", pp:"genommen", aux:"habe", p1:"nehme", p3:"nimmt", p6:"nehmen", en:"to take", zh:"拿"},
+  {inf:"essen", sg:"aß", pl:"aßen", pp:"gegessen", aux:"habe", p1:"esse", p3:"isst", p6:"essen", en:"to eat", zh:"吃"},
+  {inf:"trinken", sg:"trank", pl:"tranken", pp:"getrunken", aux:"habe", p1:"trinke", p3:"trinkt", p6:"trinken", en:"to drink", zh:"喝"},
+  {inf:"sprechen", sg:"sprach", pl:"sprachen", pp:"gesprochen", aux:"habe", p1:"spreche", p3:"spricht", p6:"sprechen", en:"to speak", zh:"说话"},
+  {inf:"lesen", sg:"las", pl:"lasen", pp:"gelesen", aux:"habe", p1:"lese", p3:"liest", p6:"lesen", en:"to read", zh:"读"},
+  {inf:"fahren", sg:"fuhr", pl:"fuhren", pp:"gefahren", aux:"bin", p1:"fahre", p3:"fährt", p6:"fahren", en:"to drive", zh:"行驶"},
+  {inf:"bleiben", sg:"blieb", pl:"blieben", pp:"geblieben", aux:"bin", p1:"bleibe", p3:"bleibt", p6:"bleiben", en:"to stay", zh:"逗留"},
+  {inf:"laufen", sg:"lief", pl:"liefen", pp:"gelaufen", aux:"bin", p1:"laufe", p3:"läuft", p6:"laufen", en:"to run", zh:"跑"},
+  {inf:"schlafen", sg:"schlief", pl:"schliefen", pp:"geschlafen", aux:"habe", p1:"schlafe", p3:"schläft", p6:"schlafen", en:"to sleep", zh:"睡觉"},
+  {inf:"tragen", sg:"trug", pl:"trugen", pp:"getragen", aux:"habe", p1:"trage", p3:"trägt", p6:"tragen", en:"to carry", zh:"穿/背"},
+  {inf:"treffen", sg:"traf", pl:"trafen", pp:"getroffen", aux:"habe", p1:"treffe", p3:"trifft", p6:"treffen", en:"to meet", zh:"遇见"},
+  {inf:"waschen", sg:"wusch", pl:"wuschen", pp:"gewaschen", aux:"habe", p1:"wasche", p3:"wäscht", p6:"waschen", en:"to wash", zh:"洗"},
+  {inf:"helfen", sg:"half", pl:"halfen", pp:"geholfen", aux:"habe", p1:"helfe", p3:"hilft", p6:"helfen", en:"to help", zh:"帮助"},
+  {inf:"machen", sg:"machte", pl:"machten", pp:"gemacht", aux:"habe", en:"to make", zh:"做"},
+  {inf:"sagen", sg:"sagte", pl:"sagten", pp:"gesagt", aux:"habe", en:"to say", zh:"说"},
+  {inf:"finden", sg:"fand", pl:"fanden", pp:"gefunden", aux:"habe", en:"to find", zh:"找到"},
+  {inf:"denken", sg:"dachte", pl:"dachten", pp:"gedacht", aux:"habe", en:"to think", zh:"想"},
+  {inf:"wissen", sg:"wusste", pl:"wussten", pp:"gewusst", aux:"habe", en:"to know", zh:"知道"},
+  {inf:"kennen", sg:"kannte", pl:"kannten", pp:"gekannt", aux:"habe", en:"to know (a person)", zh:"认识"},
+  {inf:"bringen", sg:"brachte", pl:"brachten", pp:"gebracht", aux:"habe", en:"to bring", zh:"带来"},
+  {inf:"schreiben", sg:"schrieb", pl:"schrieben", pp:"geschrieben", aux:"habe", en:"to write", zh:"写"},
+  {inf:"sitzen", sg:"saß", pl:"saßen", pp:"gesessen", aux:"habe", en:"to sit", zh:"坐"},
+  {inf:"stehen", sg:"stand", pl:"standen", pp:"gestanden", aux:"habe", en:"to stand", zh:"站"},
+  {inf:"liegen", sg:"lag", pl:"lagen", pp:"gelegen", aux:"habe", en:"to lie", zh:"躺/位于"},
+  {inf:"brennen", sg:"brannte", pl:"brannten", pp:"gebrannt", aux:"habe", en:"to burn", zh:"燃烧"},
+  {inf:"nennen", sg:"nannte", pl:"nannten", pp:"genannt", aux:"habe", en:"to name", zh:"称为"},
+  {inf:"rennen", sg:"rannte", pl:"rannten", pp:"gerannt", aux:"bin", en:"to race", zh:"奔跑"},
+  {inf:"vergessen", sg:"vergaß", pl:"vergaßen", pp:"vergessen", aux:"habe", en:"to forget", zh:"忘记"},
+  {inf:"verlieren", sg:"verlor", pl:"verloren", pp:"verloren", aux:"habe", en:"to lose", zh:"丢失"},
+  {inf:"entscheiden", sg:"entschied", pl:"entschieden", pp:"entschieden", aux:"habe", en:"to decide", zh:"决定"},
+  {inf:"schneiden", sg:"schnitt", pl:"schnitten", pp:"geschnitten", aux:"habe", en:"to cut", zh:"剪"},
+  {inf:"leiden", sg:"litt", pl:"litten", pp:"gelitten", aux:"habe", en:"to suffer", zh:"受苦"},
+  {inf:"laden", sg:"lud", pl:"luden", pp:"geladen", aux:"habe", en:"to load", zh:"装载"},
+  {inf:"sterben", sg:"starb", pl:"starben", pp:"gestorben", aux:"bin", en:"to die", zh:"死亡"},
+  {inf:"werfen", sg:"warf", pl:"warfen", pp:"geworfen", aux:"habe", en:"to throw", zh:"扔"},
+  {inf:"beginnen", sg:"begann", pl:"begannen", pp:"begonnen", aux:"habe", en:"to begin", zh:"开始"},
+  {inf:"greifen", sg:"griff", pl:"griffen", pp:"gegriffen", aux:"habe", en:"to grip", zh:"抓住"},
+  {inf:"reißen", sg:"riss", pl:"rissen", pp:"gerissen", aux:"habe", en:"to tear", zh:"撕"},
+  {inf:"gleiten", sg:"glitt", pl:"glitten", pp:"geglitten", aux:"bin", en:"to glide", zh:"滑行"},
+  {inf:"streiten", sg:"stritt", pl:"stritten", pp:"gestritten", aux:"habe", en:"to quarrel", zh:"争吵"},
+  {inf:"fallen", sg:"fiel", pl:"fielen", pp:"gefallen", aux:"bin", en:"to fall", zh:"落下"},
+  {inf:"gelingen", sg:"gelang", pl:"gelangen", pp:"gelungen", aux:"bin", en:"to succeed", zh:"成功"},
+  {inf:"klingen", sg:"klang", pl:"klangen", pp:"geklungen", aux:"habe", en:"to sound", zh:"听起来"},
+  {inf:"schwingen", sg:"schwang", pl:"schwangen", pp:"geschwungen", aux:"habe", en:"to swing", zh:"摆动"},
+  {inf:"singen", sg:"sang", pl:"sangen", pp:"gesungen", aux:"habe", en:"to sing", zh:"唱歌"},
+  {inf:"sinken", sg:"sank", pl:"sanken", pp:"gesunken", aux:"bin", en:"to sink", zh:"下沉"},
+  {inf:"gewinnen", sg:"gewann", pl:"gewannen", pp:"gewonnen", aux:"habe", en:"to win", zh:"赢"},
+  {inf:"erfinden", sg:"erfand", pl:"erfanden", pp:"erfunden", aux:"habe", en:"to invent", zh:"发明"},
+  {inf:"erschrecken", sg:"erschrak", pl:"erschraken", pp:"erschrocken", aux:"bin", en:"to be frightened", zh:"受惊"},
+  {inf:"schwören", sg:"schwor", pl:"schworen", pp:"geschworen", aux:"habe", en:"to swear", zh:"发誓"},
+  {inf:"stehlen", sg:"stahl", pl:"stahlen", pp:"gestohlen", aux:"habe", en:"to steal", zh:"偷"},
+  {inf:"brechen", sg:"brach", pl:"brachen", pp:"gebrochen", aux:"habe", en:"to break", zh:"打破"},
+  {inf:"graben", sg:"grub", pl:"gruben", pp:"gegraben", aux:"habe", en:"to dig", zh:"挖"},
   {inf:"ich", sg:"mich", pl:"mein", pp:"mich", pron:true, en:"I / me / my / myself", zh:"我"},
   {inf:"du", sg:"dich", pl:"dein", pp:"dich", pron:true, en:"you / your / yourself", zh:"你"},
   {inf:"er", sg:"ihn", pl:"sein", pp:"sich", pron:true, en:"he / him / his / himself", zh:"他"},
@@ -1754,13 +1754,21 @@ const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.cl
 const wordSrc=t=> t.src==="n" ? NOUNS : VERBS;   // 名词组磁贴(src:"n")查 NOUNS,动词查 VERBS
 const NOUN_FIELD=n=>{ for(const f of LANG_META.ln.concat(LANG_META.mv)) if(n[f]) return f; return null; };   // 名词条目的类型键=它有的字段(字段表随语言)
 const P_PRONOUN=LANG_META.pron;     // 人称变位组:形磁贴带人称(gaan ↔ ik ga;随语言)
+const ppFull=V=> V.pp && V.aux ? V.aux+" "+V.pp : V.pp;   // 完成时:ben/heb、bin/habe + 分词(第一人称;无 aux 字段的语言/代词组原样)
+const withPron=(f,w)=>{   // 人称+形式拼接(磁贴与词卡同源);elide 语言(je)在元音开头形式前省音:je ai→j'ai(h aspiré 形式出现时生成器会拦截)
+  const p=P_PRONOUN[f];
+  if(!p) return w;
+  if((LANG_META.elide||[]).includes(p) && /^[aeiouyhàâäéèêëîïôöùûü]/i.test(w)) return p.slice(0,-1)+"'"+w;
+  return p+" "+w;
+};
 const wordOf=(t)=>{
   const A=wordSrc(t);
   const isArt=A===NOUNS && LANG_META.ln.includes(t.f);   // 冠词侧(字段表随语言:de/ht、le/la、el/la、o/a、der/die/das)
   if(t.k==="inf") return (isArt && t.hint) ? A[t.v][t.f] : A[t.v].inf;   // LN 第一关:词侧放全短语(de vrouw,答案给到);其余:纯词
-  if(isArt) return t.f;   // 冠词侧:两关都只放裸冠词
+  if(isArt) return (A[t.v][t.f]||"").split(" ")[0];   // 冠词侧:裸冠词=存储短语首词(de/het;ht 是内部键不能直接显示,v1.23 线上 bug 顺修)
   const w=A[t.v][t.f];
-  return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"(前缀随语言)
+  if(t.f==="pp" && w && A[t.v].aux) return A[t.v].aux+" "+w;   // 分词磁贴带助动词(ben geweest / bin gegangen),自然换行两行
+  return withPron(t.f, w);   // 人称变位:"ga"→"ik ga"(前缀随语言,省音同源)
 };
 
 /* ---- 尺寸:确定性布局 ---- */
@@ -1786,7 +1794,10 @@ function syncSize(){
   for(const t of tiles){
     if(!t.el) continue;
     const word=wordOf(t);
-    const fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
+    const ws=word.split(" ");
+    const longest=ws.length>1?ws.reduce((a,b)=>ctx.measureText(b).width>ctx.measureText(a).width?b:a):word;   // 多词(助动词+分词/LN 提示短语):按最长单词测宽,允许换行
+    let fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(longest).width)))*(hand?0.93:1);
+    if(ws.length>1) fs=Math.min(fs, th*0.42);   // 双行:高度方向也要放得下(挑战模式小盘)
     t.el.firstChild.style.fontSize=fs+"px";
     positionTile(t);
   }
@@ -2416,8 +2427,8 @@ function wordCardHTML(vi,activeF){
   const V=VERBS[vi];
   const isPerson=activeF==="p1"||activeF==="p3"||activeF==="p6";
   const raw=isPerson
-    ? [["inf",V.inf],["p1","ik "+V.p1],["p3","hij "+V.p3],["p6","wij "+V.p6]]   // 人称变位关:形带人称,与磁贴同源
-    : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",V.pp]];
+    ? [["inf",V.inf],["p1",withPron("p1",V.p1)],["p3",withPron("p3",V.p3)],["p6",withPron("p6",V.p6)]]   // 人称变位关:形带人称,与磁贴同源(曾硬编码荷兰语 ik/hij/wij → 变体词卡显示错语言)
+    : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppFull(V)]];   // 分词带助动词(ben/heb + pp)
   const forms=raw.filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;
@@ -2793,7 +2804,7 @@ function openBook(){
       row.className="book-row"+(got?" viewable":"");
       row.innerHTML=got
         ?`<svg class="book-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg>
-          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${V.pp||"-"}</small></div>
+          <div class="book-main"><b>${V.inf}</b><small>${V.sg} · ${V.pl} · ${ppFull(V)||"-"}</small></div>
           <span class="book-tag">${glossOf(V)}<br><span class="book-count">×${save.counts[V.inf]||0}</span></span>`
         :`<div class="book-art empty">?</div>
           <div class="book-main"><b>${t("book.locked")}</b><small>${t("book.lockedsub")}</small></div>`;
@@ -2819,7 +2830,7 @@ function showCard(vi){
     document.getElementById("cardBody").innerHTML=wordCardHTML(vi,null)+sentHTML(V);
     document.getElementById("cardPanel").style.setProperty("--h",V.hue);
     document.getElementById("cardModal").classList.add("on");
-    stopSpeech(); speakWords([V.inf,V.sg,V.pl,V.pp].filter(Boolean));   // 开卡朗读完整四形态
+    stopSpeech(); speakWords([V.inf,V.sg,V.pl,ppFull(V)].filter(Boolean));   // 开卡朗读完整四形态(分词带助动词)
   });
 }
 function closeCard(){

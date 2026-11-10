@@ -1595,15 +1595,21 @@ const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.cl
 const wordSrc=t=> t.src==="n" ? NOUNS : VERBS;   // 名词组磁贴(src:"n")查 NOUNS,动词查 VERBS
 const NOUN_FIELD=n=>{ for(const f of LANG_META.ln.concat(LANG_META.mv)) if(n[f]) return f; return null; };   // 名词条目的类型键=它有的字段(字段表随语言)
 const P_PRONOUN=LANG_META.pron;     // 人称变位组:形磁贴带人称(gaan ↔ ik ga;随语言)
-const ppFull=V=> V.pp && V.aux ? V.aux+" "+V.pp : V.pp;   // 完成时:ben/heb + 分词(第一人称;变体语言/代词组无 aux 字段,原样)
+const ppFull=V=> V.pp && V.aux ? V.aux+" "+V.pp : V.pp;   // 完成时:ben/heb、bin/habe + 分词(第一人称;无 aux 字段的语言/代词组原样)
+const withPron=(f,w)=>{   // 人称+形式拼接(磁贴与词卡同源);elide 语言(je)在元音开头形式前省音:je ai→j'ai(h aspiré 形式出现时生成器会拦截)
+  const p=P_PRONOUN[f];
+  if(!p) return w;
+  if((LANG_META.elide||[]).includes(p) && /^[aeiouyhàâäéèêëîïôöùûü]/i.test(w)) return p.slice(0,-1)+"'"+w;
+  return p+" "+w;
+};
 const wordOf=(t)=>{
   const A=wordSrc(t);
   const isArt=A===NOUNS && LANG_META.ln.includes(t.f);   // 冠词侧(字段表随语言:de/ht、le/la、el/la、o/a、der/die/das)
   if(t.k==="inf") return (isArt && t.hint) ? A[t.v][t.f] : A[t.v].inf;   // LN 第一关:词侧放全短语(de vrouw,答案给到);其余:纯词
   if(isArt) return (A[t.v][t.f]||"").split(" ")[0];   // 冠词侧:裸冠词=存储短语首词(de/het;ht 是内部键不能直接显示,v1.23 线上 bug 顺修)
   const w=A[t.v][t.f];
-  if(t.f==="pp" && w && A[t.v].aux) return A[t.v].aux+" "+w;   // 分词磁贴带助动词(ben geweest / heb gegeten),自然换行两行
-  return P_PRONOUN[t.f] ? P_PRONOUN[t.f]+" "+w : w;   // 人称变位:"ga"→"ik ga"(前缀随语言)
+  if(t.f==="pp" && w && A[t.v].aux) return A[t.v].aux+" "+w;   // 分词磁贴带助动词(ben geweest / bin gegangen),自然换行两行
+  return withPron(t.f, w);   // 人称变位:"ga"→"ik ga"(前缀随语言,省音同源)
 };
 
 /* ---- 尺寸:确定性布局 ---- */
@@ -2262,7 +2268,7 @@ function wordCardHTML(vi,activeF){
   const V=VERBS[vi];
   const isPerson=activeF==="p1"||activeF==="p3"||activeF==="p6";
   const raw=isPerson
-    ? [["inf",V.inf],["p1","ik "+V.p1],["p3","hij "+V.p3],["p6","wij "+V.p6]]   // 人称变位关:形带人称,与磁贴同源
+    ? [["inf",V.inf],["p1",withPron("p1",V.p1)],["p3",withPron("p3",V.p3)],["p6",withPron("p6",V.p6)]]   // 人称变位关:形带人称,与磁贴同源(曾硬编码荷兰语 ik/hij/wij → 变体词卡显示错语言)
     : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppFull(V)]];   // 分词带助动词(ben/heb + pp)
   const forms=raw.filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");

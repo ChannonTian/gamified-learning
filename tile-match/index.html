@@ -1161,7 +1161,7 @@ function speakVerb(V){
     if(!("speechSynthesis" in window) || save.settings.ttsVolume<=0){ res(); return; }
     try{
       window.speechSynthesis.cancel();      // 立刻打断上一组(旧链经令牌检查退出)
-      const seq=[V.inf,V.sg,V.pl,ppLabel(V)];   // is+perfectum:zijn 系读 "is + 分词"
+      const seq=[V.inf,V.sg,V.pl,ppLabel(V)];   // ben+perfectum:zijn 系读 "ben + 分词"
       let i=0;
       const next=()=>{
         if(gen!==speechGen || i>=seq.length){ res(); return; }
@@ -1618,13 +1618,14 @@ function anyOverlayOpen(){
 
 function wordOf(t){ return t.f===2 ? ppLabel(VERBS[t.v]) : VERBS[t.v][["sg","pl","pp"][t.f]]; }
 
-/* is+perfectum(demo v1.16):zijn 系动词的完美时读/显示 "is + 分词",磁贴/横幅/卡片/图鉴/朗读同源 */
+/* ben+perfectum(2026-11-10 与主版/连连看对齐:助动词统一第一人称):zijn 系动词的完美时读/显示 "ben + 分词",磁贴/横幅/卡片/图鉴/朗读同源
+   (原 demo v1.16 词表引用式 "is + 分词",2026-11-09 用户定稿第一人称 ik 式) */
 const PP_ZIJN=new Set(["zijn","gaan","komen","beginnen","blijven","lopen","rijden","worden","vergeten"]);
-const ppLabel=V=>PP_ZIJN.has(V.inf)?"is "+V.pp:V.pp;
+const ppLabel=V=>PP_ZIJN.has(V.inf)?"ben "+V.pp:V.pp;
 
 const measureCanvas=document.createElement("canvas");
 function computeLevelFont(){
-  // 用 canvas 实测最长「单词」定统一字号(双行 is+分词 按单词测宽,允许换行);Grug 手写字体更宽,按主题选测量字体
+  // 用 canvas 实测最长「单词」定统一字号(双行 ben+分词 按单词测宽,允许换行);Grug 手写字体更宽,按主题选测量字体
   const ctx=measureCanvas.getContext("2d");
   const hand=(save.settings.theme||"grug")==="grug";
   ctx.font=`${hand?500:700} 100px ${hand?'"Chalkboard SE","Comic Sans MS",cursive':'-apple-system, "Segoe UI", system-ui, sans-serif'}`;
@@ -1638,7 +1639,7 @@ function computeLevelFont(){
     }
   }
   levelFont=Math.max(9,Math.min(22, 100*usable/maxW));
-  // 双行 pp(is+分词):高度方向也须放得下(两行 × 行距)
+  // 双行 pp(ben+分词):高度方向也须放得下(两行 × 行距)
   const cellH=boardEl.clientHeight/ROWS;
   levelFont=Math.min(levelFont, cellH*0.88/(2*1.05));
   if(hand) levelFont*=0.93;                  // 手写体 x 高大,再收一档防溢出(link-match v1.9#2)
@@ -2047,7 +2048,7 @@ function showLearnBanner(v,hi){
       let guard=0;
       while(guard++<12 && formsEl.scrollHeight>availH && fs>11){ fs-=1; formsEl.style.fontSize=fs+"px"; }
     }
-    speakVerb(VERBS[v]);                   // 依次朗读 原形 → 单数 → 复数 → (is+)分词
+    speakVerb(VERBS[v]);                   // 依次朗读 原形 → 单数 → 复数 → (ben+)分词
   }
   bannerTimer=setTimeout(hideBanner,BANNER_MS); // 同动词重复消除只重置连击倒计时
 }
