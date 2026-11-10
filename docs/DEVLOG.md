@@ -1,5 +1,15 @@
 # DEVLOG.md — 迭代日志
 
+## 2026-11-10 · link-match v1.25 ben/heb + perfectum(第一人称完成时,用户拍板)
+
+- **全词标注助动词**:141 个动词词条(148 减 7 代词)加 `aux:"ben"/"heb"`——37 个 zijn 类(位移/状态变化/生命阶段:demo 参考词表 8 词 zijn/gaan/komen/beginnen/blijven/lopen/rijden/vergeten + vallen/sterven/smelten/zwellen/krimpen/schrikken/treden/bederven/wijken/verlopen/rijzen/bezwijken/blijken/ontgaan/vervliegen/genezen 等)+ 104 个 hebben 类。**两可词逐词查证**:移动动词 zwemmen/springen/duiken/klimmen/kruipen/glijden/vliegen/varen→ben(教材 zijn 表主流);gelden/klinken/bestaan/vriezen(天气义)→heb([Taaladvies](https://taaladvies.net)、[inburgeringprep](https://inburgeringprep.com/vervoegen/klinken)、[Vlaanderen Team Taaladvies](https://www.vlaanderen.be/team-taaladvies/taaladviezen/voltooide-deelwoorden-met-hebben-of-zijn));genezen 取复原义(状态变化)ben;定位动词 zitten/liggen/staan/hangen→heb(北荷兰标准,ANS 两可)。**顺修 2 处例句与标签打架**:staan 例句 "is … gestaan"→"heeft"(标签 heb);lopen 例句改方向义 "daarna ben ik naar huis gelopen"(原例句活动义 heb,与 ben 标签不一致)。
+- **展示点统一带助动词**:`wordOf` pp 分支拼 `aux + 分词`(磁贴自然换行两行、ben 在上;朗读 "zijn, ben geweest");横幅词卡第四形态、图鉴列表/详情卡、开卡朗读同源走新 helper `ppFull()`;`syncSize` 多词磁贴按最长单词测宽+双行高度约束(照 demo v1.16 公式,PS 人称 "ik ga"/LN 提示短语不受影响:长词单行照旧)。代词组(pp=反身代词)与 LN·MV 名词条目无 aux 字段,原样不受影响;四语变体引擎透明(数据区替换,无 aux 即无前缀,未来 regen 安全)。
+- **demo 同步**:PP_ZIJN 9 词 "is + …"→"ben + …"(ppLabel 与注释);QA 复验 6 个 pp 关全部 9 词 ben 前缀、零 "is +" 残留。
+- **顺修 v1.23 线上 bug——LN 裸冠词磁贴显示内部键**:v1.23 "article tiles hold only de/het" 改 wordOf 冠词侧 `return t.f`,het 词冠词磁贴显示 "ht"(主版线上已有);改 `(A[t.v][t.f]||"").split(" ")[0]`(存储短语首词:de man→de、het kind→het;法 le/la、西 el/la、葡 o/a、德 der/die/das 字段名即冠词,行为不变)。LN.1 浏览器复验 4×het+5×de 正确。
+- **测试**:content-save.test.mjs 修复 v1.24 落地后过期的 5 处断言(lvOrder v5→v6 种子、v4/v2 迁移目标改 L24、74→78 关、LN 混盘 dh 类型键覆盖+hint T/F 成对、人称磁贴 "ik ben" 前缀),新增 aux 断言组(141 词全标/代词无 aux/zijn·hebben 代表词清单/wordOf·ppFull·词卡链路/LN 冠词短语首词)——**6/6 绿**(修复前在 main 上 5 项全红);path-engine 300 局 ALL PASS;四语变体冒烟 4/4。
+- **QA**:浏览器**同步驱动**扫盘(不依赖页面定时器——IAB 后台页 setTimeout 被强节流,异步 bot 停在 6/78,改每关纯同步 findPair+connect+死局同步 reshuffleRemaining)**78/78 全清零错误**:pp 关磁贴全带 ben/heb、其余组零误带、无空磁贴、无裸 ht;A1.7 逐对朗读断言 9/9 [原形, ben/heb+分词](gaan→"ben gegaan"、zoeken→"heb gezocht");无尽 6 盘(含 pp 形式盘磁贴全带 aux)+ 每日盘同步清零错误;图鉴 141 行列表/详情卡三处 aux 正确;截图 390×844 两图(两行 pp 磁贴+词卡 "heb gemoet" 高亮)+1440×900 一图(宽磁贴单行+连线)。存档备份→恢复字节一致;服务器已停、5 个 QA 标签页已关。注:每日/清盘结算落账走 480ms 延迟定时器,后台节流下不触发——该路径本 PR 未改动。
+- 存档零改动(aux 是词表数据字段;lvOrder 仍 v6,迁移链不动)。
+
 ## 2026-11-09 · tile-match v0.96 统一词卡 + is+perfectum(用户拍板:把这两项也做进三消)
 
 - **统一词卡组件**(demo v1.15 同款):新增 `wordCardHTML(v,hi)`——插画+四形态(原形带手绘弧线 swu,当前词型高亮)+右侧释义列;**横幅与图鉴详情卡共用**(横幅即图鉴卡,不再两套),横幅按本次消除的实际词型高亮(resolve 构建 formsOf),四形态换行超槽高逐级缩字号;swu 三主题退化:grug 手绘弧线/暗色浅墨/papier 橙色条。**顺拆两段式点击**(demo v1.12 同款):图鉴卡释义常显、点卡即关,cardTip/gloss-open/card.tip i18n 键全清。

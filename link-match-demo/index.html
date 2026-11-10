@@ -232,7 +232,7 @@
     transition:filter .15s, scale .15s;
   }
   .tile.k-pl .face{border-radius:6%;}
-  .tile.k-pp .face{border-radius:24px 4px 24px 4px; line-height:1.0;}   /* 叶子形(对角大圆角):纯 border-radius,描边/选中原生跟随;双行 "is + 分词" 行距收紧 */
+  .tile.k-pp .face{border-radius:24px 4px 24px 4px; line-height:1.0;}   /* 叶子形(对角大圆角):纯 border-radius,描边/选中原生跟随;双行 "ben + 分词" 行距收紧 */
   .tile.k-inf .face::after{
     content:""; position:absolute; left:32%; width:36%; right:auto; bottom:6%;
     height:4px; border-radius:2px; background:var(--accent);
@@ -1697,10 +1697,11 @@ let layout={ring:RING, tw:80, th:60};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.classList.contains("on"));
-/* 词表 Perfectum 栏标 'is' 的词 → 游戏内显示/朗读 "is + 分词"(如 is gegaan;lopen/rijden 词表注 (is)**、vergeten (is)*)
-   Let op 原文:de werkwoorden met 'is' in de derde kolom krijgen het hulpwerkwoord 'zijn' in perfectum */
+/* 词表 Perfectum 栏标 'is' 的词 → 游戏内显示/朗读 "ben + 分词"(如 ben gegaan;lopen/rijden 词表注 (is)**、vergeten (is)*)
+   Let op 原文:de werkwoorden met 'is' in de derde kolom krijgen het hulpwerkwoord 'zijn' in perfectum
+   2026-11-10 与主版对齐:助动词统一第一人称(ik 式,ben/heb),替代词典引用式 is/heeft */
 const PP_ZIJN=new Set(["zijn","gaan","komen","beginnen","blijven","lopen","rijden","worden","vergeten"]);
-const ppLabel=V=>V.pp&&PP_ZIJN.has(V.inf)?"is "+V.pp:V.pp;
+const ppLabel=V=>V.pp&&PP_ZIJN.has(V.inf)?"ben "+V.pp:V.pp;
 const wordOf=(t)=> t.k==="inf" ? VERBS[t.v].inf : ((t.f==="pp" ? ppLabel(VERBS[t.v]) : VERBS[t.v][t.f])||VERBS[t.v].sg);
 
 /* ---- 尺寸:确定性布局 ---- */
@@ -1725,7 +1726,7 @@ function syncSize(){
   // 逐块测字(用户反馈:一个长词不再拖小整盘字号);长词单独缩,短词保持可读字号
   for(const t of tiles){
     if(!t.el) continue;
-    const disp=t.k==="inf"?VERBS[t.v].inf:((t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f])||VERBS[t.v].sg);   // pp="is + 分词":按最长单词测宽(is 允许换行);无 pp 词兜底 sg
+    const disp=t.k==="inf"?VERBS[t.v].inf:((t.f==="pp"?ppLabel(VERBS[t.v]):VERBS[t.v][t.f])||VERBS[t.v].sg);   // pp="ben + 分词":按最长单词测宽(ben 允许换行);无 pp 词兜底 sg
     const ws=disp.split(" ");
     const word=ws.length>1?ws.reduce((a,b)=>ctx.measureText(b).width>ctx.measureText(a).width?b:a):disp;
     let fs=Math.max(8.5,Math.min(20, 100*(tw*0.9-6)/Math.max(1,ctx.measureText(word).width)))*(hand?0.93:1);
