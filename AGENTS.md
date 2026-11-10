@@ -63,7 +63,8 @@ gamified-learning/
 
 ## 当前状态(2026-11-10)
 
-- **tile-match v0.97 + link-match 德语 bin/habe + 变体引擎同步(2026-11-10;PR 待并)**:三消 `ppLabel` is→ben(与主版/demo 对齐);德语变体 60 词全标 `aux`(14 sein bin/46 haben habe;**beginnen/vergessen 德语用 haben、sitzen/stehen/liegen 标准用 haben,与荷兰语分类不同**);母本引擎增 `withPron(f,w)` 人称拼接单一来源,**顺修变体两个线上 bug**:①词卡人称分支硬编码 ik/hij/wij(四变体 PS 词卡显示荷兰语,v1.22b 引入);②法语省音缺失("je ai")——LANG_META 可选 `elide`(法语 ["je"]),生成器透传 aux/elide 并校验(aux 全标或全不标;elide+h 开头形式拦截 h aspiré)。四变体重新生成;`variant-smoke.mjs` 扩为带引擎段的显示断言(aux/人称同源/省音,旧版文件直接失败)。QA:三消棋盘 ben 磁贴+横幅+真实消除朗读;德 53/法 50/西 50/葡 51/荷 78 关**独立预言机**扫盘(从原始数据按显示规则重算磁贴/朗读对/词卡,不经引擎函数)零偏差;德/法截图。**法语 être/avoir 助动词之分未做**(分词性配合+显示格式待拍板);西/葡无助动词之分。存档零改动。
+- **link-match v1.26 内容准确性 + 鲁棒性审计(2026-11-10;PR 待并)**:**内容逐词对照权威源抓出 8 处错误并修**——荷兰语 zwijgen zweeg(原 zweg)/zwemmen zwom·zwommen(原 zwam·zwammen)/stelen stalen(原 stolen)/moeten gemoeten(原 gemoet;Groene Boekje 唯一形),主版+demo 同修;法语 rire imparfait 1p **riions**(原 rions=现在时);葡语 agradecer 过去时 **agradeci**(原 agradeço=现在时);西语 él/ella 反身 **se**(原直接宾语 lo/la,列标签是 reflexivo);德语 sie(pl) 物主 **ihr**(原屈折形 ihre)。**wij 反身 "onszelf" 核实为标准词**(*ons* 强调形,与 mezelf/jezelf 同系列)不改;名词 72/代词/例句/A1 人称/变体名词全绿。**引擎同形等价**:`attemptPair` 原按词索引判对,LN 冠词关多块 de/het、代词组 zichzelf×3、西葡 ser/ir 同形 fui 等视觉正确配对全被拒——新增 `twinFor`(纯函数)+`swapTwin`(互换 v/f/chip+重涂色相,其余逻辑仍按 v)+死局检测第二遍同形扫;负例(文本不同的跨词对)仍拒。**存档类型防御**:null/错类型档会在迁移 `Object.keys(null)` 处让整页脚本中断——加载合并后归一坏字段(合法进度保留;数字字符串收编),demo/三消云端 cloudMerge 后同样过(三消另修 collected 非数组)。**demo 补 `lb.you` 缺键**(排行榜命中自己 toast 显示裸键,nl/zh/en)。工具:`tools/verify-wiktionary.mjs`(nl 4 产品+de.json 词形对照,联网+缓存+误报白名单)。QA:同形优先 bot 五语言全关卡清盘(荷78/德53/法50/西50/葡51,同形对 59/49/58/62/63,总对数与历史全等,零违例零错误)+负例+乱点三轮+损坏档 27 例四产品全过+合法档逐项保留+三视口 1392 磁贴零溢出。存档零改动。测试:content-save 9/9、variant-smoke 4/4(带权威钉)、path-engine ALL PASS。详见 DEVLOG。
+- **tile-match v0.97 + link-match 德语 bin/habe + 变体引擎同步(2026-11-10;已并 #17)**:三消 `ppLabel` is→ben(与主版/demo 对齐);德语变体 60 词全标 `aux`(14 sein bin/46 haben habe;**beginnen/vergessen 德语用 haben、sitzen/stehen/liegen 标准用 haben,与荷兰语分类不同**);母本引擎增 `withPron(f,w)` 人称拼接单一来源,**顺修变体两个线上 bug**:①词卡人称分支硬编码 ik/hij/wij(四变体 PS 词卡显示荷兰语,v1.22b 引入);②法语省音缺失("je ai")——LANG_META 可选 `elide`(法语 ["je"]),生成器透传 aux/elide 并校验(aux 全标或全不标;elide+h 开头形式拦截 h aspiré)。四变体重新生成;`variant-smoke.mjs` 扩为带引擎段的显示断言(aux/人称同源/省音,旧版文件直接失败)。QA:三消棋盘 ben 磁贴+横幅+真实消除朗读;德 53/法 50/西 50/葡 51/荷 78 关**独立预言机**扫盘(从原始数据按显示规则重算磁贴/朗读对/词卡,不经引擎函数)零偏差;德/法截图。**法语 être/avoir 助动词之分未做**(分词性配合+显示格式待拍板);西/葡无助动词之分。存档零改动。
 
 - **link-match v1.25(2026-11-10,ben/heb + perfectum 第一人称;已并 #16)**:141 个动词词条全标 `aux:"ben"/"heb"`(37 zijn 类/104 hebben 类;两可词按教材主流+查证:移动动词→ben,gelden/klinken/bestaan/vriezen 天气义/定位动词 zitten·liggen·staan·hangen→heb,genezen 复原义 ben)。pp 全展示点带助动词——分词磁贴(自然换行两行、ben 在上)/横幅词卡第四形态/图鉴列表与详情卡/连对与开卡朗读("zijn, ben geweest"),同源 `ppFull()`;`syncSize` 多词按最长单词测宽+双行高度约束。代词组(pp=反身代词)与名词条目无 aux 字段,不受影响;变体语言引擎透明。demo 9 词同步 "is + …"→"ben + …"。**顺修 v1.23 线上 bug**:LN 裸冠词磁贴 het 词显示内部键 "ht"→改存储短语首词(de/het;变体字段名即冠词不变)。顺修 staan/lopen 例句与标签一致。**存档零改动**(lvOrder 仍 v6)。测试:content-save.test.mjs 修 v1.24 后过期 5 断言+新增 aux/LN 断言(6/6);QA 浏览器同步驱动 78 关全清零错误+A1.7 朗读序列 9/9+无尽 pp 盘+图鉴+三图。**坑**:IAB 后台页定时器强节流,异步 bot 会停摆——扫盘用纯同步驱动(`startLink(i)`+`NLM3.findPair/connect`+死局同步 `reshuffleRemaining()`,顶层函数声明在页面全局可直接调);QA 种子档必须带 `lvOrder:"v6"`,否则被当远古档走全链迁移。详见 DEVLOG。
 
@@ -136,6 +137,20 @@ gamified-learning/
 - **清理测试账号必须精确圈定**:DELETE 的 WHERE 里只放测试用户名;曾险些误伤真实用户数据(自查后手动补了 display_name)——动远程库前先 SELECT 确认影响行。
 - **QA 别留在本地服务器页面**:测完 `wrangler dev` 要停+提醒关掉 127.0.0.1 标签页——用户在死掉的本地页点登录("停留在登录界面"),排查半天其实是服务器没起。另外 Google 凭据在本地要用 `--var` 假值,真值只在生产 Secret。
 - **协作者分支不许清理**:远程 `claude/*`、`openai/*` 等命名分支是其他 AI 会话/队友的工作留档(即使看起来未合并/过时),**清理分支时一律跳过**(2026-10-05 用户拍板:你不是一个人在战斗)。只清理自己创建且已合并的分支。
+
+## 引擎与 QA 类(v1.26 新增)
+
+- **bot 判对逻辑=引擎同款,会漏"视觉正确但引擎拒绝"的配对**(v1.26 红测):扫盘 bot 用 `findPair`(返回 v 相同的对)与引擎自己同标准,金标准一样就测不出引擎错——LN 冠词关多块 de/het、代词组 zichzelf×3 这类**同形跨词对被拒**的 bug 在线一个多月无人发现。内容/规则审计要写**独立预言机**(按显示规则从原始数据重算应然行为,不经引擎函数),并做**同形优先**探针(`twinFor` 找跨词同文对直接 connect)。红测办法:把旧版(main)文件放临时目录另起端口当对照环境。
+- **程序化 `startLink(L0)` 会被首教演示占住 `busy`**,`NLM3.connect` 静默返回 false 像是配对 bug——探针开头先 `NLM3.skipDemo()`;断言前打印 `{busy,demo}` 状态可一眼定位。
+- **损坏/异形存档=加载期抛错=整页死档**,玩家无法自愈:`Object.keys(null)`、`counts[V.inf]`、`collected.push` 都会在 null/错类型上炸。加载合并后必须类型归一(坏字段复位、合法进度保留),云端 `cloudMerge` 合并结果同样要过一遍(远端脏数据会经 `a==null→return b` 入本地);三消 `collected` 是数组要用 `Array.isArray` 判。
+- **IAB 截图会 "surface preparation timed out"**(窗口遮挡/环境相关):布局与状态断言一律以 evaluate 读 DOM 为准,截图失败不阻塞 QA,可跳过。
+
+## 内容审计类(v1.26 新增)
+
+- **权威词形对照的工具与坑**:`tools/verify-wiktionary.mjs` 跑 nl(4 产品)/de.json 全量;nl Wiktionary 的 `{{-nlstam-|原形|单过|分词}}` **只有词干三形没有复数**,复数过去式要查独立词条页(页内须回指动词原形);模板参数要用**花括号深度**解析(嵌套 {{pn}}/[[a|b]] 会骗过正则),管道符会切开带竖线的链接。de Wiktionary 用 `{{Deutsch Verb Übersicht}}` 命名参数(Präteritum_ich/Partizip II/Präsens_er, sie, es/Hilfsverb)。**请求限速+缓存**(`/tmp/verify-wiktionary-cache.json`),一次 20 标题,失败退避重试。
+- **法/西/葡用 verbecc(Verbiste 权威表)**:`pip install --user verbecc`,`CompleteConjugator(lang).conjugate(inf, conjugate_pronouns=False).to_json()`;时态键要**精确全名匹配**(es 用 `pretérito-perfecto-simple`、pt 用 `pretérito-perfeito`——模糊 contains 会撞上 "imperfeito" 含 "perfeito" 的坑);pp 取 items[0](m.s.,带 g 标记);分词形容词性变体(electo/nato)不是错误,复合时态用 elegido/nacido。库内已知伪差:pt ir 现在 1p "imos"(古语,nós vamos 才对)、es pasar 模板故障。
+- **词典引用式 vs 人称式别混**:nl 反身列用**强调式**系列(mezelf/jezelf/zichzelf/onszelf——onszelf 是标准词,勿当错误"修"掉);西语第三列标签 reflexivo 时él/ella 必须 se(lo/la 是直接宾语);德语物主列取词典形(mein/dein/sein/ihr,不是屈折形 ihre)。
+- **形态学正则审词形会漏真错**:zweg/zwam/stolen/gemoet 都"看起来像那么回事"(内部自洽),正则全绿——真错只有对照权威表才能抓到。
 
 ## 引擎与 QA 类(v1.17 之前)
 

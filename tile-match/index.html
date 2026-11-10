@@ -881,6 +881,21 @@ try{
     if(save.settings.hintWait===7) save.settings.hintWait=12;   // 旧默认迁移:提示等待略长于连击窗口
   }
 }catch(e){}
+// 类型防御(2026-11-10 审计):损坏/异形存档(含云端合并回来的)只把坏字段复位为默认,合法进度一律保留——
+// 否则 collected.push/落账 counts 等处会抛 TypeError,整页脚本中断且玩家无法自愈
+function sanitizeSave(){
+  const isRec=x=> !!x && typeof x==="object" && !Array.isArray(x);
+  if(!Array.isArray(save.collected)) save.collected=[];
+  for(const k of ["counts","best","dailyBest","done"]) if(!isRec(save[k])) save[k]={};
+  if(!isRec(save.settings)) save.settings={...DEFAULT_SETTINGS};
+  for(const k of ["volume","ttsVolume","hintWait"]){
+    let v=save.settings[k];
+    if(typeof v==="string" && v.trim()!=="") v=Number(v);   // 数字字符串宽容收编
+    save.settings[k]= typeof v==="number" && Number.isFinite(v) && v>=0 ? v : DEFAULT_SETTINGS[k];
+  }
+  if(typeof save.unlocked!=="number" || !Number.isFinite(save.unlocked) || save.unlocked<1) save.unlocked=1;
+}
+sanitizeSave();
 function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); cloudQueueSave(); }catch(e){} }
 
 /* ================= Cloud 存档(Cloudflare D1;link-match-demo v1.17 同款引擎,存档走 ?game=tilematch) ================= */
@@ -924,6 +939,7 @@ async function cloudPull(){       // 登录后/启动时:拉云端 → 合并 �
       const merged=cloudMerge(save,j.data);
       if(!fresh){ merged.settings=save.settings; merged.style=save.style; }  // 老设备设置/画风不被动
       save=merged;
+      sanitizeSave();   // 云端档同样过类型防御(坏字段不入本地)
       applySettings(); persist();
       renderCloud();
       if(j.display_name){ cloudAuth.display_name=j.display_name; cloudSaveAuth(); }

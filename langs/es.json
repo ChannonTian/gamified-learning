@@ -614,16 +614,16 @@
    "inf": "él",
    "sg": "él",
    "pl": "su",
-   "pp": "lo",
-   "en": "he / him / his",
+   "pp": "se",
+   "en": "he / him / his / himself",
    "zh": "他"
   },
   {
    "inf": "ella",
    "sg": "ella",
    "pl": "su",
-   "pp": "la",
-   "en": "she / her / hers",
+   "pp": "se",
+   "en": "she / her / hers / herself",
    "zh": "她"
   },
   {

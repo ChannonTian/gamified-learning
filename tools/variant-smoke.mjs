@@ -14,8 +14,8 @@ const cardslice = m[1].slice(m[1].indexOf('function wordCardHTML'), m[1].indexOf
 const ctx = { console, window: { addEventListener() {}, __errs: [] } };
 vm.createContext(ctx);
 vm.runInContext('this.save={style:"A"}; this.artSVG=()=>""; this.glossOf=v=>v.en||v.gloss||"";', ctx);   // 词卡依赖的桩
-vm.runInContext(head + '\n' + wordslice + '\n' + cardslice + '\nthis.__x={VERBS,NOUNS,TIERS,LINK_LEVELS,LANG_META,wordOf,withPron,cardHTML:wordCardHTML};', ctx);
-const { VERBS, NOUNS, TIERS, LINK_LEVELS, LANG_META, wordOf, withPron, cardHTML } = ctx.__x;
+vm.runInContext(head + '\n' + wordslice + '\n' + cardslice + '\nthis.__x={VERBS,NOUNS,TIERS,LINK_LEVELS,LANG_META,wordOf,withPron,cardHTML:wordCardHTML,twinFor};', ctx);
+const { VERBS, NOUNS, TIERS, LINK_LEVELS, LANG_META, wordOf, withPron, cardHTML, twinFor } = ctx.__x;
 let fail = 0;
 const eq = (a, b, msg) => { if (JSON.stringify(a) !== JSON.stringify(b)) { console.log('FAIL', msg, 'got', JSON.stringify(a), 'want', JSON.stringify(b)); fail++; } };
 const field = n => { for (const f of LANG_META.ln.concat(LANG_META.mv)) if (n[f]) return f; return null; };
@@ -104,6 +104,38 @@ for (const v of VERBS.filter(v => v.p1)) {
     const p = LANG_META.pron[f], elided = (LANG_META.elide || []).includes(p) && /^[aeiouy]/i.test(v[f]);
     const expect = elided ? p.slice(0, -1) + "'" + v[f] : p + ' ' + v[f];
     eq(want, expect, `pronoun join ${v.inf}.${f}`);
+  }
+}
+// 权威源回归钉(2026-11-10 审计:verbecc(Verbiste)/de.wiktionary 对照后修正的条目;重新生成不得回退)
+{
+  const PINS = {
+    fr: [['rire', 'pl', 'riions']],            // imparfait 1p 双 i("rions" 是现在时)
+    pt: [['agradecer', 'sg', 'agradeci']],     // pretérito 1s("agradeço" 是现在时)
+  };
+  for (const [inf, f, want] of PINS[LANG_META.code] || []) {
+    const v = VERBS.find(x => x.inf === inf);
+    eq(v && v[f], want, 'pin ' + inf + '.' + f);
+  }
+  const prons = VERBS.filter(v => v.pron);
+  if (LANG_META.code === 'es') {               // 第三列是反身代词(legend.pr.ref):él/ella 反身=se,lo/la 是直接宾语
+    for (const p of prons) if (!['me', 'te', 'se', 'nos', 'os'].includes(p.pp)) { fail++; console.log('FAIL es 反身代词', p.inf, p.pp); }
+  }
+  if (LANG_META.code === 'de') {               // sie(she)/sie(they) 物主都用词典形 ihr(ihre 是屈折形,与 mein/dein 不一致)
+    eq(prons.filter(p => p.inf === 'sie').map(p => p.pl), ['ihr', 'ihr'], 'de sie 物主词典形');
+  }
+}
+// 同形等价(引擎):同关两词形式块文本相同时可互换——LN 裸冠词关取同冠词的两名词验证
+{
+  const lv = LINK_LEVELS.filter(l => l.grp === 'LN' && l.hint === false)[0];
+  const T = (vi, k) => ({ v: vi, k, f: field(NOUNS[vi]), src: 'n', alive: true });
+  const byArt = {};
+  for (const vi of lv.verbs) (byArt[field(NOUNS[vi])] = byArt[field(NOUNS[vi])] || []).push(vi);
+  const two = Object.values(byArt).find(a => a.length >= 2);
+  if (!two) { fail++; console.log('FAIL 找不到同冠词名词对'); }
+  else {
+    const pool = [T(two[0], 'inf'), T(two[0], 'form'), T(two[1], 'inf'), T(two[1], 'form')];
+    const got = twinFor(pool[0], pool[3], pool);
+    if (!got || got[0] !== pool[3] || got[1] !== pool[1]) { fail++; console.log('FAIL twinFor LN', NOUNS[two[0]].inf, NOUNS[two[1]].inf); }
   }
 }
 console.log(fail ? `${dir} SMOKE FAIL ${fail}` : `${dir} SMOKE ALL PASS`);

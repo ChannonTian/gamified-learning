@@ -723,7 +723,7 @@ const VERBS=[
   {inf:"vallen",   sg:"viel",    pl:"vielen",   pp:"gevallen", aux:"ben",   en:"to fall",  zh:"落下"},
   {inf:"sluiten",  sg:"sloot",   pl:"sloten",   pp:"gesloten", aux:"heb",   en:"to close", zh:"关闭"},
   {inf:"rijden",   sg:"reed",    pl:"reden",    pp:"gereden", aux:"ben",    en:"to ride",  zh:"骑/开"},
-  {inf:"zwijgen",  sg:"zweg",    pl:"zwegen",   pp:"gezwegen", aux:"heb",   en:"to keep silent", zh:"沉默"},
+  {inf:"zwijgen",  sg:"zweeg",   pl:"zwegen",   pp:"gezwegen", aux:"heb",   en:"to keep silent", zh:"沉默"},
   {inf:"wijzen",   sg:"wees",    pl:"wezen",    pp:"gewezen", aux:"heb",    en:"to point", zh:"指"},
   {inf:"werpen",   sg:"wierp",   pl:"wierpen",  pp:"geworpen", aux:"heb",   en:"to throw", zh:"投掷"},
   {inf:"gelden",   sg:"gold",    pl:"golden",   pp:"gegolden", aux:"heb",   en:"to be valid", zh:"有效"},
@@ -764,13 +764,13 @@ const VERBS=[
   {inf:"verlopen", sg:"verliep", pl:"verliepen",pp:"verlopen", aux:"ben",   en:"to proceed",zh:"进行"},
   {inf:"treffen",  sg:"trof",    pl:"troffen",  pp:"getroffen", aux:"heb",  en:"to meet",  zh:"遇到"},
   {inf:"kunnen",   sg:"kon",     pl:"konden",   pp:"gekund", aux:"heb",     en:"can; to be able",  zh:"能;会", p1:"kan", p3:"kan", p6:"kunnen", st:"Eerst kon ik het niet, maar nu heb ik het eindelijk gekund.", stz:"起初我不会;现在我终于做到了。"},
-  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoet", aux:"heb",     en:"must; to have to", zh:"必须;得", p1:"moet", p3:"moet", p6:"moeten", st:"Morgen moet ik vroeg weg; gisteren moest dat ook al.", stz:"明天我得早出门;昨天就已经是这样了。"},
+  {inf:"moeten",   sg:"moest",   pl:"moesten",  pp:"gemoeten", aux:"heb",   en:"must; to have to", zh:"必须;得", p1:"moet", p3:"moet", p6:"moeten", st:"Morgen moet ik vroeg weg; gisteren moest dat ook al.", stz:"明天我得早出门;昨天就已经是这样了。"},
   {inf:"willen",   sg:"wilde",   pl:"wilden",   pp:"gewild", aux:"heb",     en:"to want",  zh:"想要", p1:"wil", p3:"wil", p6:"willen", st:"Ik wil een hond; als kind wilde ik er altijd al één.", stz:"我想要一只狗;小时候我就一直想要。"},
   {inf:"mogen",    sg:"mocht",   pl:"mochten",  pp:"gemogen", aux:"heb",    en:"may; to be allowed",  zh:"可以;被允许", p1:"mag", p3:"mag", p6:"mogen", st:"Mag jij dat? Als kind mocht ik dat nooit.", stz:"你可以这样做吗?我小时候可从来不被允许。"},
   {inf:"zoeken",   sg:"zocht",   pl:"zochten",  pp:"gezocht", aux:"heb",    en:"to look for",  zh:"找;寻找", p1:"zoek", p3:"zoekt", p6:"zoeken", st:"Ik zocht overal; uiteindelijk heb ik ze onder de bank gezocht.", stz:"我到处找;最后在沙发底下找到了。"},
-  {inf:"zwemmen",  sg:"zwam",    pl:"zwammen",  pp:"gezwommen", aux:"ben",  en:"to swim",  zh:"游泳"},
+  {inf:"zwemmen",  sg:"zwom",    pl:"zwommen",  pp:"gezwommen", aux:"ben",  en:"to swim",  zh:"游泳"},
   {inf:"vliegen",  sg:"vloog",   pl:"vlogen",   pp:"gevlogen", aux:"ben",   en:"to fly",   zh:"飞;乘飞机"},
-  {inf:"stelen",   sg:"stal",    pl:"stolen",   pp:"gestolen", aux:"heb",   en:"to steal", zh:"偷"},
+  {inf:"stelen",   sg:"stal",    pl:"stalen",   pp:"gestolen", aux:"heb",   en:"to steal", zh:"偷"},
   {inf:"schieten", sg:"schoot",  pl:"schoten",  pp:"geschoten", aux:"heb",  en:"to shoot", zh:"射;射击"},
   {inf:"roepen",   sg:"riep",    pl:"riepen",   pp:"geroepen", aux:"heb",   en:"to call; to shout",  zh:"喊;叫"},
   {inf:"verdwijnen", sg:"verdween", pl:"verdwenen", pp:"verdwenen", aux:"ben", en:"to disappear",  zh:"消失"},
@@ -1124,8 +1124,19 @@ try{
   const s=JSON.parse(localStorage.getItem(SAVE_KEY));
   if(s && typeof s==="object"){ save={...save,...s, settings:{...DEFAULT_SETTINGS, ...(s.settings||{})}}; }
 }catch(e){}
+// 类型防御(2026-11-10 审计):损坏/异形存档只把坏字段复位为默认,合法进度一律保留——否则迁移与
+// 解锁重算处 Object.keys(null)、落账处 counts[V.inf] 会抛 TypeError,整页脚本中断且玩家无法自愈
+{
+  const isRec=x=> !!x && typeof x==="object" && !Array.isArray(x);
+  for(const k of ["done","best","dailyBest","counts"]) if(!isRec(save[k])) save[k]={};
+  for(const k of ["volume","ttsVolume","hintWait","bannerMs"]){
+    let v=save.settings[k];
+    if(typeof v==="string" && v.trim()!=="") v=Number(v);   // 数字字符串宽容收编
+    save.settings[k]= typeof v==="number" && Number.isFinite(v) && v>=0 ? v : DEFAULT_SETTINGS[k];
+  }
+}
 // 关卡布局迁移:v1(18 关)→ v2(51 关,7 词)→ v3(42 关,9 词/18 对);done/best 按映射搬家,超出新轮次的记录丢弃
-// 只对 v2 及更早(无标记)的存档重排——v4/v5 存档的键已是新索引,再进 v2 映射表会损坏进度(v1.21 存量 bug,2026-10-31 修)
+// 只对 v2 及更早(无标记)的存档重排——v4/v5 存档的键已是新索引,再进 v2 映射表会损坏进度(v1.21 存量 bug,2026-11-10 修)
 if(save.lvOrder==="v2"||save.lvOrder==null){
   const R2=[3,6,8], B2=[0,9,27];                      // v2:每档轮数与档基址(7 词/关时代)
   const R3=TIERS.map(t=>Math.ceil(t.pool.length/9)), B3=[0]; for(let i=1;i<R3.length;i++) B3.push(B3[i-1]+R3[i-1]*3);
@@ -1157,7 +1168,7 @@ if(save.lvOrder==="v3"){
   }
   save.lvOrder="v4";
 }
-// v5 迁移(2026-10-31):插入 LN 冠词组 4 关 + MV 复数组 4 关(位 12–19,过去时整体 +8);解锁改分组互锁
+// v5 迁移(2026-11-10):插入 LN 冠词组 4 关 + MV 复数组 4 关(位 12–19,过去时整体 +8);解锁改分组互锁
 if(save.lvOrder==="v4"){
   const hasProg=[save.done,save.best].some(records=>Object.keys(records).some(k=>/^L\d+$/.test(k)));
   if(hasProg){
@@ -1612,6 +1623,19 @@ const wordOf=(t)=>{
   return withPron(t.f, w);   // 人称变位:"ga"→"ik ga"(前缀随语言,省音同源)
 };
 
+/* 同形等价(v1.26):同关里显示文本相同的磁贴可互换身份——LN 关的多个 "de/het" 冠词块、代词组的 zij/zij 与
+   zichzelf×3、西/葡语 ser 与 ir 同形过去式(fui/fueron)。玩家点任意一块同形块都算对,返回要互换身份的
+   [所点块, 本命替身];替身文本相同所以只换词身份(v/f/chip)与色相,盘面文字不变。无替身返回 null */
+const twinFor=(a,b,pool)=>{
+  if(!a || !b || a.k===b.k || a.src!==b.src) return null;
+  const inf=a.k==="inf"?a:b, form=inf===a?b:a;
+  const same=(x,y)=> x && y && x!==y && x.alive && x.k===y.k && x.src===y.src && wordOf(x)===wordOf(y);
+  const ft=pool.find(x=> x.v===inf.v && same(x,form));   // 所点形式块 ≡ 原形词的本命形式块
+  if(ft) return [form,ft];
+  const it=pool.find(x=> x.v===form.v && same(x,inf));   // 所点原形块 ≡ 形式词的本命原形块
+  return it ? [inf,it] : null;
+};
+
 /* ---- 尺寸:确定性布局 ---- */
 function syncSize(){
   const dock=document.getElementById("dock"), slot=document.getElementById("bannerSlot");
@@ -1859,6 +1883,12 @@ function findAnyPairNow(){
     const o=occNow();
     if(findPathOcc(o,a.r,a.c,b.r,b.c)) return [a,b];
   }
+  // 本命对全被挡住时,同形等价对也是合法一步(否则会把还能走的盘面误判成死局去洗牌)
+  for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){
+    const a=alive[i], b=alive[j];
+    if(a.v===b.v||a.k===b.k||!twinFor(a,b,tiles)) continue;
+    if(findPathOcc(occNow(),a.r,a.c,b.r,b.c)) return [a,b];
+  }
   return null;
 }
 
@@ -2090,11 +2120,23 @@ function endSurvival(){
   wait();
 }
 
+function swapTwin(x,y){   // 两块显示文本相同:互换词身份,并按新词重涂色相(形状类随 f;同形块 f 本就相同,兜底重算)
+  for(const k of ["v","f","chip"]){ const tmp=x[k]; x[k]=y[k]; y[k]=tmp; }
+  for(const t of [x,y]){
+    if(!t.el) continue;
+    t.el.style.setProperty("--h",wordSrc(t)[t.v].hue);
+    const want=t.k==="inf"?"k-inf":"k-"+shapeKey(t.f);
+    for(const c of [...t.el.classList]) if(c.startsWith("k-") && c!==want) t.el.classList.remove(c);
+    t.el.classList.add(want);
+  }
+}
 /* 全程非阻塞(用户反馈:动效不得挡住快速连击):状态同步落账,动画与收尾走 setTimeout */
 function attemptPair(a,b){
   if(busy) return false;
-  // 词对校验:同动词,且必须 原形+本关形式 各一块(修"任意两块也能消")
-  const validPair = a && b && a!==b && a.alive && b.alive && a.v===b.v && a.k!==b.k;
+  // 词对校验:同词或同形等价,且必须 原形+本关形式 各一块(修"任意两块也能消")
+  const live = a && b && a!==b && a.alive && b.alive && a.k!==b.k;
+  const twin = live && a.v!==b.v ? twinFor(a,b,tiles) : null;
+  const validPair = live && (a.v===b.v || !!twin);
   const o=occNow();
   const path=validPair ? findPathOcc(o,a.r,a.c,b.r,b.c) : null;
   if(!path){
@@ -2105,6 +2147,7 @@ function attemptPair(a,b){
     reshuffleIfStuck();   // 失败尝试后同样查死局
     return false;
   }
+  if(twin) swapTwin(twin[0],twin[1]);   // 同形互换身份:a.v===b.v 成立,后续按词索引的落账/横幅照常
   // 成功:折线动画 + 音效 + 闪亮 + 弹字
   drawPath(path);
   const V=wordSrc(a)[a.v];
