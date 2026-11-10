@@ -9,10 +9,13 @@ const html = fs.readFileSync(`${dir}/index.html`, 'utf8');
 const m = html.match(/<script>([\s\S]*?)<\/script>/);
 if (!m) { console.error('no script block'); process.exit(1); }
 const head = m[1].split('/* ================= i18n')[0];
+const wordslice = m[1].slice(m[1].indexOf('const wordSrc='), m[1].indexOf('/* ---- 尺寸'));   // wordSrc/withPron/ppFull/wordOf
+const cardslice = m[1].slice(m[1].indexOf('function wordCardHTML'), m[1].indexOf('function nounCardHTML'));
 const ctx = { console, window: { addEventListener() {}, __errs: [] } };
 vm.createContext(ctx);
-vm.runInContext(head + '\nthis.__x={VERBS,NOUNS,TIERS,LINK_LEVELS,LANG_META};', ctx);
-const { VERBS, NOUNS, TIERS, LINK_LEVELS, LANG_META } = ctx.__x;
+vm.runInContext('this.save={style:"A"}; this.artSVG=()=>""; this.glossOf=v=>v.en||v.gloss||"";', ctx);   // 词卡依赖的桩
+vm.runInContext(head + '\n' + wordslice + '\n' + cardslice + '\nthis.__x={VERBS,NOUNS,TIERS,LINK_LEVELS,LANG_META,wordOf,withPron,cardHTML:wordCardHTML};', ctx);
+const { VERBS, NOUNS, TIERS, LINK_LEVELS, LANG_META, wordOf, withPron, cardHTML } = ctx.__x;
 let fail = 0;
 const eq = (a, b, msg) => { if (JSON.stringify(a) !== JSON.stringify(b)) { console.log('FAIL', msg, 'got', JSON.stringify(a), 'want', JSON.stringify(b)); fail++; } };
 const field = n => { for (const f of LANG_META.ln.concat(LANG_META.mv)) if (n[f]) return f; return null; };
@@ -78,5 +81,30 @@ for (const lv of LINK_LEVELS) {
 }
 // 存档键不与荷兰语冲突
 if (LANG_META.save === 'linkmatch.v1') { fail++; console.log('FAIL save key collides with Dutch'); }
+// 完成时助动词 aux(可选;标了就必须全标):分词磁贴=aux+分词,原形侧与代词条目不带
+{
+  const regular = VERBS.filter(v => !v.pron), withAux = regular.filter(v => v.aux);
+  if (withAux.length && withAux.length !== regular.length) { fail++; console.log('FAIL aux 标注不齐', withAux.length, '/', regular.length); }
+  for (const v of VERBS.filter(v => v.pron)) if (v.aux) { fail++; console.log('FAIL 代词条目不应有 aux', v.inf); }
+  for (const v of withAux) {
+    const vi = VERBS.indexOf(v);
+    if (!/^[A-Za-zÀ-ÿ]{1,8}$/.test(v.aux)) { fail++; console.log('FAIL aux 非法', v.inf, v.aux); }
+    eq(wordOf({ v: vi, k: 'form', f: 'pp' }), v.aux + ' ' + v.pp, 'pp tile aux ' + v.inf);
+    eq(wordOf({ v: vi, k: 'inf', f: 'pp' }), v.inf, 'inf tile bare ' + v.inf);
+    if (!cardHTML(vi, 'pp').includes('>' + v.aux + ' ' + v.pp + '<')) { fail++; console.log('FAIL 词卡分词未带 aux', v.inf); }
+  }
+}
+// 人称变位:磁贴与词卡同源(withPron),人称词取本语言;省音语言(elide)元音开头形式前省音
+for (const v of VERBS.filter(v => v.p1)) {
+  const vi = VERBS.indexOf(v);
+  for (const f of ['p1', 'p3', 'p6']) {
+    const want = withPron(f, v[f]);
+    eq(wordOf({ v: vi, k: 'form', f }), want, `person tile ${v.inf}.${f}`);
+    if (!cardHTML(vi, f).includes('>' + want + '<')) { fail++; console.log('FAIL 人称词卡与磁贴不同源', v.inf, f, want); }
+    const p = LANG_META.pron[f], elided = (LANG_META.elide || []).includes(p) && /^[aeiouy]/i.test(v[f]);
+    const expect = elided ? p.slice(0, -1) + "'" + v[f] : p + ' ' + v[f];
+    eq(want, expect, `pronoun join ${v.inf}.${f}`);
+  }
+}
 console.log(fail ? `${dir} SMOKE FAIL ${fail}` : `${dir} SMOKE ALL PASS`);
 process.exit(fail ? 1 : 0);

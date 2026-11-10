@@ -60,6 +60,7 @@
    "sg": "war",
    "pl": "waren",
    "pp": "gewesen",
+   "aux": "bin",
    "p1": "bin",
    "p3": "ist",
    "p6": "sind",
@@ -71,6 +72,7 @@
    "sg": "hatte",
    "pl": "hatten",
    "pp": "gehabt",
+   "aux": "habe",
    "p1": "habe",
    "p3": "hat",
    "p6": "haben",
@@ -82,6 +84,7 @@
    "sg": "wurde",
    "pl": "wurden",
    "pp": "geworden",
+   "aux": "bin",
    "p1": "werde",
    "p3": "wird",
    "p6": "werden",
@@ -93,6 +96,7 @@
    "sg": "ging",
    "pl": "gingen",
    "pp": "gegangen",
+   "aux": "bin",
    "p1": "gehe",
    "p3": "geht",
    "p6": "gehen",
@@ -104,6 +108,7 @@
    "sg": "kam",
    "pl": "kamen",
    "pp": "gekommen",
+   "aux": "bin",
    "p1": "komme",
    "p3": "kommt",
    "p6": "kommen",
@@ -115,6 +120,7 @@
    "sg": "sah",
    "pl": "sahen",
    "pp": "gesehen",
+   "aux": "habe",
    "p1": "sehe",
    "p3": "sieht",
    "p6": "sehen",
@@ -126,6 +132,7 @@
    "sg": "gab",
    "pl": "gaben",
    "pp": "gegeben",
+   "aux": "habe",
    "p1": "gebe",
    "p3": "gibt",
    "p6": "geben",
@@ -137,6 +144,7 @@
    "sg": "nahm",
    "pl": "nahmen",
    "pp": "genommen",
+   "aux": "habe",
    "p1": "nehme",
    "p3": "nimmt",
    "p6": "nehmen",
@@ -148,6 +156,7 @@
    "sg": "aß",
    "pl": "aßen",
    "pp": "gegessen",
+   "aux": "habe",
    "p1": "esse",
    "p3": "isst",
    "p6": "essen",
@@ -159,6 +168,7 @@
    "sg": "trank",
    "pl": "tranken",
    "pp": "getrunken",
+   "aux": "habe",
    "p1": "trinke",
    "p3": "trinkt",
    "p6": "trinken",
@@ -170,6 +180,7 @@
    "sg": "sprach",
    "pl": "sprachen",
    "pp": "gesprochen",
+   "aux": "habe",
    "p1": "spreche",
    "p3": "spricht",
    "p6": "sprechen",
@@ -181,6 +192,7 @@
    "sg": "las",
    "pl": "lasen",
    "pp": "gelesen",
+   "aux": "habe",
    "p1": "lese",
    "p3": "liest",
    "p6": "lesen",
@@ -192,6 +204,7 @@
    "sg": "fuhr",
    "pl": "fuhren",
    "pp": "gefahren",
+   "aux": "bin",
    "p1": "fahre",
    "p3": "fährt",
    "p6": "fahren",
@@ -203,6 +216,7 @@
    "sg": "blieb",
    "pl": "blieben",
    "pp": "geblieben",
+   "aux": "bin",
    "p1": "bleibe",
    "p3": "bleibt",
    "p6": "bleiben",
@@ -214,6 +228,7 @@
    "sg": "lief",
    "pl": "liefen",
    "pp": "gelaufen",
+   "aux": "bin",
    "p1": "laufe",
    "p3": "läuft",
    "p6": "laufen",
@@ -225,6 +240,7 @@
    "sg": "schlief",
    "pl": "schliefen",
    "pp": "geschlafen",
+   "aux": "habe",
    "p1": "schlafe",
    "p3": "schläft",
    "p6": "schlafen",
@@ -236,6 +252,7 @@
    "sg": "trug",
    "pl": "trugen",
    "pp": "getragen",
+   "aux": "habe",
    "p1": "trage",
    "p3": "trägt",
    "p6": "tragen",
@@ -247,6 +264,7 @@
    "sg": "traf",
    "pl": "trafen",
    "pp": "getroffen",
+   "aux": "habe",
    "p1": "treffe",
    "p3": "trifft",
    "p6": "treffen",
@@ -258,6 +276,7 @@
    "sg": "wusch",
    "pl": "wuschen",
    "pp": "gewaschen",
+   "aux": "habe",
    "p1": "wasche",
    "p3": "wäscht",
    "p6": "waschen",
@@ -269,6 +288,7 @@
    "sg": "half",
    "pl": "halfen",
    "pp": "geholfen",
+   "aux": "habe",
    "p1": "helfe",
    "p3": "hilft",
    "p6": "helfen",
@@ -280,6 +300,7 @@
    "sg": "machte",
    "pl": "machten",
    "pp": "gemacht",
+   "aux": "habe",
    "en": "to make",
    "zh": "做"
   },
@@ -288,6 +309,7 @@
    "sg": "sagte",
    "pl": "sagten",
    "pp": "gesagt",
+   "aux": "habe",
    "en": "to say",
    "zh": "说"
   },
@@ -296,6 +318,7 @@
    "sg": "fand",
    "pl": "fanden",
    "pp": "gefunden",
+   "aux": "habe",
    "en": "to find",
    "zh": "找到"
   },
@@ -304,6 +327,7 @@
    "sg": "dachte",
    "pl": "dachten",
    "pp": "gedacht",
+   "aux": "habe",
    "en": "to think",
    "zh": "想"
   },
@@ -312,6 +336,7 @@
    "sg": "wusste",
    "pl": "wussten",
    "pp": "gewusst",
+   "aux": "habe",
    "en": "to know",
    "zh": "知道"
   },
@@ -320,6 +345,7 @@
    "sg": "kannte",
    "pl": "kannten",
    "pp": "gekannt",
+   "aux": "habe",
    "en": "to know (a person)",
    "zh": "认识"
   },
@@ -328,6 +354,7 @@
    "sg": "brachte",
    "pl": "brachten",
    "pp": "gebracht",
+   "aux": "habe",
    "en": "to bring",
    "zh": "带来"
   },
@@ -336,6 +363,7 @@
    "sg": "schrieb",
    "pl": "schrieben",
    "pp": "geschrieben",
+   "aux": "habe",
    "en": "to write",
    "zh": "写"
   },
@@ -344,6 +372,7 @@
    "sg": "saß",
    "pl": "saßen",
    "pp": "gesessen",
+   "aux": "habe",
    "en": "to sit",
    "zh": "坐"
   },
@@ -352,6 +381,7 @@
    "sg": "stand",
    "pl": "standen",
    "pp": "gestanden",
+   "aux": "habe",
    "en": "to stand",
    "zh": "站"
   },
@@ -360,6 +390,7 @@
    "sg": "lag",
    "pl": "lagen",
    "pp": "gelegen",
+   "aux": "habe",
    "en": "to lie",
    "zh": "躺/位于"
   },
@@ -368,6 +399,7 @@
    "sg": "brannte",
    "pl": "brannten",
    "pp": "gebrannt",
+   "aux": "habe",
    "en": "to burn",
    "zh": "燃烧"
   },
@@ -376,6 +408,7 @@
    "sg": "nannte",
    "pl": "nannten",
    "pp": "genannt",
+   "aux": "habe",
    "en": "to name",
    "zh": "称为"
   },
@@ -384,6 +417,7 @@
    "sg": "rannte",
    "pl": "rannten",
    "pp": "gerannt",
+   "aux": "bin",
    "en": "to race",
    "zh": "奔跑"
   },
@@ -392,6 +426,7 @@
    "sg": "vergaß",
    "pl": "vergaßen",
    "pp": "vergessen",
+   "aux": "habe",
    "en": "to forget",
    "zh": "忘记"
   },
@@ -400,6 +435,7 @@
    "sg": "verlor",
    "pl": "verloren",
    "pp": "verloren",
+   "aux": "habe",
    "en": "to lose",
    "zh": "丢失"
   },
@@ -408,6 +444,7 @@
    "sg": "entschied",
    "pl": "entschieden",
    "pp": "entschieden",
+   "aux": "habe",
    "en": "to decide",
    "zh": "决定"
   },
@@ -416,6 +453,7 @@
    "sg": "schnitt",
    "pl": "schnitten",
    "pp": "geschnitten",
+   "aux": "habe",
    "en": "to cut",
    "zh": "剪"
   },
@@ -424,6 +462,7 @@
    "sg": "litt",
    "pl": "litten",
    "pp": "gelitten",
+   "aux": "habe",
    "en": "to suffer",
    "zh": "受苦"
   },
@@ -432,6 +471,7 @@
    "sg": "lud",
    "pl": "luden",
    "pp": "geladen",
+   "aux": "habe",
    "en": "to load",
    "zh": "装载"
   },
@@ -440,6 +480,7 @@
    "sg": "starb",
    "pl": "starben",
    "pp": "gestorben",
+   "aux": "bin",
    "en": "to die",
    "zh": "死亡"
   },
@@ -448,6 +489,7 @@
    "sg": "warf",
    "pl": "warfen",
    "pp": "geworfen",
+   "aux": "habe",
    "en": "to throw",
    "zh": "扔"
   },
@@ -456,6 +498,7 @@
    "sg": "begann",
    "pl": "begannen",
    "pp": "begonnen",
+   "aux": "habe",
    "en": "to begin",
    "zh": "开始"
   },
@@ -464,6 +507,7 @@
    "sg": "griff",
    "pl": "griffen",
    "pp": "gegriffen",
+   "aux": "habe",
    "en": "to grip",
    "zh": "抓住"
   },
@@ -472,6 +516,7 @@
    "sg": "riss",
    "pl": "rissen",
    "pp": "gerissen",
+   "aux": "habe",
    "en": "to tear",
    "zh": "撕"
   },
@@ -480,6 +525,7 @@
    "sg": "glitt",
    "pl": "glitten",
    "pp": "geglitten",
+   "aux": "bin",
    "en": "to glide",
    "zh": "滑行"
   },
@@ -488,6 +534,7 @@
    "sg": "stritt",
    "pl": "stritten",
    "pp": "gestritten",
+   "aux": "habe",
    "en": "to quarrel",
    "zh": "争吵"
   },
@@ -496,6 +543,7 @@
    "sg": "fiel",
    "pl": "fielen",
    "pp": "gefallen",
+   "aux": "bin",
    "en": "to fall",
    "zh": "落下"
   },
@@ -504,6 +552,7 @@
    "sg": "gelang",
    "pl": "gelangen",
    "pp": "gelungen",
+   "aux": "bin",
    "en": "to succeed",
    "zh": "成功"
   },
@@ -512,6 +561,7 @@
    "sg": "klang",
    "pl": "klangen",
    "pp": "geklungen",
+   "aux": "habe",
    "en": "to sound",
    "zh": "听起来"
   },
@@ -520,6 +570,7 @@
    "sg": "schwang",
    "pl": "schwangen",
    "pp": "geschwungen",
+   "aux": "habe",
    "en": "to swing",
    "zh": "摆动"
   },
@@ -528,6 +579,7 @@
    "sg": "sang",
    "pl": "sangen",
    "pp": "gesungen",
+   "aux": "habe",
    "en": "to sing",
    "zh": "唱歌"
   },
@@ -536,6 +588,7 @@
    "sg": "sank",
    "pl": "sanken",
    "pp": "gesunken",
+   "aux": "bin",
    "en": "to sink",
    "zh": "下沉"
   },
@@ -544,6 +597,7 @@
    "sg": "gewann",
    "pl": "gewannen",
    "pp": "gewonnen",
+   "aux": "habe",
    "en": "to win",
    "zh": "赢"
   },
@@ -552,6 +606,7 @@
    "sg": "erfand",
    "pl": "erfanden",
    "pp": "erfunden",
+   "aux": "habe",
    "en": "to invent",
    "zh": "发明"
   },
@@ -560,6 +615,7 @@
    "sg": "erschrak",
    "pl": "erschraken",
    "pp": "erschrocken",
+   "aux": "bin",
    "en": "to be frightened",
    "zh": "受惊"
   },
@@ -568,6 +624,7 @@
    "sg": "schwor",
    "pl": "schworen",
    "pp": "geschworen",
+   "aux": "habe",
    "en": "to swear",
    "zh": "发誓"
   },
@@ -576,6 +633,7 @@
    "sg": "stahl",
    "pl": "stahlen",
    "pp": "gestohlen",
+   "aux": "habe",
    "en": "to steal",
    "zh": "偷"
   },
@@ -584,6 +642,7 @@
    "sg": "brach",
    "pl": "brachen",
    "pp": "gebrochen",
+   "aux": "habe",
    "en": "to break",
    "zh": "打破"
   },
@@ -592,6 +651,7 @@
    "sg": "grub",
    "pl": "gruben",
    "pp": "gegraben",
+   "aux": "habe",
    "en": "to dig",
    "zh": "挖"
   }

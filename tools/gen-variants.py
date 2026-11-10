@@ -54,6 +54,16 @@ def gen(code):
         vv = next(x for x in verbs if x["inf"] == v)
         for k in ("p1", "p3", "p6"):
             if not vv.get(k): fail(f"{code}: A1 词 {v} 缺 {k}")
+    # aux(完成时助动词,第一人称)要么全标要么全不标;代词条目(pp=反身)不标
+    with_aux = [v["inf"] for v in verbs if v.get("aux")]
+    if with_aux and len(with_aux) != len(verbs):
+        fail(f"{code}: aux 标注不齐 {len(with_aux)}/{len(verbs)}(缺:{[v['inf'] for v in verbs if not v.get('aux')][:8]})")
+    # elide(省音人称,如法语 je)语言:元音开头形式会省音;h 开头形式涉及 h aspiré,必须人工确认
+    if meta.get("elide"):
+        for v in verbs:
+            for k in ("p1", "p3", "p6"):
+                if v.get(k) and v[k][:1].lower() == "h":
+                    fail(f"{code}: elide 语言出现 h 开头人称形 {v['inf']}.{k}={v[k]} — h aspiré 需人工确认是否省音")
     ln_all, mv_all = set(ln_fields), set(mv_fields)
     for n in nouns:
         got = [f for f in ln_fields if n.get(f)] + [f for f in mv_fields if n.get(f)]
@@ -82,7 +92,7 @@ def gen(code):
         lines = []
         for v in entries:
             parts = [f'inf:"{v["inf"]}"']
-            for k in ("sg", "pl", "pp", "p1", "p3", "p6"):
+            for k in ("sg", "pl", "pp", "aux", "p1", "p3", "p6"):   # aux=完成时助动词(第一人称,可选:德 bin/habe)
                 if v.get(k): parts.append(f'{k}:"{v[k]}"')
             if pron: parts.append("pron:true")
             if v.get("en"): parts.append(f'en:{js_str(v["en"])}')
@@ -99,7 +109,8 @@ def gen(code):
     def obj_js(d):
         return "{" + ", ".join(f'{k}:{json.dumps(v, ensure_ascii=False)}' for k, v in d.items()) + "}"
 
-    data_region = f'''const LANG_META={{ code:{js_str(code)}, ui:{js_str(meta["ui"])}, tts:{js_str(meta["tts"])}, save:{js_str(meta["save"])}, ln:{json.dumps(ln_fields)}, mv:{json.dumps(mv_fields)}, pron:{json.dumps(meta["pron"])} }};
+    elide_js = f", elide:{json.dumps(meta['elide'])}" if meta.get("elide") else ""   # 省音人称(法语 je):引擎 withPron 消费
+    data_region = f'''const LANG_META={{ code:{js_str(code)}, ui:{js_str(meta["ui"])}, tts:{js_str(meta["tts"])}, save:{js_str(meta["save"])}, ln:{json.dumps(ln_fields)}, mv:{json.dumps(mv_fields)}, pron:{json.dumps(meta["pron"])}{elide_js} }};
 const VERBS=[
 {verb_js(verbs)}
 {verb_js(pronouns, pron=True)}
