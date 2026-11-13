@@ -121,14 +121,17 @@ test('Link match browser regression',async t=>{
     });
     await t.test('all levels clear with correct feedback and independent progress, then reload',async()=>{
       const p=await page();const errors=[];p.on('pageerror',e=>errors.push(e.message));
-      for(let i=0;i<74;i++){
+      const total=await p.evaluate(()=>LINK_LEVELS.length);   // 关卡数随版本涨(74→78),动态取
+      for(let i=0;i<total;i++){
         await p.evaluate(async i=>{hideResult();await startLink(i);NLM3.skipDemo()},i);
         let guard=0;
         while(await p.evaluate(()=>pairsLeft>0)){
           assert.ok(guard++<30,`stuck level ${i}`);
           const result=await p.evaluate(()=>{
             const p=NLM3.findPair();if(!p)return null;
-            const a=board[p[0]][p[1]],b=board[p[2]][p[3]],expected=wordOf(a.k==='form'?a:b);
+            const a=board[p[0]][p[1]],b=board[p[2]][p[3]],ft=a.k==='form'?a:b;
+            // 横幅高亮=形式词;名词关朗读/高亮用存储全短语(de dag),磁贴只显示裸冠词 de
+            const expected=a.src==='n'?NOUNS[a.v][ft.f]:wordOf(ft);
             const ok=NLM3.connect(...p);
             return {ok,expected,highlight:bannerEl.querySelector('.bf.on')?.textContent};
           });
@@ -143,7 +146,7 @@ test('Link match browser regression',async t=>{
       await p.reload();
       assert.deepEqual(await p.evaluate(()=>NLM3.save()),saved);
       assert.deepEqual(errors,[]);
-      console.log('74/74 levels cleared; feedback and reload verified');
+      console.log(`${total}/${total} levels cleared; feedback and reload verified`);
       await p.close();
     });
   }finally{await browser.close();await new Promise(r=>server.close(r))}
