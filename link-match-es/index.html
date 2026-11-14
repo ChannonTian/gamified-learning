@@ -1750,7 +1750,7 @@ const anyOverlayOpen=()=>[...document.querySelectorAll(".overlay")].some(o=>o.cl
 const wordSrc=t=> t.src==="n" ? NOUNS : VERBS;   // 名词组磁贴(src:"n")查 NOUNS,动词查 VERBS
 const NOUN_FIELD=n=>{ for(const f of LANG_META.ln.concat(LANG_META.mv)) if(n[f]) return f; return null; };   // 名词条目的类型键=它有的字段(字段表随语言)
 const P_PRONOUN=LANG_META.pron;     // 人称变位组:形磁贴带人称(gaan ↔ ik ga;随语言)
-const ppFull=V=> V.pp && V.aux ? V.aux+" "+V.pp : V.pp;   // 完成时:ben/heb、bin/habe + 分词(第一人称;无 aux 字段的语言/代词组原样)
+const ppFull=V=> V.pp && V.aux ? V.aux+" "+V.pp : V.pp;   // 完成时:辞典式第三人称(is/heeft、ist/hat)+ 分词;法语用户定稿第一人称(suis/ai 阳性);无 aux 字段的语言/代词组原样
 const withPron=(f,w)=>{   // 人称+形式拼接(磁贴与词卡同源);elide 语言(je)在元音开头形式前省音:je ai→j'ai(h aspiré 形式出现时生成器会拦截)
   const p=P_PRONOUN[f];
   if(!p) return w;
@@ -2456,7 +2456,7 @@ function wordCardHTML(vi,activeF){
   const isPerson=activeF==="p1"||activeF==="p3"||activeF==="p6";
   const raw=isPerson
     ? [["inf",V.inf],["p1",withPron("p1",V.p1)],["p3",withPron("p3",V.p3)],["p6",withPron("p6",V.p6)]]   // 人称变位关:形带人称,与磁贴同源(曾硬编码荷兰语 ik/hij/wij → 变体词卡显示错语言)
-    : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppFull(V)]];   // 分词带助动词(ben/heb + pp)
+    : [["inf",V.inf],["sg",V.sg],["pl",V.pl],["pp",ppFull(V)]];   // 分词带助动词(is/heeft、ist/hat、suis/ai + pp)
   const forms=raw.filter(([,w])=>w)
     .map(([k,w])=>`<span class="bf${k===activeF?" on":""}${k==="inf"?" swu":""}">${w}</span>`).join("");
   return `<svg class="wc-art" viewBox="0 0 120 120">${artSVG(vi,save.style)}</svg><div class="wc-main"><div class="wc-forms">${forms}</div></div><div class="wc-gloss">${glossOf(V)}</div>`;

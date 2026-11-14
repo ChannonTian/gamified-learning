@@ -116,6 +116,20 @@ for (const v of VERBS.filter(v => v.p1)) {
     const v = VERBS.find(x => x.inf === inf);
     eq(v && v[f], want, 'pin ' + inf + '.' + f);
   }
+  // 法语助动词(Bescherelle "avec être" 惯例:不及物位移/状态变化 être,其余 avoir;2026-11-13 用户定稿第一人称阳性)
+  if (LANG_META.code === 'fr') {
+    const ETRE = ['aller', 'venir', 'partir', 'arriver', 'entrer', 'rester', 'tomber', 'sortir', 'monter', 'naître', 'mourir'];
+    const byInf = Object.fromEntries(VERBS.filter(v => !v.pron).map(v => [v.inf, v]));
+    for (const inf of ETRE) eq(byInf[inf] && byInf[inf].aux, 'suis', 'fr être ' + inf);
+    eq(VERBS.filter(v => !v.pron && v.aux === 'suis').length, 11, 'fr être count');
+    eq(VERBS.filter(v => !v.pron && v.aux === 'ai').length, 49, 'fr avoir count');
+    for (const inf of ['aller', 'finir']) {   // pp 磁贴/词卡带第一人称阳性助动词
+      const v = byInf[inf]; if (!v) continue;
+      const vi = VERBS.indexOf(v);
+      eq(wordOf({ v: vi, k: 'form', f: 'pp' }), v.aux + ' ' + v.pp, 'fr pp tile ' + inf);
+      if (!cardHTML(vi, 'pp').includes('>' + v.aux + ' ' + v.pp + '<')) { fail++; console.log('FAIL fr 词卡未带 aux', inf); }
+    }
+  }
   const prons = VERBS.filter(v => v.pron);
   if (LANG_META.code === 'es') {               // 第三列是反身代词(legend.pr.ref):él/ella 反身=se,lo/la 是直接宾语
     for (const p of prons) if (!['me', 'te', 'se', 'nos', 'os'].includes(p.pp)) { fail++; console.log('FAIL es 反身代词', p.inf, p.pp); }

@@ -58,6 +58,7 @@
    "sg": "étais",
    "pl": "étions",
    "pp": "été",
+   "aux": "ai",
    "p1": "suis",
    "p3": "est",
    "p6": "sommes",
@@ -69,6 +70,7 @@
    "sg": "avais",
    "pl": "avions",
    "pp": "eu",
+   "aux": "ai",
    "p1": "ai",
    "p3": "a",
    "p6": "avons",
@@ -80,6 +82,7 @@
    "sg": "faisais",
    "pl": "faisions",
    "pp": "fait",
+   "aux": "ai",
    "p1": "fais",
    "p3": "fait",
    "p6": "faisons",
@@ -91,6 +94,7 @@
    "sg": "disais",
    "pl": "disions",
    "pp": "dit",
+   "aux": "ai",
    "p1": "dis",
    "p3": "dit",
    "p6": "disons",
@@ -102,6 +106,7 @@
    "sg": "allais",
    "pl": "allions",
    "pp": "allé",
+   "aux": "suis",
    "p1": "vais",
    "p3": "va",
    "p6": "allons",
@@ -113,6 +118,7 @@
    "sg": "voyais",
    "pl": "voyions",
    "pp": "vu",
+   "aux": "ai",
    "p1": "vois",
    "p3": "voit",
    "p6": "voyons",
@@ -124,6 +130,7 @@
    "sg": "savais",
    "pl": "savions",
    "pp": "su",
+   "aux": "ai",
    "p1": "sais",
    "p3": "sait",
    "p6": "savons",
@@ -135,6 +142,7 @@
    "sg": "pouvais",
    "pl": "pouvions",
    "pp": "pu",
+   "aux": "ai",
    "p1": "peux",
    "p3": "peut",
    "p6": "pouvons",
@@ -146,6 +154,7 @@
    "sg": "venais",
    "pl": "venions",
    "pp": "venu",
+   "aux": "suis",
    "p1": "viens",
    "p3": "vient",
    "p6": "venons",
@@ -157,6 +166,7 @@
    "sg": "voulais",
    "pl": "voulions",
    "pp": "voulu",
+   "aux": "ai",
    "p1": "veux",
    "p3": "veut",
    "p6": "voulons",
@@ -168,6 +178,7 @@
    "sg": "devais",
    "pl": "devions",
    "pp": "dû",
+   "aux": "ai",
    "p1": "dois",
    "p3": "doit",
    "p6": "devons",
@@ -179,6 +190,7 @@
    "sg": "prenais",
    "pl": "prenions",
    "pp": "pris",
+   "aux": "ai",
    "p1": "prends",
    "p3": "prend",
    "p6": "prenons",
@@ -190,6 +202,7 @@
    "sg": "donnais",
    "pl": "donnions",
    "pp": "donné",
+   "aux": "ai",
    "p1": "donne",
    "p3": "donne",
    "p6": "donnons",
@@ -201,6 +214,7 @@
    "sg": "parlais",
    "pl": "parlions",
    "pp": "parlé",
+   "aux": "ai",
    "p1": "parle",
    "p3": "parle",
    "p6": "parlons",
@@ -212,6 +226,7 @@
    "sg": "aimais",
    "pl": "aimions",
    "pp": "aimé",
+   "aux": "ai",
    "p1": "aime",
    "p3": "aime",
    "p6": "aimons",
@@ -223,6 +238,7 @@
    "sg": "mettais",
    "pl": "mettions",
    "pp": "mis",
+   "aux": "ai",
    "p1": "mets",
    "p3": "met",
    "p6": "mettons",
@@ -234,6 +250,7 @@
    "sg": "passais",
    "pl": "passions",
    "pp": "passé",
+   "aux": "ai",
    "p1": "passe",
    "p3": "passe",
    "p6": "passons",
@@ -245,6 +262,7 @@
    "sg": "regardais",
    "pl": "regardions",
    "pp": "regardé",
+   "aux": "ai",
    "p1": "regarde",
    "p3": "regarde",
    "p6": "regardons",
@@ -256,6 +274,7 @@
    "sg": "demandais",
    "pl": "demandions",
    "pp": "demandé",
+   "aux": "ai",
    "p1": "demande",
    "p3": "demande",
    "p6": "demandons",
@@ -267,6 +286,7 @@
    "sg": "partais",
    "pl": "partions",
    "pp": "parti",
+   "aux": "suis",
    "p1": "pars",
    "p3": "part",
    "p6": "partons",
@@ -278,6 +298,7 @@
    "sg": "comprenais",
    "pl": "comprenions",
    "pp": "compris",
+   "aux": "ai",
    "en": "to understand",
    "zh": "理解"
   },
@@ -286,6 +307,7 @@
    "sg": "attendais",
    "pl": "attendions",
    "pp": "attendu",
+   "aux": "ai",
    "en": "to wait",
    "zh": "等待"
   },
@@ -294,6 +316,7 @@
    "sg": "répondais",
    "pl": "répondions",
    "pp": "répondu",
+   "aux": "ai",
    "en": "to answer",
    "zh": "回答"
   },
@@ -302,6 +325,7 @@
    "sg": "connaissais",
    "pl": "connaissions",
    "pp": "connu",
+   "aux": "ai",
    "en": "to know (a person)",
    "zh": "认识"
   },
@@ -310,6 +334,7 @@
    "sg": "croyais",
    "pl": "croyions",
    "pp": "cru",
+   "aux": "ai",
    "en": "to believe",
    "zh": "相信"
   },
@@ -318,6 +343,7 @@
    "sg": "suivais",
    "pl": "suivions",
    "pp": "suivi",
+   "aux": "ai",
    "en": "to follow",
    "zh": "跟随"
   },
@@ -326,6 +352,7 @@
    "sg": "écrivais",
    "pl": "écrivions",
    "pp": "écrit",
+   "aux": "ai",
    "en": "to write",
    "zh": "写"
   },
@@ -334,6 +361,7 @@
    "sg": "lisais",
    "pl": "lisions",
    "pp": "lu",
+   "aux": "ai",
    "en": "to read",
    "zh": "读"
   },
@@ -342,6 +370,7 @@
    "sg": "vivais",
    "pl": "vivions",
    "pp": "vécu",
+   "aux": "ai",
    "en": "to live",
    "zh": "生活"
   },
@@ -350,6 +379,7 @@
    "sg": "tenais",
    "pl": "tenions",
    "pp": "tenu",
+   "aux": "ai",
    "en": "to hold",
    "zh": "握住"
   },
@@ -358,6 +388,7 @@
    "sg": "arrivais",
    "pl": "arrivions",
    "pp": "arrivé",
+   "aux": "suis",
    "en": "to arrive",
    "zh": "到达"
   },
@@ -366,6 +397,7 @@
    "sg": "entrais",
    "pl": "entrions",
    "pp": "entré",
+   "aux": "suis",
    "en": "to enter",
    "zh": "进入"
   },
@@ -374,6 +406,7 @@
    "sg": "restais",
    "pl": "restions",
    "pp": "resté",
+   "aux": "suis",
    "en": "to stay",
    "zh": "逗留"
   },
@@ -382,6 +415,7 @@
    "sg": "tombais",
    "pl": "tombions",
    "pp": "tombé",
+   "aux": "suis",
    "en": "to fall",
    "zh": "掉落"
   },
@@ -390,6 +424,7 @@
    "sg": "sortais",
    "pl": "sortions",
    "pp": "sorti",
+   "aux": "suis",
    "en": "to go out",
    "zh": "出去"
   },
@@ -398,6 +433,7 @@
    "sg": "montais",
    "pl": "montions",
    "pp": "monté",
+   "aux": "suis",
    "en": "to go up",
    "zh": "登上"
   },
@@ -406,6 +442,7 @@
    "sg": "finissais",
    "pl": "finissions",
    "pp": "fini",
+   "aux": "ai",
    "en": "to finish",
    "zh": "完成"
   },
@@ -414,6 +451,7 @@
    "sg": "choisissais",
    "pl": "choisissions",
    "pp": "choisi",
+   "aux": "ai",
    "en": "to choose",
    "zh": "选择"
   },
@@ -422,6 +460,7 @@
    "sg": "réussissais",
    "pl": "réussissions",
    "pp": "réussi",
+   "aux": "ai",
    "en": "to succeed",
    "zh": "成功"
   },
@@ -430,6 +469,7 @@
    "sg": "pensais",
    "pl": "pensions",
    "pp": "pensé",
+   "aux": "ai",
    "en": "to think",
    "zh": "思考"
   },
@@ -438,6 +478,7 @@
    "sg": "naissais",
    "pl": "naissions",
    "pp": "né",
+   "aux": "suis",
    "en": "to be born",
    "zh": "出生"
   },
@@ -446,6 +487,7 @@
    "sg": "mourais",
    "pl": "mourions",
    "pp": "mort",
+   "aux": "suis",
    "en": "to die",
    "zh": "死亡"
   },
@@ -454,6 +496,7 @@
    "sg": "ouvrais",
    "pl": "ouvrions",
    "pp": "ouvert",
+   "aux": "ai",
    "en": "to open",
    "zh": "打开"
   },
@@ -462,6 +505,7 @@
    "sg": "offrais",
    "pl": "offrions",
    "pp": "offert",
+   "aux": "ai",
    "en": "to offer",
    "zh": "提供"
   },
@@ -470,6 +514,7 @@
    "sg": "souffrais",
    "pl": "souffrions",
    "pp": "souffert",
+   "aux": "ai",
    "en": "to suffer",
    "zh": "受苦"
   },
@@ -478,6 +523,7 @@
    "sg": "découvrais",
    "pl": "découvrions",
    "pp": "découvert",
+   "aux": "ai",
    "en": "to discover",
    "zh": "发现"
   },
@@ -486,6 +532,7 @@
    "sg": "conduisais",
    "pl": "conduisions",
    "pp": "conduit",
+   "aux": "ai",
    "en": "to drive",
    "zh": "驾驶"
   },
@@ -494,6 +541,7 @@
    "sg": "construisais",
    "pl": "construisions",
    "pp": "construit",
+   "aux": "ai",
    "en": "to build",
    "zh": "建造"
   },
@@ -502,6 +550,7 @@
    "sg": "détruisais",
    "pl": "détruisions",
    "pp": "détruit",
+   "aux": "ai",
    "en": "to destroy",
    "zh": "摧毁"
   },
@@ -510,6 +559,7 @@
    "sg": "produisais",
    "pl": "produisions",
    "pp": "produit",
+   "aux": "ai",
    "en": "to produce",
    "zh": "生产"
   },
@@ -518,6 +568,7 @@
    "sg": "battais",
    "pl": "battions",
    "pp": "battu",
+   "aux": "ai",
    "en": "to beat",
    "zh": "打败"
   },
@@ -526,6 +577,7 @@
    "sg": "rompais",
    "pl": "rompions",
    "pp": "rompu",
+   "aux": "ai",
    "en": "to break",
    "zh": "折断"
   },
@@ -534,6 +586,7 @@
    "sg": "résolvais",
    "pl": "résolvions",
    "pp": "résolu",
+   "aux": "ai",
    "en": "to solve",
    "zh": "解决"
   },
@@ -542,6 +595,7 @@
    "sg": "servais",
    "pl": "servions",
    "pp": "servi",
+   "aux": "ai",
    "en": "to serve",
    "zh": "服务"
   },
@@ -550,6 +604,7 @@
    "sg": "dormais",
    "pl": "dormions",
    "pp": "dormi",
+   "aux": "ai",
    "en": "to sleep",
    "zh": "睡觉"
   },
@@ -558,6 +613,7 @@
    "sg": "mentais",
    "pl": "mentions",
    "pp": "menti",
+   "aux": "ai",
    "en": "to lie",
    "zh": "撒谎"
   },
@@ -566,6 +622,7 @@
    "sg": "sentais",
    "pl": "sentions",
    "pp": "senti",
+   "aux": "ai",
    "en": "to feel",
    "zh": "感觉"
   },
@@ -574,6 +631,7 @@
    "sg": "courais",
    "pl": "courions",
    "pp": "couru",
+   "aux": "ai",
    "en": "to run",
    "zh": "跑"
   },
@@ -582,6 +640,7 @@
    "sg": "riais",
    "pl": "riions",
    "pp": "ri",
+   "aux": "ai",
    "en": "to laugh",
    "zh": "笑"
   },
@@ -590,6 +649,7 @@
    "sg": "atteignais",
    "pl": "atteignions",
    "pp": "atteint",
+   "aux": "ai",
    "en": "to reach",
    "zh": "达到"
   }

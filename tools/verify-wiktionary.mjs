@@ -115,7 +115,7 @@ async function verifyDe() {
       if (set.size && !set.has(repo)) flags.push(`${v.inf}: ${label} repo=${repo} wikt=[${[...set].join("|")}]`);
     }
     const aux = new Set(); for (const o of ovs) for (const k of ["Hilfsverb", "Hilfsverb*"]) if (o[k]) for (const x of norm(o[k]).split(/\s*[,/]\s*|\s+oder\s+|\s+/)) if (x) aux.add(x);
-    const want = v.aux === "bin" ? "sein" : "haben";
+    const want = v.aux === "ist" ? "sein" : "haben";
     if (!aux.has(want)) flags.push(`${v.inf}: aux repo=${v.aux}(${want}) wikt=[${[...aux].join("|")}]`);
   }
   return flags;

@@ -121,34 +121,34 @@ test('all 78 levels have unique words, valid forms and complete type-pool covera
     assert.deepEqual(ln[i].verbs,ln[i+1].verbs,ln[i].id);
   }
 });
-test('every regular verb is labelled with a first-person perfective auxiliary (ben/heb)',()=>{
+test('every regular verb is labelled with a dictionary-form perfective auxiliary (is/heeft)',()=>{
   const {VERBS}=load(null);
   const byInf=Object.fromEntries(VERBS.map(v=>[v.inf,v]));
   const regular=VERBS.filter(v=>!v.pron);
-  for(const v of regular) assert.ok(v.aux==='ben'||v.aux==='heb',v.inf);
+  for(const v of regular) assert.ok(v.aux==='is'||v.aux==='heeft',v.inf);
   assert.equal(regular.length,141);
   for(const v of VERBS.filter(v=>v.pron)) assert.equal(v.aux,undefined,v.inf);   // 代词组 pp=反身代词,无助动词
   // zijn 类代表:位移/状态变化/生命阶段(demo 参考词表 8 词 + 查证定稿的两可词)
   for(const w of ['zijn','gaan','komen','blijven','lopen','rijden','beginnen','vergeten','sterven','vallen','smelten','zwellen','krimpen','schrikken','zwemmen','vliegen','klimmen','kruipen','duiken','glijden','springen','zinken','treden','bederven','wijken','dringen','verlopen','verdwijnen','vertrekken','verschijnen','bevriezen','rijzen','bezwijken','blijken','ontgaan','vervliegen','genezen'])
-    assert.equal(byInf[w].aux,'ben',w);
+    assert.equal(byInf[w].aux,'is',w);
   // hebben 类代表:及物/活动/定位动词(两可词按查证结果:gelden/klinken/bestaan/vriezen 天气义/定位动词)
   for(const w of ['hebben','eten','zien','geven','nemen','lezen','spreken','slapen','kopen','winnen','gelden','klinken','bestaan','vriezen','hangen','zitten','liggen','staan','sluiten','breken','trekken','schuiven','schieten','splijten','kunnen','moeten','willen','mogen','genieten','onthouden'])
-    assert.equal(byInf[w].aux,'heb',w);
+    assert.equal(byInf[w].aux,'heeft',w);
 });
-test('participle tiles/cards/speech read ben/heb + pp; person and noun tiles untouched',()=>{
+test('participle tiles/cards/speech read is/heeft + pp; person and noun tiles untouched',()=>{
   const ctx=vm.createContext({window:{addEventListener(){}},save:{style:'A'},artSVG:()=>'',glossOf:v=>v.en,localStorage:{getItem:()=>'null'}});
   vm.runInContext(data+'\n'+wordslice+'\n'+cardslice+'\nthis.result={wordOf,ppFull,VIDX,cardPP:wordCardHTML(VIDX.zijn,"pp"),cardHeb:wordCardHTML(VIDX.eten,"pp"),cardP1:wordCardHTML(VIDX.zijn,"p1")};',ctx);
   const {wordOf,ppFull,cardPP,cardHeb,cardP1}=ctx.result;
-  assert.equal(wordOf({v:0,k:'form',f:'pp'}),'ben geweest');           // pp 磁贴:ben + 分词
-  assert.equal(wordOf({v:9,k:'form',f:'pp'}),'heb gegeten');           // eten:heb + 分词
+  assert.equal(wordOf({v:0,k:'form',f:'pp'}),'is geweest');            // pp 磁贴:辞典式第三人称 is + 分词
+  assert.equal(wordOf({v:9,k:'form',f:'pp'}),'heeft gegeten');         // eten:heeft + 分词
   assert.equal(wordOf({v:0,k:'inf',f:'pp'}),'zijn');                   // 原形侧不带 aux
   assert.equal(wordOf({v:0,k:'form',f:'p1'}),'ik ben');                // 人称变位仍走 P_PRONOUN(p1 ben ≠ aux ben)
   assert.equal(wordOf({v:0,k:'inf',f:'de',hint:true,src:'n'}),'de man');// LN 短语关不受影响
   assert.equal(wordOf({v:0,k:'form',f:'de',src:'n'}),'de');            // LN 裸冠词关:de 词=首词
   assert.equal(wordOf({v:18,k:'form',f:'ht',src:'n'}),'het');          // LN 裸冠词关:ht 内部键显示 het(短语首词,v1.23 线上 bug 回归)
-  assert.equal(ppFull({pp:'geweest',aux:'ben'}),'ben geweest');
+  assert.equal(ppFull({pp:'geweest',aux:'is'}),'is geweest');
   assert.equal(ppFull({pp:'geweest'}),'geweest');
-  assert.match(cardPP,/<span class="bf on">ben geweest<\/span>/);      // 词卡第四形态带 aux 且高亮
-  assert.match(cardHeb,/<span class="bf on">heb gegeten<\/span>/);
+  assert.match(cardPP,/<span class="bf on">is geweest<\/span>/);       // 词卡第四形态带 aux 且高亮
+  assert.match(cardHeb,/<span class="bf on">heeft gegeten<\/span>/);
   assert.match(cardP1,/<span class="bf on">ik ben<\/span>/);           // 人称组:形带人称(与磁贴同源)
 });
